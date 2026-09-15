@@ -1,0 +1,10 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": ["src/lib", "src/app/api", "src/hooks"],
+    "entryPointStrategy": "expand",
+    "out": "docs",
+    "tsconfig": "./tsconfig.json",
+    "name": "GANZ Conference 2027 - Internal Docs",
+    "excludePrivate": true,
+    "excludeInternal": true
+}
