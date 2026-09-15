@@ -72,7 +72,7 @@ Auto generate tests with Codegen.
 
 ### Commit format & Notes
 commitType(topic): small description
-commit types: [`feat`, `fix`, `refactor`, `style`, `docs`]
+commit types: [`feat`, `fix`, `refactor`, `style`, `docs`, `tests`]
 
 ### Pull Request Format
 Fixed header vocabulary, flexible per PR - include only the headers relevant to the change, skip the rest:
