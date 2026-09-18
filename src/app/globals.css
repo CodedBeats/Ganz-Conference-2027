@@ -173,7 +173,7 @@
     @apply mb-6 inline-block rounded-full px-4 py-1.5 text-[0.7rem] font-medium tracking-[0.2em] uppercase;
   }
   .section-heading {
-    @apply text-4xl leading-[1.1] font-extralight text-teal-dark sm:text-5xl md:text-[3.5rem];
+    @apply text-4xl leading-[1.1] font-heading text-teal-dark sm:text-5xl md:text-[3.5rem];
   }
   .eyebrow {
     @apply block text-[0.68rem] font-medium tracking-[0.2em] uppercase;
@@ -225,7 +225,7 @@
     @apply origin-center transition-transform duration-300 hover:scale-[1.03];
   }
   .placeholder-box {
-    @apply flex items-center justify-center rounded-2xl bg-placeholder font-mono text-xs tracking-[0.3em] text-teal-dark/40 uppercase select-none;
+    @apply flex items-center justify-center rounded-2xl bg-placeholder font-mono text-lg tracking-[0.3em] text-teal-dark/40 uppercase select-none;
   }
   .price-row {
     @apply flex items-center justify-between rounded-2xl bg-teal-light px-5 py-4 text-teal-dark;
