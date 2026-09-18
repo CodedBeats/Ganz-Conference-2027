@@ -33,7 +33,7 @@ export const Hero = () => {
                             <span className="text-lg font-medium sm:text-xl">{EVENT.venueShort}</span>
                         </div>
                         {/* TODO: swap for the dedicated /register page once registration (phase 2) is built */}
-                        <a href={EVENT.registerHref} className="btn-pill btn-gold self-center py-5">
+                        <a href={EVENT.registerHref} className="btn-pill btn-gold self-center py-5 text-lg ">
                             Register Now →
                         </a>
                     </div>
