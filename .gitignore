@@ -50,3 +50,7 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# design
+public/design/Homepage-Design.png
+public/design/GANZ_StyleGuide_Feb2024.pdf
