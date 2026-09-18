@@ -193,7 +193,7 @@
 
   /* ---- buttons ---- */
   .btn-pill {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase transition-all duration-200 hover:-translate-y-0.5;
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase transition-all duration-200 hover:bg-cream hover:-translate-y-0.5;
   }
   .btn-gold {
     @apply bg-gold text-teal-dark;

@@ -9,7 +9,7 @@ export const Hero = () => {
             <div className="ring-decor top-[-10%] right-[-5%] size-208 border-gold/20 md:size-240" />
             <div className="ring-decor top-[8%] right-[6%] size-144 border-gold/20 md:size-168" />
 
-            <div className="container-site relative grid items-center gap-16 py-20 md:py-28 lg:grid-cols-[3fr_2fr]">
+            <div className="container-site relative grid items-center gap-16 py-20 md:py-28 lg:grid-cols-[3fr_1fr]">
                 <div>
                     <SectionTag tone="outline">Celebrating 30 years of GANZ</SectionTag>
 
@@ -24,7 +24,7 @@ export const Hero = () => {
                         <span className="font-normal text-gold">Of The Field</span>
                     </h1>
 
-                    <div className="flex flex-wrap items-stretch gap-4">
+                    <div className="flex items-stretch gap-4">
                         <div className="hover-lift rounded-2xl bg-cream px-6 py-4 text-teal-dark">
                             <span className="eyebrow mb-1 text-teal-dark/60">Dates</span>
                             <span className="text-lg font-medium sm:text-xl">{EVENT.dates}</span>
