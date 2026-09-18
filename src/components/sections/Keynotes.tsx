@@ -8,7 +8,7 @@ const KeynoteCard = ({ keynote }: { keynote: Keynote }) => {
     if (!keynote.isAnnounced) {
         return (
             <li className="card hover-shadow flex flex-col bg-teal-light text-teal-dark">
-                <PlaceholderBox label="TBA" className="mb-8 aspect-[5/6] bg-teal/15 text-teal" />
+                <PlaceholderBox label="TBA" className="mb-8 aspect-5/6 bg-teal/15 text-teal" />
                 <h3 className="mb-1 text-2xl font-normal text-teal-dark/60">{keynote.name}</h3>
                 <span className="eyebrow mb-5 text-teal">{keynote.subtitle}</span>
                 <p className="text-base leading-relaxed text-teal-dark/60">{keynote.bio}</p>
@@ -24,7 +24,7 @@ const KeynoteCard = ({ keynote }: { keynote: Keynote }) => {
                     alt={keynote.name}
                     width={750}
                     height={500}
-                    className="mb-8 aspect-[5/6] w-full rounded-2xl object-cover object-top"
+                    className="mb-8 aspect-5/6 w-full rounded-2xl object-cover object-top"
                 />
             )}
             <div className="px-3 pb-3">

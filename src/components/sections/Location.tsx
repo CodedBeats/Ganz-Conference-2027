@@ -18,7 +18,7 @@ export const Location = () => {
 
             <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
                 {/* map implementation to follow - forced-size stand-in for now */}
-                <PlaceholderBox className="min-h-[24rem] rounded-3xl lg:min-h-[36rem]" />
+                <PlaceholderBox className="min-h-96 rounded-3xl lg:min-h-144" />
 
                 <div className="card flex flex-col bg-teal-dark text-cream">
                     <span className="eyebrow mb-3 text-gold">Venue</span>

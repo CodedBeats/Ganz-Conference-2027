@@ -20,7 +20,7 @@ export const Sponsors = () => {
                     {SPONSORS.map((sponsor) => (
                         <li
                             key={sponsor.id}
-                            className="hover-lift flex aspect-[2/1] items-center justify-center rounded-3xl bg-white/10 hover:bg-white/25"
+                            className="hover-lift flex aspect-2/1 items-center justify-center rounded-3xl bg-white/10 hover:bg-white/25"
                         >
                             {sponsor.logoSrc ? (
                                 <Image

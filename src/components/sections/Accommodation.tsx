@@ -16,7 +16,7 @@ export const Accommodation = () => {
                 </div>
 
                 <div>
-                    <PlaceholderBox className="hover-grow aspect-[5/4] w-full rounded-3xl shadow-lg shadow-teal-dark/10" />
+                    <PlaceholderBox className="hover-grow aspect-5/4 w-full rounded-3xl shadow-lg shadow-teal-dark/10" />
                     <span className="caption-mono">Image - Gold Coast / campus surrounds</span>
                 </div>
             </div>

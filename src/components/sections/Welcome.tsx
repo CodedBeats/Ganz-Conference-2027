@@ -69,7 +69,7 @@ export const Welcome = () => {
 
                 {/* stays pinned below the navbar while the welcome copy scrolls past */}
                 <div className="lg:sticky lg:top-28">
-                    <PlaceholderBox className="aspect-[4/5] w-full rounded-3xl shadow-lg shadow-teal-dark/10" />
+                    <PlaceholderBox className="aspect-4/5 w-full rounded-3xl shadow-lg shadow-teal-dark/10" />
                     <span className="caption-mono">
                         Image to come - Gold Coast, Griffith University campus or surrounding area
                     </span>
