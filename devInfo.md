@@ -69,6 +69,7 @@ Auto generate tests with Codegen.
 ### Branches
 - prod
 - docs
+- design
 
 ### Commit format & Notes
 commitType(topic): small description
