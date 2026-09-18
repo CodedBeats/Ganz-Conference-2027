@@ -15,6 +15,12 @@
   --color-placeholder: #e2e2e2;
 }
 
+/*
+ * shadcn/ui (base-nova) scaffold tokens - keep in sync with the :root/.dark
+ * blocks below. Not used by the marketing site's own components (those use
+ * the brand tokens above instead), but src/components/ui/* (e.g. Button)
+ * reads these, as will anything added later via `npx shadcn add` for the CMS.
+ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
