@@ -13,21 +13,21 @@ export const FAQS: FaqItem[] = [
     {
         id: "where-held",
         question: "Where is the conference held?",
-        answer: "",
+        answer: "At Griffith University's Gold Coast campus, Parklands Drive, Southport, on the lands of the Yugambeh people, 25-27 June 2027.",
     },
     {
         id: "open-to-trainees",
         question: "Is the conference open to trainees?",
-        answer: "",
+        answer: "Yes. Trainees and students are warmly welcome, and a limited number of supported scholarship places will be offered.",
     },
     {
         id: "experiential-sessions",
         question: "Will there be experiential and somatic sessions?",
-        answer: "",
+        answer: "Yes - alongside keynotes and clinical conversations, the program includes experiential workshops and somatic offerings that invite movement, rest and play.",
     },
     {
         id: "present-workshop",
         question: "Can I present or run a workshop?",
-        answer: "",
+        answer: "A call for papers and workshop proposals will be released ahead of the conference. Details to be confirmed.",
     },
 ];
