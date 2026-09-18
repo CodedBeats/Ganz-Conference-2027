@@ -8,7 +8,7 @@ export const Sponsors = () => {
             <div className="section-panel bg-teal text-center text-white">
                 <SectionTag tone="white">Sponsors & Partners</SectionTag>
 
-                <h2 className="mb-5 text-3xl leading-tight font-extralight sm:text-4xl md:text-5xl">
+                <h2 className="mb-5 text-3xl leading-tight font-heading sm:text-4xl md:text-5xl">
                     Supporting thirty years of Gestalt practice.
                 </h2>
                 <p className="mx-auto mb-12 max-w-xl text-lg leading-relaxed text-white/90">
@@ -31,7 +31,7 @@ export const Sponsors = () => {
                                     className="max-h-20 w-auto"
                                 />
                             ) : (
-                                <span className="font-mono text-[0.6rem] tracking-[0.3em] text-white/70 uppercase select-none">
+                                <span className="font-mono text-sm tracking-[0.3em] text-white/70 uppercase select-none">
                                     Logo
                                 </span>
                             )}
