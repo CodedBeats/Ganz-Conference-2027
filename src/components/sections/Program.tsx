@@ -7,12 +7,12 @@ export const Program = () => {
         <section id="program" className="container-site scroll-mt-24 pb-16 md:pb-24">
             <div className="section-panel bg-teal-dark text-cream">
                 {/* teal blob peeking out of the bottom-left corner */}
-                <div className="blob-decor bottom-[-14rem] left-[-12rem] size-160" />
+                <div className="blob-decor bottom-[-25rem] left-[-8rem] size-160" />
 
                 <div className="relative">
-                    <SectionTag tone="dark">The Program</SectionTag>
+                    <SectionTag tone="gold">The Program</SectionTag>
 
-                    <h2 className="mb-10 max-w-4xl text-3xl leading-[1.2] font-extralight sm:text-4xl md:text-5xl">
+                    <h2 className="mb-10 max-w-4xl text-3xl leading-[1.2] font-normal sm:text-3xl md:text-4xl">
                         Explore a dynamic three-day program featuring keynote presentations, clinical
                         conversations, research discussions, experiential workshops, and somatic offerings that
                         invite us to <span className="text-gold">move, rest, play</span> and reconnect with our
