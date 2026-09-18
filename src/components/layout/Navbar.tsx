@@ -53,13 +53,13 @@ export const Navbar = () => {
 
                 <div className="flex items-center gap-3">
                     {/* TODO: swap for the dedicated /register page once registration (phase 2) is built */}
-                    <a href={EVENT.registerHref} className="btn-pill btn-dark hidden sm:inline-flex">
+                    <a href={EVENT.registerHref} className="btn-pill btn-dark hidden hover:bg-teal sm:inline-flex">
                         Register Now
                     </a>
 
                     <button
                         type="button"
-                        className="flex size-11 items-center justify-center rounded-full text-teal-dark transition-colors hover:bg-teal-dark/10 lg:hidden"
+                        className="flex size-11 items-center justify-center rounded-full text-teal-dark transition-colors hover:bg-teal lg:hidden"
                         aria-expanded={isMenuOpen}
                         aria-controls="mobile-nav"
                         aria-label={isMenuOpen ? "Close menu" : "Open menu"}

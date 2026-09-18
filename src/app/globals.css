@@ -233,7 +233,7 @@
 
   /* ---- navbar links: underline grows in from the left, text turns teal ---- */
   .nav-link {
-    @apply relative py-1 text-sm font-medium text-teal-dark transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-teal after:transition-transform after:duration-300 after:content-[''] hover:text-teal hover:after:scale-x-100;
+    @apply relative py-1 text-sm font-normal text-teal-dark transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-teal after:transition-transform after:duration-300 after:content-[''] hover:text-teal hover:after:scale-x-100;
   }
   .nav-link-active {
     @apply text-teal after:scale-x-100;
