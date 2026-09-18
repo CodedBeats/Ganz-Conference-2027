@@ -5,9 +5,8 @@ import { SectionTag } from "@/components/shared/SectionTag";
 export const Hero = () => {
     return (
         <header id="top" className="relative overflow-hidden bg-teal-dark text-cream">
-            {/* concentric gold rings anchored to the right edge, clipped by the header */}
+            {/* large background ring, independent of the medallion (the tight one is on .medallion-wrap below) */}
             <div className="ring-decor top-[-10%] right-[-5%] size-208 border-gold/20 md:size-240" />
-            <div className="ring-decor top-[8%] right-[6%] size-144 border-gold/20 md:size-168" />
 
             <div className="container-site relative grid items-center gap-16 py-20 md:py-28 lg:grid-cols-[3fr_1fr]">
                 <div>
@@ -40,17 +39,19 @@ export const Hero = () => {
                     </div>
                 </div>
 
-                {/* logo medallion */}
+                {/* logo medallion - the ring is pinned to it via .medallion-wrap in globals.css */}
                 <div className="flex justify-center lg:justify-end">
-                    <div className="flex aspect-square w-64 items-center justify-center rounded-full bg-white p-10 md:w-80">
-                        <Image
-                            src="/design/logo/GANZLogo_FullColour.png"
-                            alt="GANZ - Gestalt Australia & New Zealand"
-                            width={300}
-                            height={261}
-                            priority
-                            className="h-auto w-full"
-                        />
+                    <div className="medallion-wrap">
+                        <div className="logo-medallion">
+                            <Image
+                                src="/design/logo/GANZLogo_FullColour.png"
+                                alt="GANZ - Gestalt Australia & New Zealand"
+                                width={300}
+                                height={261}
+                                priority
+                                className="h-auto w-full"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

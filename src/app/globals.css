@@ -254,4 +254,27 @@
   .blob-decor {
     @apply pointer-events-none absolute rounded-full bg-teal/40;
   }
+
+  /*
+   * Hero logo medallion. The ring is a pseudo-element sized and offset off
+   * the medallion itself (1.64x, offset -54.6% on each axis), so the two
+   * stay tangent on the lower-right diagonal at every width instead of
+   * drifting apart the way two independently-positioned circles would.
+   */
+  .medallion-wrap {
+    @apply relative shrink-0;
+  }
+  .medallion-wrap::before {
+    content: "";
+    @apply pointer-events-none absolute rounded-full border border-teal/30;
+    top: -54.6%;
+    left: -54.6%;
+    width: 164%;
+    aspect-ratio: 1;
+  }
+  .logo-medallion {
+    @apply relative flex aspect-square shrink-0 items-center justify-center rounded-full bg-white shadow-xl shadow-black/20 transition-all duration-500 ease-out hover:-translate-y-1.5 hover:scale-103 hover:shadow-2xl hover:shadow-black/30;
+    width: clamp(190px, 21vw, 280px);
+    padding: clamp(26px, 3vw, 42px);
+  }
 }
