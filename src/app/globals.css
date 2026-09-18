@@ -179,10 +179,10 @@
     @apply block text-[0.68rem] font-medium tracking-[0.2em] uppercase;
   }
   .lead-copy {
-    @apply text-xl leading-relaxed font-medium text-teal-dark sm:text-2xl;
+    @apply text-xl leading-relaxed font-medium text-teal-dark sm:text-3xl;
   }
   .body-copy {
-    @apply text-base leading-[1.8] text-teal-dark/80 sm:text-lg;
+    @apply text-base leading-[1.8] text-teal-dark/80 sm:text-xl;
   }
   .side-note {
     @apply max-w-xs text-base leading-relaxed text-teal-dark/70;
