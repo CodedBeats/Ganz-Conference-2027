@@ -12,7 +12,7 @@ export const Accommodation = () => {
                         We are securing a selection of accommodation options close to the Griffith University Gold
                         Coast campus, across a range of price points. Details will be published here.
                     </p>
-                    <span className="btn-pill btn-muted hover:translate-y-0">Details to be confirmed</span>
+                    <span className="inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase btn-muted">Details to be confirmed</span>
                 </div>
 
                 <div>
