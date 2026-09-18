@@ -139,3 +139,113 @@
     @apply font-sans;
   }
 }
+
+/*
+ * Shared site styles. Repeated patterns from the homepage design live here as
+ * plain class names so section components stay readable and one tweak updates
+ * every usage.
+ */
+@layer components {
+  /* ---- layout ---- */
+  .container-site {
+    @apply mx-auto w-full max-w-[1400px] px-5 sm:px-8 lg:px-12;
+  }
+  .section-block {
+    @apply py-16 md:py-24;
+  }
+  /* the big rounded coloured panels (Program, Registrations, Sponsors, FAQs, Contact) */
+  .section-panel {
+    @apply relative overflow-hidden rounded-[2.5rem] px-6 py-14 sm:px-10 md:rounded-[3rem] md:px-16 md:py-20;
+  }
+  /* heading on the left, short note on the right - stacks on small screens */
+  .section-header-row {
+    @apply mb-10 flex flex-col gap-6 md:mb-14 md:flex-row md:items-end md:justify-between;
+  }
+
+  /* ---- type ---- */
+  .section-tag {
+    @apply mb-6 inline-block rounded-full px-4 py-1.5 text-[0.7rem] font-medium tracking-[0.2em] uppercase;
+  }
+  .section-heading {
+    @apply text-4xl leading-[1.1] font-extralight text-teal-dark sm:text-5xl md:text-[3.5rem];
+  }
+  .eyebrow {
+    @apply block text-[0.68rem] font-medium tracking-[0.2em] uppercase;
+  }
+  .lead-copy {
+    @apply text-xl leading-relaxed font-medium text-teal-dark sm:text-2xl;
+  }
+  .body-copy {
+    @apply text-base leading-[1.8] text-teal-dark/80 sm:text-lg;
+  }
+  .side-note {
+    @apply max-w-xs text-base leading-relaxed text-teal-dark/70;
+  }
+  .caption-mono {
+    @apply mt-3 block font-mono text-[0.65rem] tracking-[0.15em] text-teal-dark/50 uppercase;
+  }
+
+  /* ---- buttons ---- */
+  .btn-pill {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase transition-all duration-200 hover:-translate-y-0.5;
+  }
+  .btn-gold {
+    @apply bg-gold text-teal-dark;
+  }
+  .btn-dark {
+    @apply bg-teal-dark text-cream;
+  }
+  .btn-cream {
+    @apply bg-cream text-teal-dark;
+  }
+  .btn-gold-to-cream {
+    @apply bg-gold text-teal-dark hover:bg-cream;
+  }
+  .btn-muted {
+    @apply bg-teal-dark/10 text-teal-dark/60;
+  }
+
+  /* ---- cards & hover effects ---- */
+  .card {
+    @apply rounded-3xl p-6 md:p-8;
+  }
+  .hover-lift {
+    @apply transition-all duration-200 hover:-translate-y-1;
+  }
+  .hover-shadow {
+    @apply transition-shadow duration-300 hover:shadow-xl hover:shadow-teal-dark/15;
+  }
+  .hover-grow {
+    @apply origin-center transition-transform duration-300 hover:scale-[1.03];
+  }
+  .placeholder-box {
+    @apply flex items-center justify-center rounded-2xl bg-placeholder font-mono text-xs tracking-[0.3em] text-teal-dark/40 uppercase select-none;
+  }
+  .price-row {
+    @apply flex items-center justify-between rounded-2xl bg-teal-light px-5 py-4 text-teal-dark;
+  }
+
+  /* ---- navbar links: underline grows in from the left, text turns teal ---- */
+  .nav-link {
+    @apply relative py-1 text-sm font-medium text-teal-dark transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-teal after:transition-transform after:duration-300 after:content-[''] hover:text-teal hover:after:scale-x-100;
+  }
+  .nav-link-active {
+    @apply text-teal after:scale-x-100;
+  }
+
+  /* ---- FAQ toggle icon: 0deg -> 225deg reads as clockwise on open, reverses on close ---- */
+  .faq-icon {
+    @apply flex size-9 shrink-0 items-center justify-center rounded-full bg-teal text-white transition-all duration-300 hover:bg-teal-dark;
+  }
+  .faq-icon-open {
+    @apply rotate-[225deg];
+  }
+
+  /* ---- decorative shapes ---- */
+  .ring-decor {
+    @apply pointer-events-none absolute rounded-full border;
+  }
+  .blob-decor {
+    @apply pointer-events-none absolute rounded-full bg-teal/40;
+  }
+}
