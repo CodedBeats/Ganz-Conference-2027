@@ -1,6 +1,15 @@
-import { EVENT } from "@/lib/content/site";
+"use client";
+import dynamic from 'next/dynamic';
+// components
 import { SectionTag } from "@/components/shared/SectionTag";
-import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
+// lib
+import { EVENT } from "@/lib/content/site";
+
+// don't render map component on server
+const Map = dynamic(
+    () => import("@/components/ui/Map"), 
+    { ssr: false }
+);
 
 export const Location = () => {
     return (
@@ -17,8 +26,9 @@ export const Location = () => {
             </div>
 
             <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-                {/* map implementation to follow - forced-size stand-in for now */}
-                <PlaceholderBox className="min-h-96 rounded-3xl lg:min-h-144" />
+                <div className="h-96 overflow-hidden rounded-3xl lg:h-144">
+                    <Map lat={EVENT.addressCords[0]} lng={EVENT.addressCords[1]} zoom={14} venueName="GANZ Conference Venue" />
+                </div>
 
                 <div className="card flex flex-col bg-teal-dark text-cream">
                     <span className="eyebrow mb-3 text-gold">Venue</span>

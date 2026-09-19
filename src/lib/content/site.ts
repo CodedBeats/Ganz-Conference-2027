@@ -27,6 +27,7 @@ export const EVENT = {
     venueShort: "Griffith University, Gold Coast QLD",
     venueName: "Griffith University Gold Coast Campus",
     addressLines: ["1 Parklands Dr,", "Southport QLD 4215", "Australia"],
+    addressCords: [-27.96297382840529, 153.38469244106162], 
     gettingHere:
         "G:link tram to Griffith University station. Approx. 25 minutes from Surfers Paradise, 30 minutes from Gold Coast Airport.",
     mapsHref:
