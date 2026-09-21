@@ -4,7 +4,7 @@ import { SectionTag } from "@/components/shared/SectionTag";
 
 export const Program = () => {
     return (
-        <section id="program" className="container-site scroll-mt-24 pb-16 md:pb-24">
+        <section id="program" className="section-block-b container-site scroll-mt-24">
             <div className="section-panel bg-teal-dark text-cream">
                 {/* teal blob peeking out of the bottom-left corner */}
                 <div className="blob-decor bottom-[-25rem] left-[-8rem] size-160" />
@@ -12,7 +12,7 @@ export const Program = () => {
                 <div className="relative">
                     <SectionTag tone="gold">The Program</SectionTag>
 
-                    <h2 className="mb-10 max-w-4xl text-3xl leading-[1.2] font-normal sm:text-3xl md:text-4xl">
+                    <h2 className="mb-10 max-w-4xl text-2xl sm:text-3xl leading-[1.2] font-normal md:text-4xl">
                         Explore a dynamic three-day program featuring keynote presentations, clinical
                         conversations, research discussions, experiential workshops, and somatic offerings that
                         invite us to <span className="text-gold">move, rest, play</span> and reconnect with our

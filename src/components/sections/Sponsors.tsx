@@ -4,7 +4,7 @@ import { SectionTag } from "@/components/shared/SectionTag";
 
 export const Sponsors = () => {
     return (
-        <section id="sponsors" className="container-site scroll-mt-24 pb-16 md:pb-24">
+        <section id="sponsors" className="section-block-b container-site scroll-mt-24">
             <div className="section-panel bg-teal text-center text-white">
                 <SectionTag tone="white">Sponsors & Partners</SectionTag>
 

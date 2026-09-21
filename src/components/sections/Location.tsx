@@ -26,7 +26,7 @@ export const Location = () => {
             </div>
 
             <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-                <div className="h-96 overflow-hidden rounded-3xl lg:h-144">
+                <div className="h-72 overflow-hidden rounded-3xl md:h-96 lg:h-144">
                     <Map lat={EVENT.addressCords[0]} lng={EVENT.addressCords[1]} zoom={14} venueName="GANZ Conference Venue" />
                 </div>
 

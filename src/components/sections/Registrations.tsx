@@ -4,7 +4,7 @@ import { SectionTag } from "@/components/shared/SectionTag";
 
 export const Registrations = () => {
     return (
-        <section id="registrations" className="container-site scroll-mt-24 pb-16 md:pb-24">
+        <section id="registrations" className="section-block-b container-site scroll-mt-24">
             <div className="section-panel bg-gold text-teal-dark">
                 <SectionTag>Registrations</SectionTag>
 
@@ -14,7 +14,7 @@ export const Registrations = () => {
                     you know the moment early bird opens.
                 </p>
 
-                <ul className="grid gap-6 md:grid-cols-3">
+                <ul className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
                     {PRICING_TIERS.map((tier) => {
                         const isDark = tier.tone === "dark";
 
