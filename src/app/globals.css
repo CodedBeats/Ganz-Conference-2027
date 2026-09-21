@@ -157,11 +157,15 @@
     @apply mx-auto w-full max-w-350 px-5 sm:px-8 lg:px-12;
   }
   .section-block {
-    @apply py-16 md:py-24;
+    @apply py-12 sm:py-16 md:py-24;
+  }
+  /* bottom-only counterpart of .section-block, for sections that follow a panel and only need bottom rhythm */
+  .section-block-b {
+    @apply pb-12 sm:pb-16 md:pb-24;
   }
   /* the big rounded coloured panels (Program, Registrations, Sponsors, FAQs, Contact) */
   .section-panel {
-    @apply relative overflow-hidden rounded-[2.5rem] px-6 py-14 sm:px-10 md:rounded-[3rem] md:px-16 md:py-20;
+    @apply relative overflow-hidden rounded-[2.5rem] px-6 py-10 sm:px-10 sm:py-14 md:rounded-[3rem] md:px-16 md:py-20;
   }
   /* heading on the left, short note on the right - stacks on small screens */
   .section-header-row {
@@ -263,6 +267,7 @@
    */
   .medallion-wrap {
     @apply relative shrink-0;
+    z-index: 0;
   }
   .medallion-wrap::before {
     content: "";
