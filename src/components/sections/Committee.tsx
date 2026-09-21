@@ -6,7 +6,7 @@ import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
 
 export const Committee = () => {
     return (
-        <section id="committee" className="container-site scroll-mt-24 pb-16 md:pb-24">
+        <section id="committee" className="section-block-b container-site scroll-mt-24">
             <div className="section-header-row">
                 <div>
                     <SectionTag>Conference Committee</SectionTag>

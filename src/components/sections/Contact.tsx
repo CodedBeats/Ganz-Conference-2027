@@ -2,7 +2,7 @@ import { EVENT } from "@/lib/content/site";
 
 export const Contact = () => {
     return (
-        <section id="contact" className="container-site scroll-mt-24 pb-16 md:pb-24">
+        <section id="contact" className="section-block-b container-site scroll-mt-24">
             <div className="section-panel bg-teal-dark text-center text-cream">
                 {/* faint teal rings echoing the hero */}
                 <div className="ring-decor top-1/2 left-1/2 size-160 -translate-x-1/2 -translate-y-1/2 border-teal/25" />

@@ -4,7 +4,7 @@ import { FaqItem } from "@/components/sections/FaqItem";
 
 export const Faq = () => {
     return (
-        <section id="faqs" className="container-site scroll-mt-24 pb-16 md:pb-24">
+        <section id="faqs" className="section-block-b container-site scroll-mt-24">
             <div className="section-panel bg-white">
                 <div className="grid gap-12 lg:grid-cols-[1fr_2fr] lg:gap-20">
                     <div>

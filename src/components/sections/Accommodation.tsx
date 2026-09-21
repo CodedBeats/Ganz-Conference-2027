@@ -3,7 +3,7 @@ import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
 
 export const Accommodation = () => {
     return (
-        <section id="accommodation" className="container-site scroll-mt-24 pb-16 md:pb-24">
+        <section id="accommodation" className="section-block-b container-site scroll-mt-24">
             <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,32rem)_1fr] lg:gap-20">
                 <div>
                     <SectionTag>Accommodation</SectionTag>
