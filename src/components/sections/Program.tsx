@@ -12,7 +12,7 @@ export const Program = () => {
                 <div className="relative">
                     <SectionTag tone="gold">The Program</SectionTag>
 
-                    <h2 className="mb-10 max-w-4xl text-3xl leading-[1.2] font-normal md:text-4xl">
+                    <h2 className="mb-10 max-w-4xl text-2xl sm:text-3xl leading-[1.2] font-normal md:text-4xl">
                         Explore a dynamic three-day program featuring keynote presentations, clinical
                         conversations, research discussions, experiential workshops, and somatic offerings that
                         invite us to <span className="text-gold">move, rest, play</span> and reconnect with our
