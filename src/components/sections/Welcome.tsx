@@ -1,5 +1,5 @@
 import { SectionTag } from "@/components/shared/SectionTag";
-import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
+import Image from "next/image";
 
 export const Welcome = () => {
     return (
@@ -68,11 +68,13 @@ export const Welcome = () => {
                 </div>
 
                 {/* stays pinned below the navbar while the welcome copy scrolls past */}
-                <div className="lg:sticky lg:top-28">
-                    <PlaceholderBox className="aspect-4/5 w-full rounded-3xl shadow-lg shadow-teal-dark/10" />
-                    <span className="caption-mono">
-                        Image to come - Gold Coast, Griffith University campus or surrounding area
-                    </span>
+                <div className="relative aspect-4/5 w-full lg:sticky lg:top-28">
+                    <Image
+                        src="/design/imgs/welcome.jpg"
+                        alt="Gold Coast - Copyright free"
+                        fill
+                        className="rounded-3xl object-cover shadow-lg shadow-teal-dark/10"
+                    />
                 </div>
             </div>
         </section>
