@@ -282,4 +282,27 @@
     width: clamp(190px, 21vw, 280px);
     padding: clamp(26px, 3vw, 42px);
   }
+
+  /* ---- pre-launch gate (temporary) ---- */
+  @keyframes gate-ring-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes gate-icon-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+  .gate-ring {
+    @apply pointer-events-none absolute inset-3 rounded-full border-2 border-dashed border-gold/60;
+    animation: gate-ring-spin 12s linear infinite;
+  }
+  .gate-icon-float {
+    animation: gate-icon-float 3s ease-in-out infinite;
+  }
 }
