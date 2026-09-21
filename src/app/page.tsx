@@ -11,6 +11,7 @@ import { Sponsors } from "@/components/sections/Sponsors";
 import { Committee } from "@/components/sections/Committee";
 import { Faq } from "@/components/sections/Faq";
 import { Contact } from "@/components/sections/Contact";
+import { GateLogoutButton } from "@/components/gate/GateLogoutButton";
 
 const Home = () => {
     return (
@@ -28,6 +29,7 @@ const Home = () => {
                 <Committee />
                 <Faq />
                 <Contact />
+                <GateLogoutButton />
             </main>
             <Footer />
         </>
