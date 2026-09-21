@@ -14,7 +14,7 @@ export const Contact = () => {
                     </h2>
                     <a
                         href={`mailto:${EVENT.email}`}
-                        className="btn-pill btn-gold-to-cream px-10 py-5 text-2xl font-normal tracking-normal normal-case sm:text-4xl md:px-14 md:py-6"
+                        className="btn-pill btn-gold-to-cream px-5 sm:px-10 py-5 text-2xl font-normal tracking-normal normal-case sm:text-4xl md:px-14 md:py-6"
                     >
                         {EVENT.email}
                     </a>
