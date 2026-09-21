@@ -8,11 +8,13 @@ export const Accommodation = () => {
                 <div>
                     <SectionTag>Accommodation</SectionTag>
                     <h2 className="section-heading mb-5">Where to stay</h2>
-                    <p className="body-copy mb-8">
+                    <p className="body-copy mb-2 sm:mb-8">
                         We are securing a selection of accommodation options close to the Griffith University Gold
                         Coast campus, across a range of price points. Details will be published here.
                     </p>
-                    <span className="inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase btn-muted">Details to be confirmed</span>
+                    <span className="inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase btn-muted">
+                        Details to be confirmed
+                    </span>
                 </div>
 
                 <div>
