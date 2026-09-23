@@ -74,6 +74,7 @@ Auto generate tests with Codegen.
 - design
 - responsive-design
 - map
+- metadata
 - testing
 - production
 
