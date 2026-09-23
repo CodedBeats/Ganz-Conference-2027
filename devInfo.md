@@ -22,7 +22,7 @@ npx playwright test     # run playwright e2e tests
  * Fetches the published keynote presenters, ordered by display order.
  *
  * @remarks
- * Only returns presenters marked as `published` in the CMS — draft entries are excluded.
+ * Only returns presenters marked as `published` in the CMS - draft entries are excluded.
  *
  * @param limit - Maximum number of presenters to return. Defaults to all.
  * @returns A promise resolving to the list of keynote presenters.

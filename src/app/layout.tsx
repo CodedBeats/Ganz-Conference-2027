@@ -16,7 +16,7 @@ const campton = localFont({
 });
 
 export const metadata: Metadata = {
-    title: "GANZ Conference 2027 — In Our Bodies, Of The Field",
+    title: "GANZ Conference 2027 - In Our Bodies, Of The Field",
     description:
         "13th National Gestalt Australia & New Zealand Conference. 25-27 June 2027, Griffith University, Gold Coast QLD. Celebrating 30 years of GANZ.",
     icons: {
