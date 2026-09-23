@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HardHat } from "lucide-react";
+import Image from "next/image";
 import { GateForm } from "@/components/gate/GateForm";
 
 export const metadata: Metadata = {
@@ -19,7 +19,14 @@ const GatePage = async ({ searchParams }: PageProps<"/gate">) => {
                 <div className="medallion-wrap mb-10">
                     <div className="logo-medallion">
                         <div className="gate-ring" />
-                        <HardHat className="gate-icon-float text-gold" size={48} />
+                        <Image
+                            src="/design/logo/GANZLogo_FullColour.png"
+                            alt="GANZ - Gestalt Australia & New Zealand"
+                            width={300}
+                            height={261}
+                            priority
+                            className="relative h-auto w-full"
+                        />
                     </div>
                 </div>
 
