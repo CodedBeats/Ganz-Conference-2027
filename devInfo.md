@@ -70,10 +70,12 @@ Auto generate tests with Codegen.
 
 ## GIT stuff
 ### Branches
-- production
 - docs
 - design
+- responsive-design
+- map
 - testing
+- production
 
 ### Commit format & Notes
 commitType(topic): small description
