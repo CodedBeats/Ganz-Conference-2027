@@ -3,7 +3,7 @@ import Image from "next/image";
 import { GateForm } from "@/components/gate/GateForm";
 
 export const metadata: Metadata = {
-    title: "GANZ 2027 — Coming Soon",
+    title: "GANZ 2027 - Coming Soon",
     robots: { index: false, follow: false },
 };
 

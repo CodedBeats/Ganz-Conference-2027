@@ -16,7 +16,7 @@ const GATE_HMAC_MESSAGE = "ganz-2027-gate";
  * password means the password itself never round-trips through the browser, while both this
  * function and {@link isValidGateToken} stay in sync without a session store.
  *
- * @returns The expected cookie token, or `null` if `SITE_PASSWORD` is unset/empty — callers
+ * @returns The expected cookie token, or `null` if `SITE_PASSWORD` is unset/empty - callers
  * should treat `null` as "the gate is disabled".
  */
 export function getExpectedGateToken(): string | null {
