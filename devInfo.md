@@ -70,7 +70,7 @@ Auto generate tests with Codegen.
 
 ## GIT stuff
 ### Branches
-- prod
+- production
 - docs
 - design
 - testing
