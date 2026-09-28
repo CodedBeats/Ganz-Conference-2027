@@ -40,6 +40,11 @@ Edge Functions:  `http://127.0.0.1:54321/functions/v1`
 fill file with sql stuff to do
 then apply it with
 `npx supabase db reset`
+once tables exist, generate TypeScript types from schema so queries are typed
+`npx supabase gen types typescript --local > src/types/database.ts`
+
+### ERD
+https://dbdiagram.io/d/GANZ-conference-2027-6aba76e75869425612b7f574 
 
 
 
