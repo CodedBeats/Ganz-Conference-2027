@@ -17,9 +17,6 @@ npx playwright test     # run playwright e2e tests
 
 
 ## Supabase
-once tables exist, generate TypeScript types from your schema so your queries are typed
-`npx supabase gen types typescript --local > src/types/database.ts`
-
 spin up a local stack via docker
 `npx supabase start`
 strike me down with all your hate
@@ -36,7 +33,7 @@ GraphQL:         `http://127.0.0.1:54321/graphql/v1`
 Edge Functions:  `http://127.0.0.1:54321/functions/v1`
 
 ### Writing a migration
-`npx supabase migration new xyzName`
+`npx supabase migration new xyzName` (names so far: create_sections, )
 fill file with sql stuff to do
 then apply it with
 `npx supabase db reset`
