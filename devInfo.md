@@ -32,13 +32,17 @@ REST:            `http://127.0.0.1:54321/rest/v1`
 GraphQL:         `http://127.0.0.1:54321/graphql/v1`
 Edge Functions:  `http://127.0.0.1:54321/functions/v1`
 
-### Writing a migration
+### Writing a migration (to the local environemtn)
 `npx supabase migration new xyzName` (names so far: create_sections, )
 fill file with sql stuff to do
 then apply it with
 `npx supabase db reset`
-once tables exist, generate TypeScript types from schema so queries are typed
+once tables exist, generate TypeScript types from schema so queries are typed (maybe don't do this, i can write better types than that mess)
 `npx supabase gen types typescript --local > src/types/database.ts`
+
+### Prod
+Push db to live supabase environment
+`npx supabase db push`
 
 ### ERD
 https://dbdiagram.io/d/GANZ-conference-2027-6aba76e75869425612b7f574 
