@@ -34,6 +34,81 @@ export type Database = {
     };
     public: {
         Tables: {
+            images: {
+                Row: {
+                    created_at: string;
+                    file_ref: string;
+                    id: string;
+                    name: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    created_at?: string;
+                    file_ref: string;
+                    id?: string;
+                    name: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    created_at?: string;
+                    file_ref?: string;
+                    id?: string;
+                    name?: string;
+                    updated_at?: string;
+                };
+                Relationships: [];
+            };
+            presenters: {
+                Row: {
+                    description: string | null;
+                    id: string;
+                    image: string;
+                    link: string | null;
+                    location: string | null;
+                    name: string;
+                    section_id: string;
+                    title: string | null;
+                    updated_at: string;
+                };
+                Insert: {
+                    description?: string | null;
+                    id?: string;
+                    image: string;
+                    link?: string | null;
+                    location?: string | null;
+                    name: string;
+                    section_id: string;
+                    title?: string | null;
+                    updated_at?: string;
+                };
+                Update: {
+                    description?: string | null;
+                    id?: string;
+                    image?: string;
+                    link?: string | null;
+                    location?: string | null;
+                    name?: string;
+                    section_id?: string;
+                    title?: string | null;
+                    updated_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "presenters_image_fkey";
+                        columns: ["image"];
+                        isOneToOne: true;
+                        referencedRelation: "images";
+                        referencedColumns: ["id"];
+                    },
+                    {
+                        foreignKeyName: "presenters_section_id_fkey";
+                        columns: ["section_id"];
+                        isOneToOne: false;
+                        referencedRelation: "sections";
+                        referencedColumns: ["id"];
+                    },
+                ];
+            };
             sections: {
                 Row: {
                     body: string | null;
@@ -41,6 +116,7 @@ export type Database = {
                     excerpt: string | null;
                     heading: string | null;
                     id: string;
+                    image_id: string | null;
                     is_published: boolean;
                     sort_order: number;
                     subheading: string | null;
@@ -53,6 +129,7 @@ export type Database = {
                     excerpt?: string | null;
                     heading?: string | null;
                     id?: string;
+                    image_id?: string | null;
                     is_published?: boolean;
                     sort_order?: number;
                     subheading?: string | null;
@@ -65,13 +142,67 @@ export type Database = {
                     excerpt?: string | null;
                     heading?: string | null;
                     id?: string;
+                    image_id?: string | null;
                     is_published?: boolean;
                     sort_order?: number;
                     subheading?: string | null;
                     type?: string;
                     updated_at?: string;
                 };
-                Relationships: [];
+                Relationships: [
+                    {
+                        foreignKeyName: "sections_image_id_fkey";
+                        columns: ["image_id"];
+                        isOneToOne: false;
+                        referencedRelation: "images";
+                        referencedColumns: ["id"];
+                    },
+                ];
+            };
+            stat_items: {
+                Row: {
+                    id: string;
+                    image: string;
+                    label: string;
+                    section_id: string;
+                    style: string;
+                    updated_at: string;
+                    value: string;
+                };
+                Insert: {
+                    id?: string;
+                    image: string;
+                    label: string;
+                    section_id: string;
+                    style?: string;
+                    updated_at?: string;
+                    value: string;
+                };
+                Update: {
+                    id?: string;
+                    image?: string;
+                    label?: string;
+                    section_id?: string;
+                    style?: string;
+                    updated_at?: string;
+                    value?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "stat_items_image_fkey";
+                        columns: ["image"];
+                        isOneToOne: true;
+                        referencedRelation: "images";
+                        referencedColumns: ["id"];
+                    },
+                    {
+                        foreignKeyName: "stat_items_section_id_fkey";
+                        columns: ["section_id"];
+                        isOneToOne: false;
+                        referencedRelation: "sections";
+                        referencedColumns: ["id"];
+                    },
+                ];
             };
         };
         Views: {
