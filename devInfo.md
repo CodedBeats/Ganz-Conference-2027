@@ -105,10 +105,12 @@ Auto generate tests with Codegen.
 
 ## GIT stuff
 ### Branches
+- auth
 - docs
 - design
 - responsive-design
 - map
+- supabase
 - metadata
 - testing
 - production
