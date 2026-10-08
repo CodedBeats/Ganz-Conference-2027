@@ -33,9 +33,14 @@ Single test file: `npm run test:run -- tests/pricing.test.ts` (Vitest) / `npx pl
 `.env.local` (gitignored):
 ```
 NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SECRET_KEY=          # live, only for scripts/create-admin.mjs
+SUPABASE_URL_DEV=             # local stack
+SUPABASE_PUBLISHABLE_KEY_DEV=
+SUPABASE_SECRET_KEY_DEV=
 SITE_PASSWORD=
+ADMIN_EMAIL=                  # the one admin login (no sign-ups)
+ADMIN_PASSWORD=
 ```
 
 ## Coding Conventions
