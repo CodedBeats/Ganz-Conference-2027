@@ -84,6 +84,7 @@ Fixed header vocabulary, flexible per PR - include only the headers relevant to 
 **New Infrastructure** *Description*
 **Tested** *Description*
 e.g. a style/refactor PR might only need **Summary** + **Tested**; a bug fix might use **Problem** + **Fix** + **Tested**.
+Keep PRs short and plain: a sentence or two (or a few short bullets) per header, written in plain English. Avoid walls of `code formatting` - only backtick something when it's a file, table or command the reader actually needs to find. No tables, no exhaustive per-column/per-row breakdowns; the diff covers the detail.
 
 ### Staging and Production
 - Branch model: `master` is staging (feature branches merge here, auto-deploys to a persistent Vercel preview). `prod` is production (Vercel Production Branch, real domain, password-gated pre-launch) — ship via PR from `master` into `prod`.*.

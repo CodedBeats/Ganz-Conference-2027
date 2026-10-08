@@ -34,7 +34,7 @@ GraphQL:         `http://127.0.0.1:54321/graphql/v1`
 Edge Functions:  `http://127.0.0.1:54321/functions/v1`
 
 ### Writing a migration (to the local environemtn)
-`npx supabase migration new xyzName` (names so far: create_sections, )
+`npx supabase migration new xyzName` (names so far: create_sections, add_images_stats_presenters, reshape_content_tables)
 fill file with sql stuff to do
 then apply it with
 `npx supabase db reset` (this resets the local db schema and data, then `seed.sql` adds in daata)

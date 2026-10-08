@@ -58,50 +58,56 @@ export type Database = {
                 };
                 Relationships: [];
             };
-            presenters: {
+            people: {
                 Row: {
                     description: string | null;
                     id: string;
-                    image: string;
+                    image: string | null;
                     link: string | null;
                     location: string | null;
                     name: string;
                     section_id: string;
+                    sort_order: number;
+                    style: string;
                     title: string | null;
                     updated_at: string;
                 };
                 Insert: {
                     description?: string | null;
                     id?: string;
-                    image: string;
+                    image?: string | null;
                     link?: string | null;
                     location?: string | null;
                     name: string;
                     section_id: string;
+                    sort_order?: number;
+                    style?: string;
                     title?: string | null;
                     updated_at?: string;
                 };
                 Update: {
                     description?: string | null;
                     id?: string;
-                    image?: string;
+                    image?: string | null;
                     link?: string | null;
                     location?: string | null;
                     name?: string;
                     section_id?: string;
+                    sort_order?: number;
+                    style?: string;
                     title?: string | null;
                     updated_at?: string;
                 };
                 Relationships: [
                     {
-                        foreignKeyName: "presenters_image_fkey";
+                        foreignKeyName: "people_image_fkey";
                         columns: ["image"];
                         isOneToOne: true;
                         referencedRelation: "images";
                         referencedColumns: ["id"];
                     },
                     {
-                        foreignKeyName: "presenters_section_id_fkey";
+                        foreignKeyName: "people_section_id_fkey";
                         columns: ["section_id"];
                         isOneToOne: false;
                         referencedRelation: "sections";
@@ -161,28 +167,37 @@ export type Database = {
             };
             stat_items: {
                 Row: {
+                    description: string | null;
                     id: string;
-                    image: string;
+                    image: string | null;
                     label: string;
+                    parent_id: string | null;
                     section_id: string;
+                    sort_order: number;
                     style: string;
                     updated_at: string;
                     value: string;
                 };
                 Insert: {
+                    description?: string | null;
                     id?: string;
-                    image: string;
+                    image?: string | null;
                     label: string;
+                    parent_id?: string | null;
                     section_id: string;
+                    sort_order?: number;
                     style?: string;
                     updated_at?: string;
                     value: string;
                 };
                 Update: {
+                    description?: string | null;
                     id?: string;
-                    image?: string;
+                    image?: string | null;
                     label?: string;
+                    parent_id?: string | null;
                     section_id?: string;
+                    sort_order?: number;
                     style?: string;
                     updated_at?: string;
                     value?: string;
@@ -193,6 +208,13 @@ export type Database = {
                         columns: ["image"];
                         isOneToOne: true;
                         referencedRelation: "images";
+                        referencedColumns: ["id"];
+                    },
+                    {
+                        foreignKeyName: "stat_items_parent_id_fkey";
+                        columns: ["parent_id"];
+                        isOneToOne: false;
+                        referencedRelation: "stat_items";
                         referencedColumns: ["id"];
                     },
                     {
