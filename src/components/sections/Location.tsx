@@ -1,50 +1,55 @@
 "use client";
+import { Fragment } from "react";
 import dynamic from 'next/dynamic';
 // components
-import { SectionTag } from "@/components/shared/SectionTag";
+import { SectionHeaderRow } from "@/components/shared/SectionHeaderRow";
+import { RichText } from "@/components/shared/RichText";
 // lib
 import { EVENT } from "@/lib/content/site";
+import type { CmsSection } from "@/types/content";
 
 // don't render map component on server
 const Map = dynamic(
-    () => import("@/components/ui/Map"), 
+    () => import("@/components/ui/Map"),
     { ssr: false }
 );
 
-export const Location = () => {
+export const Location = ({ section }: { section?: CmsSection }) => {
+    if (!section) return null;
+
+    // first stat is the venue headline, the rest (address, getting here, ...) are label/value blocks
+    const [venue, ...details] = section.stats;
+
     return (
         <section id="location" className="section-block container-site scroll-mt-24">
-            <div className="section-header-row">
-                <div>
-                    <SectionTag>Location</SectionTag>
-                    <h2 className="section-heading">Finding us on campus.</h2>
-                </div>
-                <p className="side-note max-w-sm">
-                    Griffith University&apos;s Gold Coast campus at Southport - not the Nathan, Mt Gravatt or Logan
-                    campuses.
-                </p>
-            </div>
+            <SectionHeaderRow tag="Location" heading={section.heading} note={section.body} noteClassName="max-w-sm" />
 
             <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
                 <div className="h-72 overflow-hidden rounded-3xl md:h-96 lg:h-144">
-                    <Map lat={EVENT.addressCords[0]} lng={EVENT.addressCords[1]} zoom={14} venueName="GANZ Conference Venue" />
+                    <Map
+                        lat={EVENT.addressCords[0]}
+                        lng={EVENT.addressCords[1]}
+                        zoom={14}
+                        venueName={venue?.value ?? "Conference venue"}
+                    />
                 </div>
 
                 <div className="card flex flex-col bg-teal-dark text-cream">
-                    <span className="eyebrow mb-3 text-gold">Venue</span>
-                    <h3 className="mb-8 text-3xl leading-tight font-medium">{EVENT.venueName}</h3>
+                    {venue && (
+                        <>
+                            <span className="eyebrow mb-3 text-gold">{venue.label}</span>
+                            <h3 className="mb-8 text-3xl leading-tight font-medium">{venue.value}</h3>
+                        </>
+                    )}
 
-                    <span className="eyebrow mb-3 text-cream/60">Address</span>
-                    <p className="mb-8 text-xl leading-relaxed">
-                        {EVENT.addressLines.map((line) => (
-                            <span key={line} className="block">
-                                {line}
-                            </span>
-                        ))}
-                    </p>
-
-                    <span className="eyebrow mb-3 text-cream/60">Getting here</span>
-                    <p className="mb-10 text-lg leading-relaxed text-cream/90">{EVENT.gettingHere}</p>
+                    {details.map((stat) => (
+                        <Fragment key={stat.id}>
+                            <span className="eyebrow mb-3 text-cream/60">{stat.label}</span>
+                            <p className="mb-8 text-lg leading-relaxed text-cream/90">
+                                <RichText text={stat.value} />
+                            </p>
+                        </Fragment>
+                    ))}
 
                     <a
                         href={EVENT.mapsHref}

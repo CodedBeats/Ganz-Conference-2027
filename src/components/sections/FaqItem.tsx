@@ -3,17 +3,17 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { FaqItem as FaqItemData } from "@/types/content";
-
 interface FaqItemProps {
-    item: FaqItemData;
+    id: string;
+    question: string;
+    answer: string;
     defaultOpen?: boolean;
 }
 
-export const FaqItem = ({ item, defaultOpen = false }: FaqItemProps) => {
+export const FaqItem = ({ id, question, answer, defaultOpen = false }: FaqItemProps) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
-    const hasAnswer = item.answer.trim().length > 0;
-    const panelId = `faq-panel-${item.id}`;
+    const hasAnswer = answer.trim().length > 0;
+    const panelId = `faq-panel-${id}`;
 
     return (
         <li className="rounded-3xl bg-teal-pale text-teal-dark">
@@ -24,7 +24,7 @@ export const FaqItem = ({ item, defaultOpen = false }: FaqItemProps) => {
                 aria-controls={panelId}
                 onClick={() => setIsOpen((prev) => !prev)}
             >
-                <span className="text-lg font-medium sm:text-xl">{item.question}</span>
+                <span className="text-lg font-medium sm:text-xl">{question}</span>
                 {/* rotates 0 -> 225deg (clockwise) to form an "x", back anticlockwise on close */}
                 <span className={cn("faq-icon", isOpen && "faq-icon-open")} aria-hidden="true">
                     <Plus className="size-4" strokeWidth={2.5} />
@@ -40,7 +40,7 @@ export const FaqItem = ({ item, defaultOpen = false }: FaqItemProps) => {
             >
                 <div className="min-h-0 overflow-hidden">
                     <p className="px-6 pb-6 text-base leading-relaxed text-teal-dark/75 md:px-8">
-                        {hasAnswer ? item.answer : "Answer coming soon."}
+                        {hasAnswer ? answer : "Answer coming soon."}
                     </p>
                 </div>
             </div>

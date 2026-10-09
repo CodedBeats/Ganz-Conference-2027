@@ -1,8 +1,11 @@
-import { FAQS } from "@/lib/content/faqs";
+import type { CmsSection } from "@/types/content";
 import { SectionTag } from "@/components/shared/SectionTag";
+import { RichText } from "@/components/shared/RichText";
 import { FaqItem } from "@/components/sections/FaqItem";
 
-export const Faq = () => {
+export const Faq = ({ section }: { section?: CmsSection }) => {
+    if (!section) return null;
+
     return (
         <section id="faqs" className="section-block-b container-site scroll-mt-24">
             <div className="section-panel bg-white">
@@ -10,18 +13,25 @@ export const Faq = () => {
                     <div>
                         <SectionTag>FAQs</SectionTag>
                         <h2 className="section-heading mb-6">
-                            Questions,
-                            <br />
-                            answered.
+                            <RichText text={section.heading} />
                         </h2>
-                        <p className="side-note">
-                            Full answers will be published as arrangements are confirmed. Anything else, write to us.
-                        </p>
+                        {section.body && (
+                            <p className="side-note">
+                                <RichText text={section.body} />
+                            </p>
+                        )}
                     </div>
 
+                    {/* each FAQ is a stat: label = question, value = answer */}
                     <ul className="space-y-4">
-                        {FAQS.map((item, index) => (
-                            <FaqItem key={item.id} item={item} defaultOpen={index === 0} />
+                        {section.stats.map((item, index) => (
+                            <FaqItem
+                                key={item.id}
+                                id={item.id}
+                                question={item.label}
+                                answer={item.value}
+                                defaultOpen={index === 0}
+                            />
                         ))}
                     </ul>
                 </div>

@@ -1,6 +1,12 @@
-import { EVENT } from "@/lib/content/site";
+import type { CmsSection } from "@/types/content";
+import { RichText } from "@/components/shared/RichText";
 
-export const Contact = () => {
+export const Contact = ({ section }: { section?: CmsSection }) => {
+    if (!section) return null;
+
+    // the section body holds the contact email
+    const email = section.body?.trim();
+
     return (
         <section id="contact" className="section-block-b container-site scroll-mt-24">
             <div className="section-panel bg-teal-dark text-center text-cream">
@@ -10,14 +16,16 @@ export const Contact = () => {
 
                 <div className="relative py-6 md:py-12">
                     <h2 className="mb-10 text-4xl leading-tight font-heading sm:text-6xl md:text-7xl">
-                        We&apos;d love to hear from you.
+                        <RichText text={section.heading} />
                     </h2>
-                    <a
-                        href={`mailto:${EVENT.email}`}
-                        className="btn-pill btn-gold-to-cream px-5 sm:px-10 py-5 text-2xl font-normal tracking-normal normal-case sm:text-4xl md:px-14 md:py-6"
-                    >
-                        {EVENT.email}
-                    </a>
+                    {email && (
+                        <a
+                            href={`mailto:${email}`}
+                            className="btn-pill btn-gold-to-cream px-5 sm:px-10 py-5 text-2xl font-normal tracking-normal normal-case sm:text-4xl md:px-14 md:py-6"
+                        >
+                            {email}
+                        </a>
+                    )}
                 </div>
             </div>
         </section>

@@ -15,26 +15,24 @@ import { GateLogoutButton } from "@/components/gate/GateLogoutButton";
 import { getPageContent } from "@/lib/content/getPageContent";
 
 const Home = async () => {
+    // each section renders nothing when its content is missing (e.g. unpublished in the CMS)
     const content = await getPageContent();
-
-    // TODO: pass each section in as props (e.g. <Keynotes section={content.keynotes} />) - logged to the server terminal until then
-    console.dir(content, { depth: null });
 
     return (
         <>
             <Navbar />
             <main className="flex-1">
-                <Hero />
-                <Welcome />
-                <Program />
-                <Keynotes />
-                <Registrations />
-                <Location />
-                <Accommodation />
-                <Sponsors />
-                <Committee />
-                <Faq />
-                <Contact />
+                <Hero section={content.hero} />
+                <Welcome section={content.welcome} />
+                <Program section={content.program} />
+                <Keynotes section={content.keynotes} />
+                <Registrations section={content.registrations} />
+                <Location section={content.location} />
+                <Accommodation section={content.accommodation} />
+                <Sponsors section={content.sponsors} />
+                <Committee section={content.committee} />
+                <Faq section={content.faqs} />
+                <Contact section={content.contact} />
                 <GateLogoutButton />
             </main>
             <Footer />
