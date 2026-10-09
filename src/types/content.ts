@@ -76,3 +76,78 @@ export interface Sponsor {
     logoSrc?: string;
     href?: string;
 }
+
+/* ---------------------------------------------------------------------------
+ * CMS shapes - what `getPageContent` returns from Supabase, before each section
+ * maps it into the component-facing shapes above.
+ * ------------------------------------------------------------------------- */
+
+/** Every section `type` the home page knows how to render. Matches each section's DOM id. */
+export const SECTION_TYPES = [
+    "hero",
+    "welcome",
+    "program",
+    "keynotes",
+    "registrations",
+    "location",
+    "accommodation",
+    "sponsors",
+    "committee",
+    "faqs",
+    "contact",
+] as const;
+
+export type SectionType = (typeof SECTION_TYPES)[number];
+
+/** Visual variant shared by stat items and people (`secondary` = TBC / TBA / dark card). */
+export type CmsStyle = "primary" | "secondary" | "tertiary";
+
+/** An image row resolved through a foreign key. `file_ref` is a `/public` path for now. */
+export interface CmsImage {
+    id: string;
+    name: string;
+    file_ref: string;
+}
+
+/** A stat item with its nested children (e.g. registration tier -> price rows). */
+export interface CmsStatItem {
+    id: string;
+    label: string;
+    value: string;
+    description: string | null;
+    style: CmsStyle;
+    sort_order: number;
+    image: CmsImage | null;
+    children: CmsStatItem[];
+}
+
+/** A keynote presenter or committee member - told apart by the section it belongs to. */
+export interface CmsPerson {
+    id: string;
+    name: string;
+    title: string | null;
+    location: string | null;
+    description: string | null;
+    link: string | null;
+    style: CmsStyle;
+    sort_order: number;
+    image: CmsImage | null;
+}
+
+/** One published section with everything it owns, ready to hand to its component. */
+export interface CmsSection {
+    id: string;
+    type: SectionType;
+    heading: string | null;
+    subheading: string | null;
+    body: string | null;
+    excerpt: string | null;
+    sort_order: number;
+    image: CmsImage | null;
+    /** Top-level stat items only - children are nested under their parent. */
+    stats: CmsStatItem[];
+    people: CmsPerson[];
+}
+
+/** All published sections keyed by type. Unpublished sections are simply absent. */
+export type PageContent = Partial<Record<SectionType, CmsSection>>;
