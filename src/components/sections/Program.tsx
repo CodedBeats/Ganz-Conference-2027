@@ -1,8 +1,12 @@
 import { cn } from "@/lib/utils";
-import { EVENT, PROGRAM_STATS } from "@/lib/content/site";
+import type { CmsSection } from "@/types/content";
+import { EVENT } from "@/lib/content/site";
 import { SectionTag } from "@/components/shared/SectionTag";
+import { RichText } from "@/components/shared/RichText";
 
-export const Program = () => {
+export const Program = ({ section }: { section?: CmsSection }) => {
+    if (!section) return null;
+
     return (
         <section id="program" className="section-block-b container-site scroll-mt-24">
             <div className="section-panel bg-teal-dark text-cream">
@@ -13,10 +17,7 @@ export const Program = () => {
                     <SectionTag tone="gold">The Program</SectionTag>
 
                     <h2 className="mb-10 max-w-4xl text-2xl sm:text-3xl leading-[1.2] font-normal md:text-4xl">
-                        Explore a dynamic three-day program featuring keynote presentations, clinical
-                        conversations, research discussions, experiential workshops, and somatic offerings that
-                        invite us to <span className="text-gold">move, rest, play</span> and reconnect with our
-                        bodies.
+                        <RichText text={section.heading} accentClassName="text-gold" />
                     </h2>
 
                     {/* TODO: point at the full program page once it exists */}
@@ -25,15 +26,16 @@ export const Program = () => {
                     </a>
 
                     <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                        {PROGRAM_STATS.map((stat) => (
+                        {section.stats.map((stat) => (
                             <li
-                                key={stat.label}
+                                key={stat.id}
                                 className="card hover-lift group bg-cream text-teal-dark hover:bg-gold"
                             >
+                                {/* secondary = not confirmed yet (e.g. "TBC"), shown in the accent colour */}
                                 <span
                                     className={cn(
                                         "mb-2 block text-5xl font-bold transition-colors",
-                                        stat.isPending && "text-teal group-hover:text-teal-dark",
+                                        stat.style === "secondary" && "text-teal group-hover:text-teal-dark",
                                     )}
                                 >
                                     {stat.value}
