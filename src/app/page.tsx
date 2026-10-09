@@ -12,8 +12,14 @@ import { Committee } from "@/components/sections/Committee";
 import { Faq } from "@/components/sections/Faq";
 import { Contact } from "@/components/sections/Contact";
 import { GateLogoutButton } from "@/components/gate/GateLogoutButton";
+import { getPageContent } from "@/lib/content/getPageContent";
 
-const Home = () => {
+const Home = async () => {
+    const content = await getPageContent();
+
+    // TODO: pass each section in as props (e.g. <Keynotes section={content.keynotes} />) - logged to the server terminal until then
+    console.dir(content, { depth: null });
+
     return (
         <>
             <Navbar />
