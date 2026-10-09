@@ -1,7 +1,11 @@
+import type { CmsSection } from "@/types/content";
 import { SectionTag } from "@/components/shared/SectionTag";
-import Image from "next/image";
+import { RichText } from "@/components/shared/RichText";
+import { ContentImage } from "@/components/shared/ContentImage";
 
-export const Accommodation = () => {
+export const Accommodation = ({ section }: { section?: CmsSection }) => {
+    if (!section) return null;
+
     return (
         <section
             id="accommodation"
@@ -10,26 +14,30 @@ export const Accommodation = () => {
             <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,32rem)_1fr] lg:gap-20">
                 <div>
                     <SectionTag>Accommodation</SectionTag>
-                    <h2 className="section-heading mb-5">Where to stay</h2>
+                    <h2 className="section-heading mb-5">
+                        <RichText text={section.heading} />
+                    </h2>
                     <p className="body-copy mb-2 sm:mb-8">
-                        We are securing a selection of accommodation options
-                        close to the Griffith University Gold Coast campus,
-                        across a range of price points. Details will be
-                        published here.
+                        <RichText text={section.body} />
                     </p>
-                    <span className="inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase btn-muted">
-                        Details to be confirmed
-                    </span>
+                    {/* status pill, e.g. "Details to be confirmed" */}
+                    {section.excerpt && (
+                        <span className="inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase btn-muted">
+                            {section.excerpt}
+                        </span>
+                    )}
                 </div>
 
-                <div className="hover-grow relative aspect-5/4 w-full">
-                    <Image
-                        src="/design/imgs/accommodation.jpg"
-                        alt="Gold Coast Accommodation - Copyright free"
-                        fill
-                        className="rounded-3xl object-cover shadow-lg shadow-teal-dark/10"
-                    />
-                </div>
+                {section.image && (
+                    <div className="hover-grow relative aspect-5/4 w-full">
+                        <ContentImage
+                            image={section.image}
+                            alt=""
+                            fill
+                            className="rounded-3xl object-cover shadow-lg shadow-teal-dark/10"
+                        />
+                    </div>
+                )}
             </div>
         </section>
     );
