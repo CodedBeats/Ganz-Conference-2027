@@ -111,6 +111,7 @@ Auto generate tests with Codegen.
 - responsive-design
 - map
 - supabase
+- cms
 - metadata
 - testing
 - production
