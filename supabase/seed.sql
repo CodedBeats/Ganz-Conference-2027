@@ -169,4 +169,6 @@ insert into public.people (image, name, title, location, description, link, styl
     (null, 'Zoe Webber',    'Committee',      null, 'Bio coming soon.', null, 'primary', 3, (select id from public.sections where type = 'committee')),
     (null, 'Mia O''Brian',  'Committee',      null, 'Bio coming soon.', null, 'primary', 4, (select id from public.sections where type = 'committee')),
     (null, 'Gina Denholm',  'Committee',      null, 'Bio coming soon.', null, 'primary', 5, (select id from public.sections where type = 'committee')),
-    (null, 'Michael Pitt',  'Committee',      null, 'Bio coming soon.', null, 'primary', 6, (select id from public.sections where type = 'committee'));
+    (null, 'Michael Pitt',  'Committee',      null, 'Bio coming soon.', null, 'primary', 6, (select id from public.sections where type = 'committee')),
+    -- secondary = the pale "More to come" placeholder card
+    (null, 'More to come',  'Committee',      null, 'Further members to be announced.', null, 'secondary', 7, (select id from public.sections where type = 'committee'));
