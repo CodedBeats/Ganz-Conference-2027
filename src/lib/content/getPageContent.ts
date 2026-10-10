@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import {
+    CMS_STYLES,
     SECTION_TYPES,
     type CmsImage,
     type CmsPerson,
@@ -8,8 +9,6 @@ import {
     type CmsStyle,
     type PageContent,
 } from "@/types/content";
-
-const CMS_STYLES: readonly CmsStyle[] = ["primary", "secondary", "tertiary"];
 
 /** A stat item as it comes back from the query - flat, with `parent_id` still on it. */
 export interface StatItemRow {

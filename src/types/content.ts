@@ -31,8 +31,11 @@ export const SECTION_TYPES = [
 
 export type SectionType = (typeof SECTION_TYPES)[number];
 
+/** Every visual variant the DB's `style` check constraint allows. */
+export const CMS_STYLES = ["primary", "secondary", "tertiary"] as const;
+
 /** Visual variant shared by stat items and people (`secondary` = TBC / TBA / dark card). */
-export type CmsStyle = "primary" | "secondary" | "tertiary";
+export type CmsStyle = (typeof CMS_STYLES)[number];
 
 /** An image row resolved through a foreign key. `file_ref` is a `/public` path for now. */
 export interface CmsImage {
