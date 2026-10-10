@@ -26,36 +26,53 @@ describe("isPostgrestError", () => {
 });
 
 describe("handleError", () => {
-    it.each([
-        ["23505", "That already exists."],
-        ["23503", "This is still in use elsewhere, so it can't be removed."],
-        ["23514", "One of the values isn't allowed."],
-        ["23502", "A required field is missing."],
-        ["22P02", "One of the values is in the wrong format."],
-        ["42501", "You don't have permission to do that."],
-        ["PGRST116", "That item couldn't be found."],
-    ])("maps DB code %s to friendly copy", (code, message) => {
-        expect(handleError(postgrestError(code), "test")).toEqual({ message, code });
+    it.each(["23505", "23503", "23514", "23502", "22P02", "42501", "PGRST116"])(
+        "explains DB code %s in plain English with a next step",
+        (code) => {
+            const handled = handleError(postgrestError(code), "test");
+
+            expect(handled.code).toBe(code);
+            expect(handled.message).not.toBe("Something went wrong. Please try again.");
+            expect(handled.message).not.toContain(code);
+            expect(handled.hint).toBeTruthy();
+            expect(handled.codeMeaning).toBeTruthy();
+        },
+    );
+
+    it("maps a duplicate value to unique-value copy", () => {
+        expect(handleError(postgrestError("23505"), "test").message).toBe(
+            "Another item already uses this value, and it has to be unique.",
+        );
     });
 
-    it("falls back for unknown DB codes but keeps the code", () => {
+    it("falls back for unknown DB codes, keeping the code and the raw message as its meaning", () => {
         expect(handleError(postgrestError("99999"), "test")).toEqual({
             message: "Something went wrong. Please try again.",
+            hint: expect.stringContaining("Try again"),
             code: "99999",
+            codeMeaning: "raw db message",
         });
     });
 
-    it("still maps auth errors", () => {
+    it("still maps known auth errors without a hint", () => {
         const error = new AuthApiError("Invalid login credentials", 400, "invalid_credentials");
 
-        expect(handleError(error, "login")).toEqual({ message: "Incorrect email or password.", code: "invalid_credentials" });
+        expect(handleError(error, "login")).toEqual({
+            message: "Incorrect email or password.",
+            hint: null,
+            code: "invalid_credentials",
+            codeMeaning: null,
+        });
     });
 
-    it("falls back for anything else and logs with the context", () => {
+    it("falls back for anything else, keeps its message as details and logs with the context", () => {
         expect(handleError(new Error("boom"), "somewhere")).toEqual({
             message: "Something went wrong. Please try again.",
+            hint: expect.any(String),
             code: null,
+            codeMeaning: "boom",
         });
+        expect(handleError(42, "somewhere").codeMeaning).toBeNull();
         expect(console.error).toHaveBeenCalledWith("[somewhere]", expect.any(Error));
     });
 });
