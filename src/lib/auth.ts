@@ -18,6 +18,19 @@ export const getCurrentUser = cache(async (): Promise<User | null> => {
 });
 
 /**
+ * Whether the user carries the admin role.
+ *
+ * @remarks
+ * Reads the same `app_metadata.role` claim as `public.is_admin()`, which every write policy
+ * checks. Checking it up front matters because RLS turns a non-admin update or delete into a
+ * silent zero-row no-op rather than an error. `app_metadata` can't be edited by the user,
+ * unlike `user_metadata`.
+ */
+export function isAdminUser(user: User): boolean {
+    return user.app_metadata.role === "admin";
+}
+
+/**
  * Guard for admin-only pages and actions - returns the user or redirects to `/login`.
  *
  * @see {@link updateSession} in `src/lib/supabase/middleware.ts` for the earlier, optimistic redirect.
