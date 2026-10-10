@@ -69,6 +69,16 @@ describe("sanitizeInput", () => {
         expect(result.values).toEqual({ section_id: SECTION_ID, label: "Days", value: "3" });
     });
 
+    it("allows blank stat values but still requires them on create", () => {
+        expect(sanitizeInput({ value: "   " }, STAT_ITEM_CREATE_FIELDS, { isPartial: true }).values).toEqual({ value: "" });
+        expect(
+            sanitizeInput({ section_id: SECTION_ID, label: "Sponsor one" }, STAT_ITEM_CREATE_FIELDS, { isPartial: false }).error,
+        ).toBe("Value is required.");
+        expect(sanitizeInput({ value: null }, STAT_ITEM_CREATE_FIELDS, { isPartial: true }).error).toBe(
+            "Value must be text.",
+        );
+    });
+
     it("rejects blank required text even on update", () => {
         const result = sanitizeInput({ name: "   " }, PERSON_UPDATE_FIELDS, { isPartial: true });
 
