@@ -15,13 +15,22 @@ import type {
  *
  * - `text` - required, trimmed, must not be empty
  * - `nullableText` - trimmed; `""` becomes `null` so a cleared form field clears the column
+ * - `blankableText` - required, trimmed, but may be `""` (a not-null column that's allowed to be blank)
  * - `integer` - a whole number (e.g. `sort_order`)
  * - `boolean` - `true` / `false`
  * - `style` - one of {@link CMS_STYLES}
  * - `id` - required uuid (a foreign key that must be set)
  * - `nullableId` - uuid or `null`; `""` becomes `null`
  */
-export type FieldKind = "text" | "nullableText" | "integer" | "boolean" | "style" | "id" | "nullableId";
+export type FieldKind =
+    | "text"
+    | "nullableText"
+    | "blankableText"
+    | "integer"
+    | "boolean"
+    | "style"
+    | "id"
+    | "nullableId";
 
 /** Every key of an input type mapped to how it's validated. Keys not listed here never reach the DB. */
 export type FieldSchema<T> = { readonly [K in keyof T]-?: FieldKind };
@@ -34,7 +43,7 @@ interface SanitizeOptions {
 }
 
 /** Kinds that must be present on create. Everything else falls back to the column's DB default. */
-const REQUIRED_KINDS: ReadonlySet<FieldKind> = new Set(["text", "id"]);
+const REQUIRED_KINDS: ReadonlySet<FieldKind> = new Set(["text", "blankableText", "id"]);
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -67,6 +76,8 @@ function sanitizeField(value: unknown, kind: FieldKind, label: string): FieldRes
             if (typeof value !== "string") return fail(`${label} must be text.`);
             return ok(value.trim() || null);
         }
+        case "blankableText":
+            return typeof value === "string" ? ok(value.trim()) : fail(`${label} must be text.`);
         case "integer":
             return Number.isInteger(value) ? ok(value) : fail(`${label} must be a whole number.`);
         case "boolean":
@@ -164,7 +175,8 @@ export const PERSON_CREATE_FIELDS: FieldSchema<PersonCreateInput> = {
 
 export const STAT_ITEM_UPDATE_FIELDS: FieldSchema<StatItemUpdateInput> = {
     label: "text",
-    value: "text",
+    // blank is meaningful: a sponsor with no website yet, an FAQ awaiting its answer
+    value: "blankableText",
     description: "nullableText",
     style: "style",
     sort_order: "integer",
