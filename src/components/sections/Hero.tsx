@@ -3,6 +3,12 @@ import { EVENT } from "@/lib/content/site";
 import { SectionTag } from "@/components/shared/SectionTag";
 import { RichText } from "@/components/shared/RichText";
 import { ContentImage } from "@/components/shared/ContentImage";
+import { CmsBox } from "@/components/cms/CmsBox";
+import { CmsText } from "@/components/cms/CmsText";
+
+const EXCERPT_CLASS = "mb-6 text-xl font-medium sm:mb-8 sm:text-xl md:text-2xl";
+const HEADING_CLASS =
+    "mb-8 text-5xl leading-[1.05] font-extralight tracking-tight sm:mb-12 sm:text-7xl md:text-[6.5rem]";
 
 export const Hero = ({ section }: { section?: CmsSection }) => {
     if (!section) return null;
@@ -14,28 +20,49 @@ export const Hero = ({ section }: { section?: CmsSection }) => {
 
             <div className="container-site relative grid items-center gap-12 py-14 z-1 sm:py-20 md:gap-16 md:py-28 lg:grid-cols-[3fr_1fr]">
                 <div className="z-1">
-                    {section.subheading && <SectionTag tone="outline">{section.subheading}</SectionTag>}
+                    <CmsBox
+                        table="sections"
+                        rowId={section.id}
+                        label="Hero section"
+                        values={{ subheading: section.subheading, excerpt: section.excerpt, heading: section.heading }}
+                    >
+                        <CmsText field="subheading" label="Tag line" editClassName="mb-6 max-w-sm text-sm text-gold">
+                            {section.subheading && <SectionTag tone="outline">{section.subheading}</SectionTag>}
+                        </CmsText>
 
-                    <p className="mb-6 text-xl font-medium sm:mb-8 sm:text-xl md:text-2xl">
-                        <RichText text={section.excerpt} accentClassName="text-gold" />
-                    </p>
+                        <CmsText field="excerpt" label="Intro" multiline hint="highlight" editClassName={EXCERPT_CLASS}>
+                            <p className={EXCERPT_CLASS}>
+                                <RichText text={section.excerpt} accentClassName="text-gold" />
+                            </p>
+                        </CmsText>
 
-                    <h1 className="mb-8 text-5xl leading-[1.05] font-extralight tracking-tight sm:mb-12 sm:text-7xl md:text-[6.5rem]">
-                        <RichText text={section.heading} accentClassName="font-normal text-gold" />
-                    </h1>
+                        <CmsText field="heading" label="Heading" multiline hint="highlight" editClassName={HEADING_CLASS}>
+                            <h1 className={HEADING_CLASS}>
+                                <RichText text={section.heading} accentClassName="font-normal text-gold" />
+                            </h1>
+                        </CmsText>
+                    </CmsBox>
 
                     <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-stretch">
                         <div className="flex gap-4 sm:contents">
                             {section.stats.map((stat) => (
-                                <div
+                                <CmsBox
                                     key={stat.id}
+                                    table="stat_items"
+                                    rowId={stat.id}
+                                    label={`Hero stat: ${stat.label}`}
+                                    values={{ label: stat.label, value: stat.value }}
                                     className="hover-lift flex-1 rounded-2xl bg-teal-dark border-2 border-teal/50 sm:border-0 sm:bg-cream px-6 py-4 sm:flex-none"
                                 >
-                                    <span className="eyebrow mb-1 text-cream/60 sm:text-teal-dark/60">{stat.label}</span>
-                                    <span className="text-sm font-medium text-cream sm:text-teal-dark sm:text-xl">
-                                        {stat.value}
-                                    </span>
-                                </div>
+                                    <CmsText field="label" label="Label" editClassName="eyebrow mb-1 text-cream/60 sm:text-teal-dark/60">
+                                        <span className="eyebrow mb-1 text-cream/60 sm:text-teal-dark/60">{stat.label}</span>
+                                    </CmsText>
+                                    <CmsText field="value" label="Value" editClassName="text-sm font-medium text-cream sm:text-teal-dark sm:text-xl">
+                                        <span className="text-sm font-medium text-cream sm:text-teal-dark sm:text-xl">
+                                            {stat.value}
+                                        </span>
+                                    </CmsText>
+                                </CmsBox>
                             ))}
                         </div>
                         {/* TODO: swap for the dedicated /register page once registration (phase 2) is built */}
