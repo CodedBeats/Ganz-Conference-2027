@@ -305,4 +305,31 @@
   .gate-icon-float {
     animation: gate-icon-float 3s ease-in-out infinite;
   }
+
+  /* ---- homepage CMS editor (admins only) ---- */
+  /* outline rather than border so showing the boxes never shifts the layout;
+     violet/fuchsia sit outside the brand palette so they read as admin UI on every panel colour */
+  .cms-box {
+    @apply relative outline-2 outline-offset-4 outline-violet-400/70 outline-dashed;
+  }
+  .cms-box-editing {
+    @apply outline-3 outline-fuchsia-500 outline-solid;
+  }
+  /* sits half outside the corner so it never covers content like the FAQ toggle */
+  .cms-toolbar {
+    @apply absolute -top-3 -right-3 z-20 flex gap-1.5 font-sans;
+  }
+  /* while editing: links can't navigate away and hover motion stops shuffling the inputs */
+  .cms-box-editing a {
+    @apply pointer-events-none;
+  }
+  .cms-box-editing.hover-lift,
+  .cms-box-editing .hover-lift,
+  .cms-box-editing.hover-grow,
+  .cms-box-editing .hover-grow,
+  .hover-lift:has(.cms-box-editing),
+  .hover-grow:has(.cms-box-editing) {
+    translate: none !important;
+    scale: none !important;
+  }
 }
