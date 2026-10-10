@@ -10,8 +10,12 @@
  * @see {@link sanitizeInput} in `src/lib/cms/fields.ts`
  */
 
+import type { HandledError } from "@/lib/errors";
 import type { CmsStyle } from "@/types/content";
 import type { Tables, TablesInsert } from "@/types/database";
+
+/** A failed CMS action - plain-English `message` and `hint`, plus the code and its meaning for a details view. */
+export type CmsError = HandledError;
 
 /**
  * What every CMS action resolves to. Narrow on `error` before touching `data`.
@@ -19,11 +23,17 @@ import type { Tables, TablesInsert } from "@/types/database";
  * @example
  * ```ts
  * const result = await updatePerson(id, { name });
- * if (result.error) return setError(result.error);
+ * if (result.error) return showError(result.error);
  * console.log(result.data.updated_at);
  * ```
  */
-export type CmsActionResult<T> = { data: T; error: null } | { data: null; error: string };
+export type CmsActionResult<T> = { data: T; error: null } | { data: null; error: CmsError };
+
+/** Tables the homepage editor can update in place. Images aren't editable from the page yet. */
+export type EditableTable = "sections" | "people" | "stat_items";
+
+/** The editable text-ish fields of one row, keyed by column - what an editor box holds as its draft. */
+export type CmsFieldValues = Record<string, string | null>;
 
 /** Returned by every delete action. */
 export interface DeletedRow {

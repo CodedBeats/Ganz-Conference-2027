@@ -12,13 +12,16 @@ import { Committee } from "@/components/sections/Committee";
 import { Faq } from "@/components/sections/Faq";
 import { Contact } from "@/components/sections/Contact";
 import { GateLogoutButton } from "@/components/gate/GateLogoutButton";
+import { CmsEditorProvider } from "@/components/cms/CmsEditorProvider";
+import { AdminBar } from "@/components/cms/AdminBar";
 import { getPageContent } from "@/lib/content/getPageContent";
+import { isCmsEditor } from "@/lib/cms/editor";
 
 const Home = async () => {
     // each section renders nothing when its content is missing (e.g. unpublished in the CMS)
-    const content = await getPageContent();
+    const [content, isEditor] = await Promise.all([getPageContent(), isCmsEditor()]);
 
-    return (
+    const page = (
         <>
             <Navbar />
             <main className="flex-1">
@@ -37,6 +40,16 @@ const Home = async () => {
             </main>
             <Footer />
         </>
+    );
+
+    // admins get the inline editor; visitors never receive its provider or toolbar
+    if (!isEditor) return page;
+
+    return (
+        <CmsEditorProvider>
+            {page}
+            <AdminBar />
+        </CmsEditorProvider>
     );
 };
 
