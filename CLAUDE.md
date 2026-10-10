@@ -15,10 +15,9 @@ npm run lint       # ESLint
 npm run docs       # generate TypeDoc reference into /docs from src/lib, src/app/api, src/hooks, src/types
 npm run test       # Vitest, watch mode
 npm run test:run   # Vitest, single run
-npx playwright test  # Playwright e2e
 ```
 
-Single test file: `npm run test:run -- tests/pricing.test.ts` (Vitest) / `npx playwright test tests/foo.spec.ts` (Playwright).
+Single test file: `npm run test:run -- tests/pricing.test.ts`.
 
 ## Architecture
 - **Next.js 16, App Router, TypeScript.** Read the relevant guide under `node_modules/next/dist/docs/` before writing App Router code — see `AGENTS.md` for why (this Next.js version diverges from training data).
@@ -27,7 +26,7 @@ Single test file: `npm run test:run -- tests/pricing.test.ts` (Vitest) / `npx pl
 - **Backend:** Supabase (Postgres, Auth, Storage). Client setup is intended to live at `src/lib/supabase/` (not yet created).
 - **Pre-launch gate:** `SITE_PASSWORD` env var is meant to gate the whole site via `src/middleware.ts` (not yet created) until public launch.
 - **Docs generation:** TypeDoc pulls from `/** */` comments in `src/lib`, `src/app/api`, `src/hooks`, `src/types` only. Use the doc-comment style shown in `devInfo.md` (`@remarks`, `@param`, `@returns`) for anything in those directories, since it's the only place they render into `/docs`.
-- **Testing:** Vitest for unit tests (`vite.config.mts`, jsdom environment) and Playwright for e2e (`playwright.config.ts`, chromium/firefox/webkit). Both currently point at the same `tests/` directory (Playwright's `testDir` is `./tests`, and the existing Vitest spec also lives at `tests/pricing.test.ts`) — watch for filename collisions between the two runners when adding new test files.
+- **Testing:** Vitest is the only test runner in use: unit tests live in `tests/` (`vite.config.mts`, jsdom environment, `e2e/**` excluded). Playwright is configured (`playwright.config.ts`, `testDir: ./e2e`) and `e2e/` has a couple of old specs, but it's completely unused right now and there are no plans to use it yet. Don't write, run or update Playwright tests, and don't suggest them as verification — use Vitest.
 
 ## Environment variables
 `.env.local` (gitignored):
