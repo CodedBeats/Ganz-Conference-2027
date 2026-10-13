@@ -53,9 +53,9 @@ export const Footer = () => {
                     <ul className="space-y-3 text-base text-teal-dark">
                         <li>{EVENT.dates}</li>
                         <li>
-                            Griffith University
+                            The University of Queensland, St Lucia Campus 
                             <br />
-                            Gold Coast, QLD, Australia
+                            Brisbane, QLD, Australia
                         </li>
                         <li>
                             <a href={`mailto:${EVENT.email}`} className="transition-colors hover:text-teal">
