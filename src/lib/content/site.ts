@@ -30,9 +30,9 @@ export const EVENT = {
     // TODO: read from the CMS (hero stats / contact section) so they can't drift
     dates: "25-27 June 2027",
     email: "contact@ganz.org.au",
-    addressCords: [-27.96297382840529, 153.38469244106162],
+    addressCords: [-27.49343944694796, 153.00669951349366],
     mapsHref:
-        "https://www.google.com/maps/search/?api=1&query=Griffith+University+Gold+Coast+Campus",
+        "https://maps.app.goo.gl/11kzEXrxXa5RQnWk9",
     // TODO: point at the dedicated /register page once registration (phase 2) is built.
     registerHref: "#registrations",
     programHref: "#program",
