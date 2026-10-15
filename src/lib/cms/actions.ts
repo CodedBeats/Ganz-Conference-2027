@@ -1,13 +1,13 @@
 "use server";
 
 /**
- * Admin CMS mutations - create, update and delete for every content table.
+ * Admin CMS mutations - create, update and delete for every content table, plus file uploads.
  *
  * @remarks
  * Every export here is a Server Action, callable from client components via `onClick`,
  * `startTransition` or a `useActionState` adapter. Each one checks the caller is an admin,
- * sanitises its input with {@link sanitizeInput}, runs a single query and resolves to a
- * {@link CmsActionResult} - they never throw for expected failures.
+ * sanitises its input with {@link sanitizeInput}, runs its query (file actions also talk to
+ * Storage) and resolves to a {@link CmsActionResult} - they never throw for expected failures.
  *
  * Only async functions may be exported from a `"use server"` file, and every export becomes
  * a public POST endpoint - keep helpers unexported.
@@ -18,8 +18,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { handleError } from "@/lib/errors";
 import {
-    IMAGE_CREATE_FIELDS,
-    IMAGE_UPDATE_FIELDS,
+    FILE_CREATE_FIELDS,
+    FILE_UPDATE_FIELDS,
     PERSON_CREATE_FIELDS,
     PERSON_UPDATE_FIELDS,
     SECTION_CREATE_FIELDS,
@@ -29,14 +29,27 @@ import {
     isValidId,
     sanitizeInput,
 } from "@/lib/cms/fields";
+import {
+    FILES_BUCKET,
+    buildStoragePath,
+    fileInUseError,
+    findFileUsages,
+    isFileMimeType,
+    isGeneratedStoragePath,
+    isStorageRef,
+    validateUpload,
+} from "@/lib/cms/files";
 import type {
     CmsActionResult,
     CmsError,
     DeletedRow,
     EditableTable,
-    ImageCreateInput,
-    ImageRecord,
-    ImageUpdateInput,
+    FileCreateInput,
+    FileRecord,
+    FileUpdateInput,
+    FileUploadRequest,
+    FileUploadTicket,
+    FileUsage,
     PersonCreateInput,
     PersonRecord,
     PersonUpdateInput,
@@ -83,6 +96,11 @@ const reject = (error: CmsError): QueryResult<never> => ({ data: null, error: ne
 const invalid = (message: string) => reject(cmsError(message, VALIDATION_HINT));
 const notFound = () => reject(NOT_FOUND_ERROR);
 
+interface CmsActionOptions {
+    /** Off for calls that don't change content (reads, upload tickets) - nothing on the site needs refreshing. */
+    shouldRevalidate?: boolean;
+}
+
 /**
  * Shared admin check, error handling and revalidation for every CMS action.
  *
@@ -95,10 +113,12 @@ const notFound = () => reject(NOT_FOUND_ERROR);
  *
  * @param context - Action name, used to prefix server logs (e.g. `"updatePerson"`).
  * @param mutate - Runs the query. Return {@link invalid} or {@link notFound} instead to reject the request.
+ * @param options - See {@link CmsActionOptions}.
  */
 async function runCmsAction<T>(
     context: string,
     mutate: (supabase: SupabaseServerClient) => PromiseLike<QueryResult<T>> | QueryResult<T>,
+    { shouldRevalidate = true }: CmsActionOptions = {},
 ): Promise<CmsActionResult<T>> {
     const user = await getCurrentUser();
     if (!user) {
@@ -120,7 +140,7 @@ async function runCmsAction<T>(
         if (data === null) return { data: null, error: NOT_FOUND_ERROR };
 
         console.log(`[cms] ${context} by ${user.email}`);
-        revalidatePath("/", "layout");
+        if (shouldRevalidate) revalidatePath("/", "layout");
         return { data, error: null };
     } catch (error) {
         return { data: null, error: handleError(error, `cms:${context}`) };
@@ -243,7 +263,7 @@ export async function updatePerson(id: string, input: PersonUpdateInput): Promis
     return updatePersonRow(id, input);
 }
 
-/** Deletes a person. Their image row is kept - delete it separately with {@link deleteImage}. */
+/** Deletes a person. Their image's file row is kept - delete it separately with {@link deleteFile}. */
 export async function deletePerson(id: string): Promise<CmsActionResult<DeletedRow>> {
     return runCmsAction("deletePerson", (supabase) => {
         if (!isValidId(id)) return notFound();
@@ -285,37 +305,125 @@ export async function deleteStatItem(id: string): Promise<CmsActionResult<Delete
     });
 }
 
-// ---- images ----
+// ---- files ----
 
-/** Registers an image. `file_ref` is a `/public` path for now - this doesn't upload anything. */
-export async function createImage(input: ImageCreateInput): Promise<CmsActionResult<ImageRecord>> {
-    return runCmsAction("createImage", (supabase) => {
-        const { values, error } = sanitizeInput(input, IMAGE_CREATE_FIELDS, { isPartial: false });
+const UPLOAD_MISSING_ERROR = cmsError(
+    "The uploaded file couldn't be found, so it wasn't saved.",
+    "Upload the file again. If it keeps happening, check your internet connection.",
+);
+
+/**
+ * Step 1 of an upload - checks the file and hands back a one-time permit to upload it.
+ *
+ * @remarks
+ * The bytes never pass through Next: Vercel caps request bodies at ~4.5MB, so the browser
+ * uploads straight to Storage with the returned token, then calls {@link createFile}. Use
+ * `uploadFile` in `src/lib/cms/uploadFile.ts` rather than calling the steps by hand.
+ *
+ * The type and size here are whatever the browser claims - the bucket's own limits check
+ * the real upload.
+ */
+export async function createFileUpload(input: FileUploadRequest): Promise<CmsActionResult<FileUploadTicket>> {
+    return runCmsAction(
+        "createFileUpload",
+        async (supabase) => {
+            const { error: nameError } = sanitizeInput(input, FILE_UPDATE_FIELDS, { isPartial: false });
+            if (nameError !== null) return invalid(nameError);
+            const { mimeType, error: uploadError } = validateUpload(input.mimeType, input.size);
+            if (uploadError !== null) return invalid(uploadError);
+
+            const { data, error } = await supabase.storage
+                .from(FILES_BUCKET)
+                .createSignedUploadUrl(buildStoragePath(mimeType));
+            if (error) return { data: null, error };
+            return { data: { path: data.path, token: data.token }, error: null };
+        },
+        { shouldRevalidate: false },
+    );
+}
+
+/**
+ * Step 2 of an upload - registers the uploaded object as a `files` row.
+ *
+ * @remarks
+ * `file_ref` must be a path handed out by {@link createFileUpload}, and the object must
+ * actually be in the bucket. `mime_type` is taken from the stored object, not the caller.
+ */
+export async function createFile(input: FileCreateInput): Promise<CmsActionResult<FileRecord>> {
+    return runCmsAction("createFile", async (supabase) => {
+        const { values, error } = sanitizeInput(input, FILE_CREATE_FIELDS, { isPartial: false });
         if (error !== null) return invalid(error);
-        return supabase.from("images").insert(values).select().single();
+        if (!isGeneratedStoragePath(values.file_ref)) return reject(UPLOAD_MISSING_ERROR);
+
+        const { data: object, error: infoError } = await supabase.storage.from(FILES_BUCKET).info(values.file_ref);
+        if (infoError) {
+            // a 4xx here means the object isn't there (the upload failed or never happened)
+            const isMissing = infoError.status !== undefined && infoError.status < 500;
+            return isMissing ? reject(UPLOAD_MISSING_ERROR) : { data: null, error: infoError };
+        }
+        if (!isFileMimeType(object.contentType)) return invalid("Only PNG, JPG, WebP and PDF files can be uploaded.");
+
+        return supabase
+            .from("files")
+            .insert({ ...values, mime_type: object.contentType })
+            .select()
+            .single();
     });
 }
 
-/** Renames an image or points it at a different file. Only the keys passed are changed. */
-export async function updateImage(id: string, input: ImageUpdateInput): Promise<CmsActionResult<ImageRecord>> {
-    return runCmsAction("updateImage", (supabase) => {
+/** Renames a file. The stored object and every reference to it are untouched. */
+export async function updateFile(id: string, input: FileUpdateInput): Promise<CmsActionResult<FileRecord>> {
+    return runCmsAction("updateFile", (supabase) => {
         if (!isValidId(id)) return notFound();
-        const { values, error } = sanitizeInput(input, IMAGE_UPDATE_FIELDS, { isPartial: true });
+        const { values, error } = sanitizeInput(input, FILE_UPDATE_FIELDS, { isPartial: true });
         if (error !== null) return invalid(error);
-        return supabase.from("images").update(values).eq("id", id).select().single();
+        return supabase.from("files").update(values).eq("id", id).select().single();
     });
 }
 
 /**
- * Deletes an image row.
+ * Everything still pointing at a file - for warning the editor before they try to delete it.
+ *
+ * @returns An empty list when the file is safe to delete.
+ */
+export async function getFileUsages(id: string): Promise<CmsActionResult<FileUsage[]>> {
+    return runCmsAction(
+        "getFileUsages",
+        async (supabase) => {
+            if (!isValidId(id)) return notFound();
+            return { data: await findFileUsages(supabase, id), error: null };
+        },
+        { shouldRevalidate: false },
+    );
+}
+
+/**
+ * Deletes a file row and its stored object.
  *
  * @remarks
- * Sections using it as a header lose their image (`image_id` is set to null), but the delete
- * is blocked while any person or stat item still uses it. The file itself isn't touched.
+ * Refused while any section, person or stat item still uses the file - the error lists
+ * them so the editor knows what to clear or swap first. The foreign keys are `on delete
+ * restrict` too, so a reference added mid-delete still blocks it.
+ *
+ * The row goes first so the site never points at a missing object. If removing the object
+ * then fails, the delete still succeeds - an orphaned object is invisible and harmless.
+ * `/public` files (legacy rows) only lose their row.
  */
-export async function deleteImage(id: string): Promise<CmsActionResult<DeletedRow>> {
-    return runCmsAction("deleteImage", (supabase) => {
+export async function deleteFile(id: string): Promise<CmsActionResult<DeletedRow>> {
+    return runCmsAction("deleteFile", async (supabase) => {
         if (!isValidId(id)) return notFound();
-        return supabase.from("images").delete().eq("id", id).select("id").single();
+
+        const usages = await findFileUsages(supabase, id);
+        if (usages.length > 0) return reject(fileInUseError(usages));
+
+        const { data, error } = await supabase.from("files").delete().eq("id", id).select("id, file_ref").single();
+        if (error) return { data: null, error };
+
+        if (isStorageRef(data.file_ref)) {
+            const { error: removeError } = await supabase.storage.from(FILES_BUCKET).remove([data.file_ref]);
+            if (removeError) console.error(`[cms:deleteFile] row deleted but object ${data.file_ref} wasn't`, removeError);
+        }
+
+        return { data: { id: data.id }, error: null };
     });
 }
