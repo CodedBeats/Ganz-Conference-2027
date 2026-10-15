@@ -4,9 +4,6 @@ import { NextResponse, type NextRequest } from "next/server";
 /** Where admins land after signing in. */
 export const ADMIN_HOME_PATH = "/admin";
 
-/** Pages an authenticated user has no reason to see - they get sent to {@link ADMIN_HOME_PATH}. */
-const GUEST_ONLY_PATHS = ["/login"];
-
 /** Path prefixes that need a session - anonymous visitors get sent to `/login`. */
 const PROTECTED_PATH_PREFIXES = ["/admin"];
 
@@ -57,8 +54,10 @@ export async function updateSession(request: NextRequest) {
         return redirectResponse;
     };
 
-    if (isAuthed && GUEST_ONLY_PATHS.includes(pathname)) return redirectTo(ADMIN_HOME_PATH);
-
+    // Only ever redirect *towards* /login here. getClaims trusts any validly signed token, so a
+    // revoked session (deleted user, signed out elsewhere) still looks authed until it expires -
+    // sending /login to /admin on that basis loops with requireUser sending /admin back to /login.
+    // The login page does its own verified "already signed in" check instead.
     const isProtected = PROTECTED_PATH_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
     if (!isAuthed && isProtected) return redirectTo("/login");
 
