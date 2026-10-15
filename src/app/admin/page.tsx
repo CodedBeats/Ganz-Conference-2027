@@ -1,12 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
+import { getFiles } from "@/lib/content/getFiles";
 import { SignOutButton } from "@/components/auth/SignOutButton";
+import { FileManager } from "@/components/files/FileManager";
 
 export const metadata: Metadata = {
     title: "GANZ 2027 - Admin",
     robots: { index: false, follow: false },
 };
+
+/** Placeholder until Phase 2 ticketing - mirrors the registration tiers in the seed. */
+const TICKET_TIERS = [
+    { name: "GANZ Members", tickets: ["Early Bird", "Full Registration"] },
+    { name: "Non-Members", tickets: ["Early Bird", "Full Registration"] },
+    { name: "Scholarships", tickets: ["Scholarship Rate"] },
+];
+
+const CARD_TITLE = "mb-5 text-2xl leading-tight font-heading sm:text-3xl";
 
 const formatDateTime = (iso: string | undefined) =>
     iso
@@ -19,6 +30,7 @@ const formatDateTime = (iso: string | undefined) =>
 
 const AdminPage = async () => {
     const user = await requireUser();
+    const files = await getFiles();
     const role = typeof user.app_metadata.role === "string" ? user.app_metadata.role : "none";
 
     return (
@@ -40,7 +52,7 @@ const AdminPage = async () => {
 
             <div className="grid gap-6 md:grid-cols-2">
                 <section className="card bg-white">
-                    <span className="eyebrow mb-5 text-teal">Account</span>
+                    <h2 className={CARD_TITLE}>Account</h2>
                     <dl className="space-y-4">
                         <div>
                             <dt className="eyebrow mb-1 text-teal-dark/50">Email</dt>
@@ -58,11 +70,33 @@ const AdminPage = async () => {
                 </section>
 
                 <section className="card bg-teal-light">
-                    <span className="eyebrow mb-5 text-teal">Content</span>
-                    <h2 className="mb-3 text-2xl font-medium">Coming soon</h2>
-                    <p className="body-copy text-teal-dark/70">
-                        Editing for sections, presenters, committee, FAQs and pricing will live here.
+                    <h2 className={CARD_TITLE}>Ticketing</h2>
+                    <div className="space-y-5">
+                        {TICKET_TIERS.map((tier) => (
+                            <div key={tier.name}>
+                                <h3 className="eyebrow mb-2 text-teal-dark/60">{tier.name}</h3>
+                                <ul className="space-y-2">
+                                    {tier.tickets.map((ticket) => (
+                                        <li key={ticket} className="price-row bg-white">
+                                            <span>{ticket}</span>
+                                            <span className="font-medium">$###</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                    <p className="mt-5 text-sm text-teal-dark/70">
+                        Ticket editing is coming in Phase 2 with registrations.
                     </p>
+                </section>
+
+                <section className="card bg-white md:col-span-2">
+                    <h2 className={CARD_TITLE}>Files</h2>
+                    <p className="mb-6 text-teal-dark/70">
+                        Upload, rename, move and delete the images and PDFs used on the site.
+                    </p>
+                    <FileManager files={files} className="h-[40rem]" />
                 </section>
             </div>
         </main>
