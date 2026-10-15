@@ -34,11 +34,12 @@ export type Database = {
     };
     public: {
         Tables: {
-            images: {
+            files: {
                 Row: {
                     created_at: string;
                     file_ref: string;
                     id: string;
+                    mime_type: string;
                     name: string;
                     updated_at: string;
                 };
@@ -46,6 +47,7 @@ export type Database = {
                     created_at?: string;
                     file_ref: string;
                     id?: string;
+                    mime_type: string;
                     name: string;
                     updated_at?: string;
                 };
@@ -53,6 +55,7 @@ export type Database = {
                     created_at?: string;
                     file_ref?: string;
                     id?: string;
+                    mime_type?: string;
                     name?: string;
                     updated_at?: string;
                 };
@@ -103,7 +106,7 @@ export type Database = {
                         foreignKeyName: "people_image_fkey";
                         columns: ["image"];
                         isOneToOne: true;
-                        referencedRelation: "images";
+                        referencedRelation: "files";
                         referencedColumns: ["id"];
                     },
                     {
@@ -160,7 +163,7 @@ export type Database = {
                         foreignKeyName: "sections_image_id_fkey";
                         columns: ["image_id"];
                         isOneToOne: false;
-                        referencedRelation: "images";
+                        referencedRelation: "files";
                         referencedColumns: ["id"];
                     },
                 ];
@@ -207,7 +210,7 @@ export type Database = {
                         foreignKeyName: "stat_items_image_fkey";
                         columns: ["image"];
                         isOneToOne: true;
-                        referencedRelation: "images";
+                        referencedRelation: "files";
                         referencedColumns: ["id"];
                     },
                     {
