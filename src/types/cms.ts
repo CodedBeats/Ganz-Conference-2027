@@ -11,6 +11,7 @@
  */
 
 import type { HandledError } from "@/lib/errors";
+import type { FileFolder } from "@/lib/cms/files";
 import type { CmsStyle } from "@/types/content";
 import type { Tables, TablesInsert } from "@/types/database";
 
@@ -90,10 +91,10 @@ export type StatItemRecord = Tables<"stat_items">;
  * `file_ref` is the storage path handed out by `createFileUpload`. `mime_type` is left out -
  * the server reads it from the stored object rather than trusting the caller.
  */
-export type FileCreateInput = Pick<TablesInsert<"files">, "name" | "file_ref">;
+export type FileCreateInput = Pick<TablesInsert<"files">, "name" | "file_ref"> & { folder?: FileFolder };
 
-/** Only the display name is editable - `file_ref` would let a caller point the row at any path. */
-export type FileUpdateInput = Pick<FileCreateInput, "name">;
+/** Rename or move a file. `file_ref` isn't editable - it would let a caller point the row at any path. */
+export type FileUpdateInput = Partial<Pick<FileCreateInput, "name" | "folder">>;
 
 export type FileRecord = Tables<"files">;
 
@@ -102,6 +103,8 @@ export interface FileUploadRequest {
     name: string;
     mimeType: string;
     size: number;
+    /** Checked up front so a bad folder fails before the upload, not after. Defaults to `general`. */
+    folder?: FileFolder;
 }
 
 /** A one-time permit to upload a single object straight to Storage at `path`. */
@@ -120,3 +123,6 @@ export interface FileUsage {
     /** Human-readable name of the row, e.g. a person's name or a section's type. */
     label: string;
 }
+
+/** A file plus everywhere it's used - what the CMS file manager lists. */
+export type LibraryFile = FileRecord & { usages: FileUsage[] };
