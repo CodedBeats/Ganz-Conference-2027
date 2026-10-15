@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-    IMAGE_UPDATE_FIELDS,
+    FILE_CREATE_FIELDS,
     PERSON_CREATE_FIELDS,
     PERSON_UPDATE_FIELDS,
     SECTION_UPDATE_FIELDS,
@@ -104,7 +104,7 @@ describe("sanitizeInput", () => {
         expect(sanitizeInput({ is_published: "yes" }, SECTION_UPDATE_FIELDS, { isPartial: true }).error).toBe(
             "Is published must be true or false.",
         );
-        expect(sanitizeInput({ file_ref: 7 }, IMAGE_UPDATE_FIELDS, { isPartial: true }).error).toBe(
+        expect(sanitizeInput({ file_ref: 7 }, FILE_CREATE_FIELDS, { isPartial: true }).error).toBe(
             "File ref must be text.",
         );
         expect(sanitizeInput({ image: "nope" }, PERSON_UPDATE_FIELDS, { isPartial: true }).error).toBe(

@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import Image, { type ImageProps } from "next/image";
-import type { CmsImage } from "@/types/content";
+import { getFileUrl } from "@/lib/cms/files";
+import type { CmsFile } from "@/types/content";
 
 type ContentImageProps = Omit<ImageProps, "src" | "alt"> & {
-    image: CmsImage | null;
+    image: CmsFile | null;
     /** Pass `""` for purely decorative photos. */
     alt: string;
     /** Rendered instead when the CMS has no image yet (nothing by default). */
@@ -14,5 +15,5 @@ type ContentImageProps = Omit<ImageProps, "src" | "alt"> & {
 export const ContentImage = ({ image, alt, fallback = null, ...imageProps }: ContentImageProps) => {
     if (!image) return fallback;
 
-    return <Image src={image.file_ref} alt={alt} {...imageProps} />;
+    return <Image src={getFileUrl(image.file_ref)} alt={alt} {...imageProps} />;
 };

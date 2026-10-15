@@ -37,11 +37,18 @@ export const CMS_STYLES = ["primary", "secondary", "tertiary"] as const;
 /** Visual variant shared by stat items and people (`secondary` = TBC / TBA / dark card). */
 export type CmsStyle = (typeof CMS_STYLES)[number];
 
-/** An image row resolved through a foreign key. `file_ref` is a `/public` path for now. */
-export interface CmsImage {
+/**
+ * A `files` row resolved through a foreign key.
+ *
+ * @remarks
+ * `file_ref` is a Storage path or a legacy `/public` path - turn it into a URL with
+ * `getFileUrl` from `src/lib/cms/files.ts`.
+ */
+export interface CmsFile {
     id: string;
     name: string;
     file_ref: string;
+    mime_type: string;
 }
 
 /** A stat item with its nested children (e.g. registration tier -> price rows). */
@@ -52,7 +59,7 @@ export interface CmsStatItem {
     description: string | null;
     style: CmsStyle;
     sort_order: number;
-    image: CmsImage | null;
+    image: CmsFile | null;
     children: CmsStatItem[];
 }
 
@@ -66,7 +73,7 @@ export interface CmsPerson {
     link: string | null;
     style: CmsStyle;
     sort_order: number;
-    image: CmsImage | null;
+    image: CmsFile | null;
 }
 
 /** One published section with everything it owns, ready to hand to its component. */
@@ -78,7 +85,7 @@ export interface CmsSection {
     body: string | null;
     excerpt: string | null;
     sort_order: number;
-    image: CmsImage | null;
+    image: CmsFile | null;
     /** Top-level stat items only - children are nested under their parent. */
     stats: CmsStatItem[];
     people: CmsPerson[];

@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
     CMS_STYLES,
     SECTION_TYPES,
-    type CmsImage,
+    type CmsFile,
     type CmsPerson,
     type CmsSection,
     type CmsStatItem,
@@ -19,7 +19,7 @@ export interface StatItemRow {
     style: string;
     sort_order: number;
     parent_id: string | null;
-    image: CmsImage | null;
+    image: CmsFile | null;
 }
 
 /** A person as it comes back from the query. */
@@ -126,7 +126,7 @@ export function groupSectionsByType(rows: SectionRow[]): PageContent {
  * already hides drafts from the public - a logged-in admin passes `is_admin()` and would
  * otherwise see draft sections on the live page.
  *
- * Image `file_ref`s are passed through untouched (currently `/public` paths).
+ * File `file_ref`s are passed through untouched - resolve them with `getFileUrl`.
  *
  * @returns Published sections keyed by type - see {@link PageContent}.
  * @throws If the Supabase query fails.
@@ -138,9 +138,9 @@ export async function getPageContent(): Promise<PageContent> {
         .from("sections")
         .select(
             `id, type, heading, subheading, body, excerpt, sort_order,
-            image:images(id, name, file_ref),
-            stat_items(id, label, value, description, style, sort_order, parent_id, image:images(id, name, file_ref)),
-            people(id, name, title, location, description, link, style, sort_order, image:images(id, name, file_ref))`,
+            image:files(id, name, file_ref, mime_type),
+            stat_items(id, label, value, description, style, sort_order, parent_id, image:files(id, name, file_ref, mime_type)),
+            people(id, name, title, location, description, link, style, sort_order, image:files(id, name, file_ref, mime_type))`,
         )
         .eq("is_published", true)
         .order("sort_order")

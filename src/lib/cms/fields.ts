@@ -1,7 +1,7 @@
 import { CMS_STYLES } from "@/types/content";
 import type {
-    ImageCreateInput,
-    ImageUpdateInput,
+    FileCreateInput,
+    FileUpdateInput,
     PersonCreateInput,
     PersonUpdateInput,
     SectionCreateInput,
@@ -189,9 +189,12 @@ export const STAT_ITEM_CREATE_FIELDS: FieldSchema<StatItemCreateInput> = {
     section_id: "id",
 };
 
-export const IMAGE_UPDATE_FIELDS: FieldSchema<ImageUpdateInput> = {
+export const FILE_UPDATE_FIELDS: FieldSchema<FileUpdateInput> = {
     name: "text",
-    file_ref: "text",
 };
 
-export const IMAGE_CREATE_FIELDS: FieldSchema<ImageCreateInput> = IMAGE_UPDATE_FIELDS;
+/** `file_ref` is also checked against {@link isGeneratedStoragePath} - any non-empty text isn't enough. */
+export const FILE_CREATE_FIELDS: FieldSchema<FileCreateInput> = {
+    ...FILE_UPDATE_FIELDS,
+    file_ref: "text",
+};

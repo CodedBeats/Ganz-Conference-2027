@@ -29,7 +29,7 @@ export type CmsError = HandledError;
  */
 export type CmsActionResult<T> = { data: T; error: null } | { data: null; error: CmsError };
 
-/** Tables the homepage editor can update in place. Images aren't editable from the page yet. */
+/** Tables the homepage editor can update in place. Files aren't editable from the page yet. */
 export type EditableTable = "sections" | "people" | "stat_items";
 
 /** The editable text-ish fields of one row, keyed by column - what an editor box holds as its draft. */
@@ -81,11 +81,42 @@ export type StatItemUpdateInput = Partial<Omit<StatItemCreateInput, "section_id"
 
 export type StatItemRecord = Tables<"stat_items">;
 
-// ---- images ----
+// ---- files ----
 
-/** `file_ref` is a `/public` path for now - Storage uploads come later. */
-export type ImageCreateInput = Pick<TablesInsert<"images">, "name" | "file_ref">;
+/**
+ * Registers an object already uploaded to the `files` bucket.
+ *
+ * @remarks
+ * `file_ref` is the storage path handed out by `createFileUpload`. `mime_type` is left out -
+ * the server reads it from the stored object rather than trusting the caller.
+ */
+export type FileCreateInput = Pick<TablesInsert<"files">, "name" | "file_ref">;
 
-export type ImageUpdateInput = Partial<ImageCreateInput>;
+/** Only the display name is editable - `file_ref` would let a caller point the row at any path. */
+export type FileUpdateInput = Pick<FileCreateInput, "name">;
 
-export type ImageRecord = Tables<"images">;
+export type FileRecord = Tables<"files">;
+
+/** What the browser sends before uploading - checked against the allowed types and size. */
+export interface FileUploadRequest {
+    name: string;
+    mimeType: string;
+    size: number;
+}
+
+/** A one-time permit to upload a single object straight to Storage at `path`. */
+export interface FileUploadTicket {
+    path: string;
+    token: string;
+}
+
+/** Content tables whose rows can point at a file. */
+export type FileUsageTable = "sections" | "people" | "stat_items";
+
+/** One row that still points at a file - what blocks deleting it. */
+export interface FileUsage {
+    table: FileUsageTable;
+    id: string;
+    /** Human-readable name of the row, e.g. a person's name or a section's type. */
+    label: string;
+}
