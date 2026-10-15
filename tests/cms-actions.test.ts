@@ -162,7 +162,7 @@ describe("updateCmsRow", () => {
         mocks.createClient.mockResolvedValue(supabase);
 
         // simulates a hand-crafted POST - the type system stops this in app code
-        const result = await updateCmsRow(JSON.parse('"images"'), ROW_ID, { name: "x" });
+        const result = await updateCmsRow(JSON.parse('"files"'), ROW_ID, { name: "x" });
 
         expect(result.error?.message).toMatch(/couldn't be found/);
         expect(supabase.from).not.toHaveBeenCalled();
