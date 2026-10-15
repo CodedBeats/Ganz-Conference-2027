@@ -99,6 +99,7 @@ describe("createFileUpload", () => {
         [{ name: "Logo", mimeType: "image/svg+xml", size: 100 }, /Only PNG, JPG, WebP and PDF/],
         [{ name: "Logo", mimeType: "image/png", size: 50 * 1024 * 1024 }, /at most 20MB/],
         [{ name: "  ", mimeType: "image/png", size: 100 }, /Name is required/],
+        [{ name: "Logo", mimeType: "image/png", size: 100, folder: JSON.parse('"photos"') }, /Folder must be one of/],
     ])("rejects %o without asking storage", async (input, message) => {
         const supabase = useSupabase();
 
@@ -148,12 +149,18 @@ describe("createFile", () => {
         const row = { id: FILE_ID, name: "Logo", file_ref: STORAGE_PATH, mime_type: "image/png" };
         const supabase = useSupabase({ single: { data: row, error: null } });
 
-        const result = await createFile({ name: " Logo ", file_ref: STORAGE_PATH, ...{ mime_type: "application/pdf" } });
+        const result = await createFile({
+            name: " Logo ",
+            folder: "keynotes",
+            file_ref: STORAGE_PATH,
+            ...{ mime_type: "application/pdf" },
+        });
 
         expect(result).toEqual({ data: row, error: null });
         expect(supabase.bucket.info).toHaveBeenCalledWith(STORAGE_PATH);
         expect(supabase.builders.files.insert).toHaveBeenCalledWith({
             name: "Logo",
+            folder: "keynotes",
             file_ref: STORAGE_PATH,
             mime_type: "image/png",
         });
@@ -172,12 +179,30 @@ describe("createFile", () => {
 });
 
 describe("updateFile", () => {
-    it("only ever changes the name", async () => {
+    it("only ever changes the name and folder", async () => {
         const supabase = useSupabase({ single: { data: { id: FILE_ID }, error: null } });
 
         await updateFile(FILE_ID, { name: "New name", ...{ file_ref: "/etc/passwd" } });
 
         expect(supabase.builders.files.update).toHaveBeenCalledWith({ name: "New name" });
+    });
+
+    it("moves a file to another folder", async () => {
+        const supabase = useSupabase({ single: { data: { id: FILE_ID }, error: null } });
+
+        const result = await updateFile(FILE_ID, { folder: "committee" });
+
+        expect(result.error).toBeNull();
+        expect(supabase.builders.files.update).toHaveBeenCalledWith({ folder: "committee" });
+    });
+
+    it("rejects unknown folders", async () => {
+        const supabase = useSupabase();
+
+        const result = await updateFile(FILE_ID, { folder: JSON.parse('"photos"') });
+
+        expect(result.error?.message).toBe("Folder must be one of: keynotes, committee, misc, general.");
+        expect(supabase.from).not.toHaveBeenCalled();
     });
 
     it("treats a file_ref-only update as nothing to save", async () => {

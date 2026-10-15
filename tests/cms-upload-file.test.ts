@@ -33,27 +33,32 @@ describe("uploadFile", () => {
         mocks.createFile.mockResolvedValue({ data: row, error: null });
         const file = makeFile();
 
-        const result = await uploadFile(file, "GANZ logo");
+        const result = await uploadFile(file, { name: "GANZ logo", folder: "general" });
 
         expect(result).toEqual({ data: row, error: null });
-        expect(mocks.createFileUpload).toHaveBeenCalledWith({ name: "GANZ logo", mimeType: "image/png", size: file.size });
+        expect(mocks.createFileUpload).toHaveBeenCalledWith({
+            name: "GANZ logo",
+            folder: "general",
+            mimeType: "image/png",
+            size: file.size,
+        });
         expect(mocks.uploadToSignedUrl).toHaveBeenCalledWith(TICKET.path, TICKET.token, file);
-        expect(mocks.createFile).toHaveBeenCalledWith({ name: "GANZ logo", file_ref: TICKET.path });
+        expect(mocks.createFile).toHaveBeenCalledWith({ name: "GANZ logo", folder: "general", file_ref: TICKET.path });
     });
 
-    it("defaults the name to the file's own name", async () => {
+    it("defaults the name to the file's own name, without its extension", async () => {
         mocks.createFile.mockResolvedValue({ data: {}, error: null });
 
-        await uploadFile(makeFile());
+        await uploadFile(makeFile(), { folder: "keynotes" });
 
-        expect(mocks.createFile).toHaveBeenCalledWith({ name: "logo.png", file_ref: TICKET.path });
+        expect(mocks.createFile).toHaveBeenCalledWith({ name: "logo", folder: "keynotes", file_ref: TICKET.path });
     });
 
     it("stops if the ticket is refused", async () => {
         const error = { message: "Only PNG, JPG, WebP and PDF files can be uploaded.", hint: null, code: null, codeMeaning: null };
         mocks.createFileUpload.mockResolvedValue({ data: null, error });
 
-        const result = await uploadFile(makeFile());
+        const result = await uploadFile(makeFile(), { folder: "general" });
 
         expect(result.error).toBe(error);
         expect(mocks.uploadToSignedUrl).not.toHaveBeenCalled();
@@ -68,7 +73,7 @@ describe("uploadFile", () => {
         const error = Object.assign(new Error(raw), { name: "StorageApiError", status: 400, code });
         mocks.uploadToSignedUrl.mockResolvedValue({ data: null, error });
 
-        const result = await uploadFile(makeFile());
+        const result = await uploadFile(makeFile(), { folder: "general" });
 
         expect(result.error?.message).toMatch(message);
         expect(result.error?.code).toBe(code);
@@ -79,7 +84,7 @@ describe("uploadFile", () => {
     it("catches network failures during the upload", async () => {
         mocks.uploadToSignedUrl.mockRejectedValue(new Error("Failed to fetch"));
 
-        const result = await uploadFile(makeFile());
+        const result = await uploadFile(makeFile(), { folder: "general" });
 
         expect(result.error?.message).toBe("Something went wrong. Please try again.");
         expect(result.error?.codeMeaning).toBe("Failed to fetch");
