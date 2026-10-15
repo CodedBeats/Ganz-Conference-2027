@@ -3,7 +3,9 @@ import { splitParagraphs } from "@/lib/content/text";
 import { SectionTag } from "@/components/shared/SectionTag";
 import { RichText } from "@/components/shared/RichText";
 import { ContentImage } from "@/components/shared/ContentImage";
+import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
 import { CmsBox } from "@/components/cms/CmsBox";
+import { CmsImageSlot } from "@/components/cms/CmsImageSlot";
 import { CmsText } from "@/components/cms/CmsText";
 import { CmsHideWhileEditing } from "@/components/cms/CmsHideWhileEditing";
 
@@ -61,16 +63,24 @@ export const Welcome = ({ section }: { section?: CmsSection }) => {
                 </CmsBox>
 
                 {/* stays pinned below the navbar while the welcome copy scrolls past */}
-                {section.image && (
-                    <div className="relative aspect-4/5 w-full lg:sticky lg:top-28">
-                        <ContentImage
-                            image={section.image}
-                            alt=""
-                            fill
-                            className="rounded-3xl object-cover shadow-lg shadow-teal-dark/10"
-                        />
-                    </div>
-                )}
+                <CmsImageSlot
+                    table="sections"
+                    rowId={section.id}
+                    field="image_id"
+                    fileId={section.image?.id ?? null}
+                    folder="general"
+                    label="Welcome section"
+                    className="relative aspect-4/5 w-full lg:sticky lg:top-28"
+                    isHiddenWhenEmpty
+                    placeholder={<PlaceholderBox label="Image" className="absolute inset-0 rounded-3xl" />}
+                >
+                    <ContentImage
+                        image={section.image}
+                        alt=""
+                        fill
+                        className="rounded-3xl object-cover shadow-lg shadow-teal-dark/10"
+                    />
+                </CmsImageSlot>
             </div>
         </section>
     );
