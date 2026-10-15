@@ -4,6 +4,7 @@ import { SectionHeaderRow } from "@/components/shared/SectionHeaderRow";
 import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
 import { ContentImage } from "@/components/shared/ContentImage";
 import { CmsBox } from "@/components/cms/CmsBox";
+import { CmsImageSlot } from "@/components/cms/CmsImageSlot";
 import { CmsText } from "@/components/cms/CmsText";
 import { CmsStyleField } from "@/components/cms/CmsStyleField";
 import type { CmsStyleOption } from "@/components/cms/CmsStyleFieldClient";
@@ -44,17 +45,28 @@ const KeynoteCard = ({ person }: { person: CmsPerson }) => {
                 isTba ? "bg-teal-light text-teal-dark" : "bg-teal-dark p-4 text-cream md:p-4",
             )}
         >
-            {isTba ? (
-                <PlaceholderBox label="TBA" className="mb-8 aspect-5/6 bg-teal/15 text-teal" />
-            ) : (
-                <ContentImage
-                    image={person.image}
-                    alt={person.name}
-                    width={750}
-                    height={500}
-                    className="mb-8 aspect-5/6 w-full rounded-2xl object-cover object-top"
-                />
-            )}
+            <CmsImageSlot
+                table="people"
+                rowId={person.id}
+                field="image"
+                fileId={person.image?.id ?? null}
+                folder="keynotes"
+                label={`Keynote: ${person.name}`}
+                className="mb-8"
+                placeholder={isTba ? undefined : <PlaceholderBox label="Photo" className="aspect-5/6" />}
+            >
+                {isTba ? (
+                    <PlaceholderBox label="TBA" className="aspect-5/6 bg-teal/15 text-teal" />
+                ) : (
+                    <ContentImage
+                        image={person.image}
+                        alt={person.name}
+                        width={750}
+                        height={500}
+                        className="aspect-5/6 w-full rounded-2xl object-cover object-top"
+                    />
+                )}
+            </CmsImageSlot>
 
             <div className={cn(!isTba && "px-3 pb-3")}>
                 <CmsStyleField options={KEYNOTE_STYLES} />

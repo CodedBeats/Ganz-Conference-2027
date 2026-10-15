@@ -4,6 +4,7 @@ import { SectionHeaderRow } from "@/components/shared/SectionHeaderRow";
 import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
 import { ContentImage } from "@/components/shared/ContentImage";
 import { CmsBox } from "@/components/cms/CmsBox";
+import { CmsImageSlot } from "@/components/cms/CmsImageSlot";
 import { CmsText } from "@/components/cms/CmsText";
 import { CmsStyleField } from "@/components/cms/CmsStyleField";
 import type { CmsStyleOption } from "@/components/cms/CmsStyleFieldClient";
@@ -27,19 +28,29 @@ const MemberCard = ({ member }: { member: CmsPerson }) => {
             values={{ name: member.name, title: member.title, description: member.description, style: member.style }}
             className={cn("hover-shadow rounded-3xl p-4 pb-6", isPlaceholder ? "bg-teal-light" : "bg-white")}
         >
-            <ContentImage
-                image={member.image}
-                alt={member.name}
-                width={400}
-                height={400}
-                className="mb-5 aspect-square w-full rounded-2xl object-cover"
-                fallback={
-                    <PlaceholderBox
-                        label={isPlaceholder ? "TBA" : "TBC"}
-                        className={cn("mb-5 aspect-square", isPlaceholder && "bg-teal/15 text-teal")}
-                    />
-                }
-            />
+            <CmsImageSlot
+                table="people"
+                rowId={member.id}
+                field="image"
+                fileId={member.image?.id ?? null}
+                folder="committee"
+                label={`Committee: ${member.name}`}
+                className="mb-5"
+            >
+                <ContentImage
+                    image={member.image}
+                    alt={member.name}
+                    width={400}
+                    height={400}
+                    className="aspect-square w-full rounded-2xl object-cover"
+                    fallback={
+                        <PlaceholderBox
+                            label={isPlaceholder ? "TBA" : "TBC"}
+                            className={cn("aspect-square", isPlaceholder && "bg-teal/15 text-teal")}
+                        />
+                    }
+                />
+            </CmsImageSlot>
 
             <div className="px-1">
                 <CmsStyleField options={MEMBER_STYLES} />

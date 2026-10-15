@@ -3,6 +3,7 @@ import { SectionTag } from "@/components/shared/SectionTag";
 import { RichText } from "@/components/shared/RichText";
 import { ContentImage } from "@/components/shared/ContentImage";
 import { CmsBox } from "@/components/cms/CmsBox";
+import { CmsImageSlot } from "@/components/cms/CmsImageSlot";
 import { CmsText } from "@/components/cms/CmsText";
 
 const HEADING_CLASS = "mb-5 text-3xl leading-tight font-heading sm:text-4xl md:text-5xl";
@@ -32,19 +33,30 @@ const SponsorSlot = ({ sponsor }: { sponsor: CmsStatItem }) => {
             values={{ label: sponsor.label, value: sponsor.value }}
             className="hover-lift flex aspect-2/1 flex-col items-center justify-center gap-3 rounded-3xl bg-white/10 hover:bg-white/25"
         >
-            {sponsor.value ? (
-                <a
-                    href={sponsor.value}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={sponsor.label}
-                    className="flex size-full items-center justify-center"
-                >
-                    {logo}
-                </a>
-            ) : (
-                logo
-            )}
+            {/* the slot wraps the link rather than sitting inside it, so its button never triggers navigation */}
+            <CmsImageSlot
+                table="stat_items"
+                rowId={sponsor.id}
+                field="image"
+                fileId={sponsor.image?.id ?? null}
+                folder="misc"
+                label={`Sponsor: ${sponsor.label}`}
+                className="flex w-full flex-1 items-center justify-center"
+            >
+                {sponsor.value ? (
+                    <a
+                        href={sponsor.value}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={sponsor.label}
+                        className="flex size-full items-center justify-center"
+                    >
+                        {logo}
+                    </a>
+                ) : (
+                    logo
+                )}
+            </CmsImageSlot>
 
             {/* neither shows as text on the page - the name is the logo's alt text, the website is its link */}
             <CmsText field="label" label="Sponsor name" editClassName="w-full px-5 text-left text-sm" />
