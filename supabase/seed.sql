@@ -5,11 +5,11 @@
 
 -- Files: only real assets in /public/design. Anything without one (committee
 -- photos, TBA keynotes, sponsor logos) stays null so the UI shows its placeholder.
-insert into public.files (name, file_ref, mime_type) values
-    ('ganz-logo',                '/design/logo/GANZLogo_FullColour.png', 'image/png'),
-    ('welcome',                  '/design/imgs/welcome.jpg',             'image/jpeg'),
-    ('accommodation',            '/design/imgs/accommodation.jpg',       'image/jpeg'),
-    ('keynote-michael-clemmens', '/design/imgs/Michael Clemons.jpg',     'image/jpeg');
+insert into public.files (name, file_ref, mime_type, folder) values
+    ('ganz-logo',                '/design/logo/GANZLogo_FullColour.png', 'image/png',  'general'),
+    ('welcome',                  '/design/imgs/welcome.jpg',             'image/jpeg', 'general'),
+    ('accommodation',            '/design/imgs/accommodation.jpg',       'image/jpeg', 'general'),
+    ('keynote-michael-clemmens', '/design/imgs/Michael Clemons.jpg',     'image/jpeg', 'keynotes');
 
 -- Sections: `type` matches each section's DOM id
 insert into public.sections (type, heading, subheading, body, excerpt, sort_order, image_id) values

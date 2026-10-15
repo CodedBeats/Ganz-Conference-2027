@@ -3,7 +3,9 @@ import { EVENT } from "@/lib/content/site";
 import { SectionTag } from "@/components/shared/SectionTag";
 import { RichText } from "@/components/shared/RichText";
 import { ContentImage } from "@/components/shared/ContentImage";
+import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
 import { CmsBox } from "@/components/cms/CmsBox";
+import { CmsImageSlot } from "@/components/cms/CmsImageSlot";
 import { CmsText } from "@/components/cms/CmsText";
 
 const EXCERPT_CLASS = "mb-6 text-xl font-medium sm:mb-8 sm:text-xl md:text-2xl";
@@ -73,22 +75,36 @@ export const Hero = ({ section }: { section?: CmsSection }) => {
                 </div>
 
                 {/* logo medallion - the ring is pinned to it via .medallion-wrap in globals.css */}
-                {section.image && (
-                    <div className="flex justify-center lg:justify-end">
+                <CmsImageSlot
+                    table="sections"
+                    rowId={section.id}
+                    field="image_id"
+                    fileId={section.image?.id ?? null}
+                    folder="general"
+                    label="Hero logo"
+                    className="flex justify-center lg:justify-end"
+                    isHiddenWhenEmpty
+                    placeholder={
                         <div className="medallion-wrap">
                             <div className="logo-medallion">
-                                <ContentImage
-                                    image={section.image}
-                                    alt="GANZ - Gestalt Australia & New Zealand"
-                                    width={300}
-                                    height={261}
-                                    preload
-                                    className="h-auto w-full"
-                                />
+                                <PlaceholderBox label="Logo" className="size-full rounded-full" />
                             </div>
                         </div>
+                    }
+                >
+                    <div className="medallion-wrap">
+                        <div className="logo-medallion">
+                            <ContentImage
+                                image={section.image}
+                                alt="GANZ - Gestalt Australia & New Zealand"
+                                width={300}
+                                height={261}
+                                preload
+                                className="h-auto w-full"
+                            />
+                        </div>
                     </div>
-                )}
+                </CmsImageSlot>
             </div>
         </header>
     );

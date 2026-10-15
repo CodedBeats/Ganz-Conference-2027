@@ -2,6 +2,7 @@
 
 import { AlertTriangle, PencilLine } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { CmsErrorDetails } from "@/components/cms/CmsErrorDetails";
 import type { CmsError } from "@/types/cms";
 
 /** What the dialog is currently showing. */
@@ -28,33 +29,8 @@ const ErrorBody = ({ itemLabel, error }: { itemLabel: string; error: CmsError })
             <AlertTriangle className="size-5" aria-hidden="true" />
         </span>
         <DialogTitle className="text-xl leading-snug font-medium">Couldn&apos;t save &ldquo;{itemLabel}&rdquo;</DialogTitle>
-
-        <div className="space-y-4 text-base leading-relaxed">
-            <section>
-                <h3 className="eyebrow mb-1 text-teal-dark/50">What happened</h3>
-                <DialogDescription className="text-base text-teal-dark">{error.message}</DialogDescription>
-            </section>
-
-            {error.hint && (
-                <section>
-                    <h3 className="eyebrow mb-1 text-teal-dark/50">What to do</h3>
-                    <p>{error.hint}</p>
-                </section>
-            )}
-
-            <p className="text-sm text-teal-dark/60">Your edits are still in the box - nothing has been lost.</p>
-
-            {/* a code is only ever shown next to its explanation */}
-            {error.codeMeaning && (
-                <details className="rounded-2xl bg-teal-pale px-4 py-3 text-sm">
-                    <summary className="cursor-pointer font-medium">Technical details</summary>
-                    <p className="mt-2 text-teal-dark/80">
-                        {error.code && <span className="font-mono">Error code {error.code}: </span>}
-                        {error.codeMeaning}
-                    </p>
-                </details>
-            )}
-        </div>
+        <CmsErrorDetails error={error} isInDialog />
+        <p className="text-sm text-teal-dark/60">Your edits are still in the box - nothing has been lost.</p>
     </>
 );
 

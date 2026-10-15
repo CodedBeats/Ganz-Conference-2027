@@ -7,9 +7,9 @@ import { useCmsEditor } from "@/hooks/useCmsEditor";
 
 const BAR_LINK = "rounded-full px-3 py-1.5 transition-colors hover:bg-cream/10";
 
-/** Floating admin controls: edit boxes on/off (to preview the page as visitors see it), dashboard, sign out. */
+/** Floating admin controls: edit boxes on/off (to preview the page as visitors see it), files, dashboard, sign out. */
 export const AdminBar = () => {
-    const { isEditMode, setEditMode } = useCmsEditor();
+    const { isEditMode, setEditMode, openFileManager } = useCmsEditor();
 
     return (
         <div className="fixed right-4 bottom-4 z-40 flex items-center gap-1 rounded-full bg-teal-dark py-1.5 pr-1.5 pl-4 text-sm text-cream shadow-xl shadow-teal-dark/30">
@@ -37,6 +37,10 @@ export const AdminBar = () => {
                     />
                 </span>
                 Edit boxes
+            </button>
+
+            <button type="button" onClick={openFileManager} className={BAR_LINK}>
+                Files
             </button>
 
             <Link href="/admin" className={BAR_LINK}>

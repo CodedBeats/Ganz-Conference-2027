@@ -1,4 +1,5 @@
 import { CMS_STYLES } from "@/types/content";
+import { FILE_FOLDERS, isFileFolder } from "@/lib/cms/files";
 import type {
     FileCreateInput,
     FileUpdateInput,
@@ -19,6 +20,7 @@ import type {
  * - `integer` - a whole number (e.g. `sort_order`)
  * - `boolean` - `true` / `false`
  * - `style` - one of {@link CMS_STYLES}
+ * - `folder` - one of {@link FILE_FOLDERS}
  * - `id` - required uuid (a foreign key that must be set)
  * - `nullableId` - uuid or `null`; `""` becomes `null`
  */
@@ -29,6 +31,7 @@ export type FieldKind =
     | "integer"
     | "boolean"
     | "style"
+    | "folder"
     | "id"
     | "nullableId";
 
@@ -86,6 +89,8 @@ function sanitizeField(value: unknown, kind: FieldKind, label: string): FieldRes
             return CMS_STYLES.some((style) => style === value)
                 ? ok(value)
                 : fail(`${label} must be one of: ${CMS_STYLES.join(", ")}.`);
+        case "folder":
+            return isFileFolder(value) ? ok(value) : fail(`${label} must be one of: ${FILE_FOLDERS.join(", ")}.`);
         case "id":
             return isValidId(value) ? ok(value) : fail(`${label} is missing or invalid.`);
         case "nullableId":
@@ -191,6 +196,7 @@ export const STAT_ITEM_CREATE_FIELDS: FieldSchema<StatItemCreateInput> = {
 
 export const FILE_UPDATE_FIELDS: FieldSchema<FileUpdateInput> = {
     name: "text",
+    folder: "folder",
 };
 
 /** `file_ref` is also checked against {@link isGeneratedStoragePath} - any non-empty text isn't enough. */

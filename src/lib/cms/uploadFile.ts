@@ -1,10 +1,17 @@
 import { createClient } from "@/lib/supabase/client";
 import { createFile, createFileUpload } from "@/lib/cms/actions";
-import { FILES_BUCKET, MAX_FILE_BYTES } from "@/lib/cms/files";
+import { FILES_BUCKET, MAX_FILE_BYTES, stripExtension, type FileFolder } from "@/lib/cms/files";
 import { handleError } from "@/lib/errors";
 import type { CmsActionResult, CmsError, FileRecord } from "@/types/cms";
 
 const UPLOAD_HINT = "Pick a different file, then try again.";
+
+export interface UploadFileOptions {
+    /** Library folder to file it under. */
+    folder: FileFolder;
+    /** Display name. Defaults to the file's own name without its extension. */
+    name?: string;
+}
 
 /**
  * The Storage API's error code, e.g. `EntityTooLarge`.
@@ -51,11 +58,14 @@ function toUploadError(error: unknown): CmsError {
  * If step 3 fails the object is left in the bucket unreferenced - harmless, just unused.
  *
  * @param file - From an `<input type="file">` or a drop event.
- * @param name - Display name for the CMS file library. Defaults to the file's own name.
+ * @param options - Folder and optional display name - see {@link UploadFileOptions}.
  * @returns The new `files` row, or an error ready to show.
  */
-export async function uploadFile(file: File, name = file.name): Promise<CmsActionResult<FileRecord>> {
-    const ticket = await createFileUpload({ name, mimeType: file.type, size: file.size });
+export async function uploadFile(
+    file: File,
+    { folder, name = stripExtension(file.name) }: UploadFileOptions,
+): Promise<CmsActionResult<FileRecord>> {
+    const ticket = await createFileUpload({ name, folder, mimeType: file.type, size: file.size });
     if (ticket.error) return ticket;
 
     try {
@@ -68,5 +78,5 @@ export async function uploadFile(file: File, name = file.name): Promise<CmsActio
         return { data: null, error: toUploadError(error) };
     }
 
-    return createFile({ name, file_ref: ticket.data.path });
+    return createFile({ name, folder, file_ref: ticket.data.path });
 }

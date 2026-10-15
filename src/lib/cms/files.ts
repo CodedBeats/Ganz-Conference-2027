@@ -25,6 +25,22 @@ export const FILE_MIME_TYPES = {
 
 export type FileMimeType = keyof typeof FILE_MIME_TYPES;
 
+/** Folders in the CMS file library, in display order. Matches the `files.folder` check constraint. */
+export const FILE_FOLDERS = ["keynotes", "committee", "misc", "general"] as const;
+
+export type FileFolder = (typeof FILE_FOLDERS)[number];
+
+export const FOLDER_LABELS: Record<FileFolder, string> = {
+    keynotes: "Keynotes",
+    committee: "Committee",
+    misc: "Misc",
+    general: "General",
+};
+
+export function isFileFolder(value: unknown): value is FileFolder {
+    return FILE_FOLDERS.some((folder) => folder === value);
+}
+
 /** 20MB - matches the bucket's `file_size_limit`. */
 export const MAX_FILE_BYTES = 20 * 1024 * 1024;
 
@@ -32,6 +48,27 @@ const STORAGE_PATH_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[
 
 export function isFileMimeType(value: unknown): value is FileMimeType {
     return typeof value === "string" && Object.hasOwn(FILE_MIME_TYPES, value);
+}
+
+/** Whether a file can go in an image slot - everything allowed except PDFs. */
+export function isImageMimeType(mimeType: string): boolean {
+    return isFileMimeType(mimeType) && mimeType.startsWith("image/");
+}
+
+/**
+ * The extension shown after a file's name in the CMS, e.g. `jpg`.
+ *
+ * @remarks
+ * Derived from `mime_type` rather than stored in `name`, so renaming can't break it.
+ */
+export function getFileExtension(mimeType: string): string {
+    return isFileMimeType(mimeType) ? FILE_MIME_TYPES[mimeType] : "";
+}
+
+/** `"Team photo.final.jpg"` -> `"Team photo.final"` - the default display name for an upload. */
+export function stripExtension(fileName: string): string {
+    const dot = fileName.lastIndexOf(".");
+    return dot > 0 ? fileName.slice(0, dot) : fileName;
 }
 
 /**
@@ -131,16 +168,33 @@ export async function findFileUsages(supabase: SupabaseClient<Database>, fileId:
     const error = sections.error ?? people.error ?? statItems.error;
     if (error) throw error;
 
+    return toFileUsages({ sections: sections.data ?? [], people: people.data ?? [], stat_items: statItems.data ?? [] });
+}
+
+/** A `files` row with its referencing rows embedded, as `getFiles` selects it. */
+export interface FileRowWithReferences {
+    sections: { id: string; type: string }[];
+    people: { id: string; name: string }[];
+    stat_items: { id: string; label: string }[];
+}
+
+/** Flattens the embedded references from {@link FileRowWithReferences} into a usage list. */
+export function toFileUsages({ sections, people, stat_items }: FileRowWithReferences): FileUsage[] {
     return [
-        ...(sections.data ?? []).map((row) => ({ table: "sections" as const, id: row.id, label: row.type })),
-        ...(people.data ?? []).map((row) => ({ table: "people" as const, id: row.id, label: row.name })),
-        ...(statItems.data ?? []).map((row) => ({ table: "stat_items" as const, id: row.id, label: row.label })),
+        ...sections.map((row) => ({ table: "sections" as const, id: row.id, label: row.type })),
+        ...people.map((row) => ({ table: "people" as const, id: row.id, label: row.name })),
+        ...stat_items.map((row) => ({ table: "stat_items" as const, id: row.id, label: row.label })),
     ];
+}
+
+/** `Person "Ada"` - one usage, for the file manager's "Used in" list. */
+export function describeFileUsage(usage: FileUsage): string {
+    return `${USAGE_LABELS[usage.table]} "${usage.label}"`;
 }
 
 /** `Person "Ada", Section "welcome"` - for error copy and the CMS delete warning. */
 export function describeFileUsages(usages: FileUsage[]): string {
-    return usages.map((usage) => `${USAGE_LABELS[usage.table]} "${usage.label}"`).join(", ");
+    return usages.map(describeFileUsage).join(", ");
 }
 
 /** The error returned when a delete is refused because the file is still in use. */

@@ -2,7 +2,9 @@ import type { CmsSection } from "@/types/content";
 import { SectionTag } from "@/components/shared/SectionTag";
 import { RichText } from "@/components/shared/RichText";
 import { ContentImage } from "@/components/shared/ContentImage";
+import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
 import { CmsBox } from "@/components/cms/CmsBox";
+import { CmsImageSlot } from "@/components/cms/CmsImageSlot";
 import { CmsText } from "@/components/cms/CmsText";
 
 const STATUS_CLASS =
@@ -40,16 +42,24 @@ export const Accommodation = ({ section }: { section?: CmsSection }) => {
                     </CmsText>
                 </CmsBox>
 
-                {section.image && (
-                    <div className="hover-grow relative aspect-5/4 w-full">
-                        <ContentImage
-                            image={section.image}
-                            alt=""
-                            fill
-                            className="rounded-3xl object-cover shadow-lg shadow-teal-dark/10"
-                        />
-                    </div>
-                )}
+                <CmsImageSlot
+                    table="sections"
+                    rowId={section.id}
+                    field="image_id"
+                    fileId={section.image?.id ?? null}
+                    folder="general"
+                    label="Accommodation section"
+                    className="hover-grow relative aspect-5/4 w-full"
+                    isHiddenWhenEmpty
+                    placeholder={<PlaceholderBox label="Image" className="absolute inset-0 rounded-3xl" />}
+                >
+                    <ContentImage
+                        image={section.image}
+                        alt=""
+                        fill
+                        className="rounded-3xl object-cover shadow-lg shadow-teal-dark/10"
+                    />
+                </CmsImageSlot>
             </div>
         </section>
     );

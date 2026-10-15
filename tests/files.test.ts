@@ -2,11 +2,17 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
     MAX_FILE_BYTES,
     buildStoragePath,
+    describeFileUsage,
     describeFileUsages,
     fileInUseError,
+    getFileExtension,
     getFileUrl,
+    isFileFolder,
     isGeneratedStoragePath,
+    isImageMimeType,
     isStorageRef,
+    stripExtension,
+    toFileUsages,
     validateUpload,
 } from "../src/lib/cms/files";
 
@@ -89,5 +95,48 @@ describe("file in use copy", () => {
     it("uses the singular for one place", () => {
         const error = fileInUseError([{ table: "stat_items", id: "1", label: "Days" }]);
         expect(error.message).toBe('This file is still used in 1 place: Stat item "Days".');
+    });
+});
+
+describe("folders and display names", () => {
+    it("knows the four folders", () => {
+        expect(isFileFolder("keynotes")).toBe(true);
+        expect(isFileFolder("general")).toBe(true);
+        expect(isFileFolder("photos")).toBe(false);
+        expect(isFileFolder(undefined)).toBe(false);
+    });
+
+    it("derives the extension from the mime type", () => {
+        expect(getFileExtension("image/jpeg")).toBe("jpg");
+        expect(getFileExtension("application/pdf")).toBe("pdf");
+        expect(getFileExtension("text/plain")).toBe("");
+        expect(isImageMimeType("image/webp")).toBe(true);
+        expect(isImageMimeType("application/pdf")).toBe(false);
+    });
+
+    it.each([
+        ["logo.png", "logo"],
+        ["Team photo.final.jpg", "Team photo.final"],
+        ["README", "README"],
+        [".hidden", ".hidden"],
+    ])("strips the extension from %s", (fileName, expected) => {
+        expect(stripExtension(fileName)).toBe(expected);
+    });
+});
+
+describe("toFileUsages", () => {
+    it("flattens embedded references into labelled usages", () => {
+        expect(
+            toFileUsages({
+                sections: [{ id: "s1", type: "welcome" }],
+                people: [{ id: "p1", name: "Ada" }],
+                stat_items: [{ id: "st1", label: "Sponsor one" }],
+            }),
+        ).toEqual([
+            { table: "sections", id: "s1", label: "welcome" },
+            { table: "people", id: "p1", label: "Ada" },
+            { table: "stat_items", id: "st1", label: "Sponsor one" },
+        ]);
+        expect(describeFileUsage({ table: "stat_items", id: "st1", label: "Sponsor one" })).toBe('Stat item "Sponsor one"');
     });
 });
