@@ -15,6 +15,7 @@ import { GateLogoutButton } from "@/components/gate/GateLogoutButton";
 import { CmsEditorProvider } from "@/components/cms/CmsEditorProvider";
 import { AdminBar } from "@/components/cms/AdminBar";
 import { getPageContent } from "@/lib/content/getPageContent";
+import { getFiles } from "@/lib/content/getFiles";
 import { isCmsEditor } from "@/lib/cms/editor";
 
 const Home = async () => {
@@ -42,11 +43,13 @@ const Home = async () => {
         </>
     );
 
-    // admins get the inline editor; visitors never receive its provider or toolbar
+    // admins get the inline editor; visitors never receive its provider, toolbar or file list
     if (!isEditor) return page;
 
+    const files = await getFiles();
+
     return (
-        <CmsEditorProvider>
+        <CmsEditorProvider files={files}>
             {page}
             <AdminBar />
         </CmsEditorProvider>

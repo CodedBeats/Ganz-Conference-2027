@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { CmsError } from "@/types/cms";
+import type { CmsError, LibraryFile } from "@/types/cms";
 
 /** The box currently in edit mode - only one may be open at a time. */
 export interface ActiveCmsBox {
@@ -23,6 +23,10 @@ export interface CmsEditorContextValue {
     releaseBox: (id: string) => void;
     /** Opens the error dialog for a failed save of `itemLabel`. */
     showError: (itemLabel: string, error: CmsError) => void;
+    /** The whole file library, for the file manager and image pickers. */
+    files: LibraryFile[];
+    /** Opens the file manager modal (not as a picker). */
+    openFileManager: () => void;
 }
 
 export const CmsEditorContext = createContext<CmsEditorContextValue | null>(null);
