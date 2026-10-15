@@ -38,6 +38,7 @@ export type Database = {
                 Row: {
                     created_at: string;
                     file_ref: string;
+                    folder: string;
                     id: string;
                     mime_type: string;
                     name: string;
@@ -46,6 +47,7 @@ export type Database = {
                 Insert: {
                     created_at?: string;
                     file_ref: string;
+                    folder?: string;
                     id?: string;
                     mime_type: string;
                     name: string;
@@ -54,6 +56,7 @@ export type Database = {
                 Update: {
                     created_at?: string;
                     file_ref?: string;
+                    folder?: string;
                     id?: string;
                     mime_type?: string;
                     name?: string;
@@ -105,7 +108,7 @@ export type Database = {
                     {
                         foreignKeyName: "people_image_fkey";
                         columns: ["image"];
-                        isOneToOne: true;
+                        isOneToOne: false;
                         referencedRelation: "files";
                         referencedColumns: ["id"];
                     },
@@ -209,7 +212,7 @@ export type Database = {
                     {
                         foreignKeyName: "stat_items_image_fkey";
                         columns: ["image"];
-                        isOneToOne: true;
+                        isOneToOne: false;
                         referencedRelation: "files";
                         referencedColumns: ["id"];
                     },
