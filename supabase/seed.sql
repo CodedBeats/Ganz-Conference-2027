@@ -3,13 +3,13 @@
 -- by \n, and *asterisks* mark the accent-coloured highlight spans.
 -- style: 'primary' = normal look, 'secondary' = alternate look (TBC / TBA / dark card).
 
--- Images: only real assets in /public/design. Anything without one (committee
+-- Files: only real assets in /public/design. Anything without one (committee
 -- photos, TBA keynotes, sponsor logos) stays null so the UI shows its placeholder.
-insert into public.images (name, file_ref) values
-    ('ganz-logo',                '/design/logo/GANZLogo_FullColour.png'),
-    ('welcome',                  '/design/imgs/welcome.jpg'),
-    ('accommodation',            '/design/imgs/accommodation.jpg'),
-    ('keynote-michael-clemmens', '/design/imgs/Michael Clemons.jpg');
+insert into public.files (name, file_ref, mime_type) values
+    ('ganz-logo',                '/design/logo/GANZLogo_FullColour.png', 'image/png'),
+    ('welcome',                  '/design/imgs/welcome.jpg',             'image/jpeg'),
+    ('accommodation',            '/design/imgs/accommodation.jpg',       'image/jpeg'),
+    ('keynote-michael-clemmens', '/design/imgs/Michael Clemons.jpg',     'image/jpeg');
 
 -- Sections: `type` matches each section's DOM id
 insert into public.sections (type, heading, subheading, body, excerpt, sort_order, image_id) values
@@ -18,7 +18,7 @@ insert into public.sections (type, heading, subheading, body, excerpt, sort_orde
         'Celebrating 30 years of GANZ',
         null,
         '13th National *Gestalt Australia & New Zealand* Conference',
-        1, (select id from public.images where name = 'ganz-logo')),
+        1, (select id from public.files where name = 'ganz-logo')),
     ('welcome',
         'It is with great pleasure that we welcome you to the 13th Gestalt Australia & New Zealand Conference, *In Our Bodies, Of The Field*, held on the lands of the Yugambeh people of the Gold Coast, and marking 30 years of Gestalt Australia & New Zealand.',
         null,
@@ -33,7 +33,7 @@ insert into public.sections (type, heading, subheading, body, excerpt, sort_orde
             'We look forward to welcoming you to the Gold Coast in June 2027, as we celebrate 30 years of GANZ and gather together to imagine, question and create the next chapter of our community.'
         ], E'\n\n'),
         'And we will ask what happens when we bring this awareness more fully into our therapeutic relationships and into our understanding of field.',
-        2, (select id from public.images where name = 'welcome')),
+        2, (select id from public.files where name = 'welcome')),
     ('program',
         'Explore a dynamic three-day program featuring keynote presentations, clinical conversations, research discussions, experiential workshops, and somatic offerings that invite us to *move, rest, play* and reconnect with our bodies.',
         null, null, null,
@@ -61,7 +61,7 @@ insert into public.sections (type, heading, subheading, body, excerpt, sort_orde
         null,
         'We are securing a selection of accommodation options close to the Griffith University Gold Coast campus, across a range of price points. Details will be published here.',
         'Details to be confirmed',
-        7, (select id from public.images where name = 'accommodation')),
+        7, (select id from public.files where name = 'accommodation')),
     ('sponsors',
         'Supporting thirty years of Gestalt practice.',
         null,
@@ -152,7 +152,7 @@ join public.stat_items tier
 
 -- People: keynotes and committee
 insert into public.people (image, name, title, location, description, link, style, sort_order, section_id) values
-    ((select id from public.images where name = 'keynote-michael-clemmens'),
+    ((select id from public.files where name = 'keynote-michael-clemmens'),
         'Michael Clemmens', null, 'Pittsburgh, USA',
         'Psychologist, Gestalt trainer and author whose work centres the body as the ground of contact. He teaches internationally on embodiment, addiction and the somatic field of the therapeutic relationship.',
         'https://michaelclemmens.com',
