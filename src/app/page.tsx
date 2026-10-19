@@ -39,7 +39,7 @@ const Home = async () => {
                 <Contact section={content.contact} />
                 <GateLogoutButton />
             </main>
-            <Footer />
+            <Footer section={content.footer} />
         </>
     );
 

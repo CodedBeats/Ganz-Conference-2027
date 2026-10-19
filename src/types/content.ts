@@ -14,7 +14,7 @@ export interface NavLink {
     label: string;
 }
 
-/** Every section `type` the home page knows how to render. Matches each section's DOM id. */
+/** Every section `type` the home page knows how to render. Matches each section's DOM id (`footer` has none). */
 export const SECTION_TYPES = [
     "hero",
     "welcome",
@@ -27,6 +27,7 @@ export const SECTION_TYPES = [
     "committee",
     "faqs",
     "contact",
+    "footer",
 ] as const;
 
 export type SectionType = (typeof SECTION_TYPES)[number];
