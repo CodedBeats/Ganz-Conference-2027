@@ -1,5 +1,5 @@
 import type { CmsSection, CmsStatItem } from "@/types/content";
-import { NAV_LINKS } from "@/lib/content/site";
+import { FOOTER_LINKS } from "@/lib/content/site";
 import { RichText } from "@/components/shared/RichText";
 import { ContentImage } from "@/components/shared/ContentImage";
 import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
@@ -9,14 +9,14 @@ import { CmsText } from "@/components/cms/CmsText";
 
 // footer splits the nav into two columns; ABOUT holds the last four links
 const ABOUT_IDS = new Set(["sponsors", "committee", "faqs", "contact"]);
-const CONFERENCE_LINKS = NAV_LINKS.filter((link) => !ABOUT_IDS.has(link.id));
-const ABOUT_LINKS = NAV_LINKS.filter((link) => ABOUT_IDS.has(link.id));
+const CONFERENCE_LINKS = FOOTER_LINKS.filter((link) => !ABOUT_IDS.has(link.id));
+const ABOUT_LINKS = FOOTER_LINKS.filter((link) => ABOUT_IDS.has(link.id));
 
 const DESCRIPTION_CLASS = "max-w-xs text-base leading-relaxed text-teal-dark/70";
 const ACKNOWLEDGEMENT_CLASS = "text-sm leading-relaxed text-teal-dark/70";
 const COPYRIGHT_CLASS = "text-sm text-teal-dark/60";
 
-const FooterLinks = ({ heading, links }: { heading: string; links: typeof NAV_LINKS }) => (
+const FooterLinks = ({ heading, links }: { heading: string; links: typeof FOOTER_LINKS }) => (
     <div>
         <span className="eyebrow mb-5 text-teal-dark/50">{heading}</span>
         <ul className="space-y-2.5">

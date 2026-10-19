@@ -20,6 +20,17 @@ export const NAV_LINKS: NavLink[] = [
 ];
 
 /**
+ * Footer links: the nav links plus Submissions, after Registrations.
+ *
+ * @remarks
+ * Submissions is reached from the hero button and kept out of the navbar so the bar
+ * doesn't overflow, but it still gets a footer link for anyone who scrolled past the hero.
+ */
+export const FOOTER_LINKS: NavLink[] = NAV_LINKS.flatMap((link) =>
+    link.id === "registrations" ? [link, { id: "submissions", label: "Submissions" }] : [link],
+);
+
+/**
  * Site config that isn't editable in the CMS (links, map position).
  */
 export const EVENT = {
@@ -28,5 +39,6 @@ export const EVENT = {
         "https://maps.app.goo.gl/11kzEXrxXa5RQnWk9",
     // TODO: point at the dedicated /register page once registration (phase 2) is built.
     registerHref: "#registrations",
+    submissionsHref: "#submissions",
     programHref: "#program",
 } as const;
