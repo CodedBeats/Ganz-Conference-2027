@@ -12,7 +12,13 @@ const EXCERPT_CLASS = "mb-6 text-xl font-medium sm:mb-8 sm:text-xl md:text-2xl";
 const HEADING_CLASS =
     "mb-8 text-5xl leading-[1.05] font-extralight tracking-tight sm:mb-12 sm:text-7xl md:text-[6.5rem]";
 
-export const Hero = ({ section }: { section?: CmsSection }) => {
+interface HeroProps {
+    section?: CmsSection;
+    /** Whether the Submissions section is published - the button would point at nothing otherwise. */
+    hasSubmissions: boolean;
+}
+
+export const Hero = ({ section, hasSubmissions }: HeroProps) => {
     if (!section) return null;
 
     return (
@@ -67,6 +73,14 @@ export const Hero = ({ section }: { section?: CmsSection }) => {
                                 </CmsBox>
                             ))}
                         </div>
+                        {hasSubmissions && (
+                            <a
+                                href={EVENT.submissionsHref}
+                                className="btn-pill btn-teal w-full py-5 sm:text-lg sm:w-auto sm:self-center"
+                            >
+                                Make a Submission →
+                            </a>
+                        )}
                         {/* TODO: swap for the dedicated /register page once registration (phase 2) is built */}
                         <a href={EVENT.registerHref} className="btn-pill btn-gold w-full py-5 sm:text-lg sm:w-auto sm:self-center">
                             Register Now →

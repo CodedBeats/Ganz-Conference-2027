@@ -5,6 +5,7 @@ import { Welcome } from "@/components/sections/Welcome";
 import { Program } from "@/components/sections/Program";
 import { Keynotes } from "@/components/sections/Keynotes";
 import { Registrations } from "@/components/sections/Registrations";
+import { Submissions } from "@/components/sections/Submissions";
 import { Location } from "@/components/sections/Location";
 import { Accommodation } from "@/components/sections/Accommodation";
 import { Sponsors } from "@/components/sections/Sponsors";
@@ -26,11 +27,12 @@ const Home = async () => {
         <>
             <Navbar />
             <main className="flex-1">
-                <Hero section={content.hero} />
+                <Hero section={content.hero} hasSubmissions={Boolean(content.submissions)} />
                 <Welcome section={content.welcome} />
                 <Program section={content.program} />
                 <Keynotes section={content.keynotes} />
                 <Registrations section={content.registrations} />
+                <Submissions section={content.submissions} />
                 <Location section={content.location} />
                 <Accommodation section={content.accommodation} />
                 <Sponsors section={content.sponsors} />
