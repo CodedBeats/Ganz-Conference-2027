@@ -113,6 +113,7 @@ Auto generate tests with Codegen.
 - map
 - supabase
 - cms
+- share
 - metadata
 - testing
 - production
