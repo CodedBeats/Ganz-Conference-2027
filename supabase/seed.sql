@@ -9,7 +9,10 @@ insert into public.files (name, file_ref, mime_type, folder) values
     ('ganz-logo',                '/design/logo/GANZLogo_FullColour.png', 'image/png',  'general'),
     ('welcome',                  '/design/imgs/welcome.jpg',             'image/jpeg', 'general'),
     ('accommodation',            '/design/imgs/accommodation.jpg',       'image/jpeg', 'general'),
-    ('keynote-michael-clemmens', '/design/imgs/Michael Clemons.jpg',     'image/jpeg', 'keynotes');
+    ('keynote-michael-clemmens', '/design/imgs/Michael Clemons.jpg',     'image/jpeg', 'keynotes'),
+    ('flag-aboriginal',          '/design/imgs/flag-aboriginal.jpg',     'image/jpeg', 'misc'),
+    ('flag-tsi',                 '/design/imgs/flag-tsi.jpg',            'image/jpeg', 'misc'),
+    ('flag-maori',               '/design/imgs/flag-maori.jpg',          'image/jpeg', 'misc');
 
 -- Sections: `type` matches each section's DOM id
 insert into public.sections (type, heading, subheading, body, excerpt, sort_order, image_id) values
@@ -85,7 +88,15 @@ insert into public.sections (type, heading, subheading, body, excerpt, sort_orde
         null,
         'contact@ganz.org.au',
         null,
-        11, null);
+        11, null),
+    -- footer: image = logo, body = description under it, excerpt = acknowledgement
+    -- of country, subheading = copyright line. Not in the nav, so it has no DOM id.
+    ('footer',
+        null,
+        '© 2027 Gestalt Australia & New Zealand. All rights reserved.',
+        'Gestalt Australia & New Zealand - The professional association for Gestalt practitioners across Australia and Aotearoa New Zealand.',
+        'GANZ acknowledges the lands, waterways and skies across Australia and Aotearoa (New Zealand) where we live, meet and practise. We honour the continuing connection of First Nations peoples to Country, acknowledge that sovereignty was never ceded in Australia, and honour Te Tiriti o Waitangi in Aotearoa. We honour the richness of Indigenous healing practices and our ongoing learning alongside First Nations peoples.',
+        12, (select id from public.files where name = 'ganz-logo'));
 
 -- Top-level stat items
 insert into public.stat_items (label, value, style, description, sort_order, section_id) values
@@ -149,6 +160,29 @@ join public.stat_items tier
     on tier.label = rows.tier_label
     and tier.parent_id is null
     and tier.section_id = (select id from public.sections where type = 'registrations');
+
+-- Footer: two unrendered group rows ("Details", "Flags") own the editable rows,
+-- so a flag whose image is cleared doesn't get mistaken for a detail line.
+insert into public.stat_items (label, value, sort_order, section_id)
+select group_label, '', group_order, (select id from public.sections where type = 'footer')
+from (values ('Details', 1), ('Flags', 2)) as groups (group_label, group_order);
+
+insert into public.stat_items (label, value, image, sort_order, section_id, parent_id)
+select rows.label, rows.value, (select id from public.files where name = rows.file_name),
+    rows.sort_order, footer.id, grp.id
+from (values
+    ('Details', 'Dates',                              '25-27 June 2027',                                              null,              1),
+    ('Details', 'Address',                            E'Griffith University, Gold Coast Campus\nSouthport QLD, Australia', null,         2),
+    ('Details', 'Email',                              'contact@ganz.org.au',                                          null,              3),
+    ('Flags',   'Aboriginal flag',                    '',                                                             'flag-aboriginal', 1),
+    ('Flags',   'Torres Strait Islander flag',        '',                                                             'flag-tsi',        2),
+    ('Flags',   'Tino Rangatiratanga (Māori) flag',   '',                                                             'flag-maori',      3)
+) as rows (group_label, label, value, file_name, sort_order)
+cross join (select id from public.sections where type = 'footer') as footer
+join public.stat_items grp
+    on grp.label = rows.group_label
+    and grp.parent_id is null
+    and grp.section_id = footer.id;
 
 -- People: keynotes and committee
 insert into public.people (image, name, title, location, description, link, style, sort_order, section_id) values
