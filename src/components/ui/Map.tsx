@@ -26,7 +26,8 @@ interface MapProps {
 
 const Map = ({ lat, lng, zoom = 13, venueName }: MapProps) => {
     return (
-        <MapContainer center={[lat, lng]} zoom={zoom} className="size-full">
+        // `isolate` keeps Leaflet's pane/control z-indexes (400-1000) inside the map, so it scrolls under the sticky navbar
+        <MapContainer center={[lat, lng]} zoom={zoom} className="isolate size-full">
             <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution="&copy; OpenStreetMap contributors"

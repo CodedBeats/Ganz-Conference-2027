@@ -5,12 +5,14 @@ import { ArrowLeft, FileText, Folder, Image as ImageIcon, Loader2, Upload, X } f
 import { cn } from "@/lib/utils";
 import {
     FILE_FOLDERS,
+    FILE_KIND_LABELS,
     FILE_MIME_TYPES,
     FOLDER_LABELS,
     getFileExtension,
     isFileFolder,
     isImageMimeType,
     type FileFolder,
+    type FileKind,
 } from "@/lib/cms/files";
 import { uploadFile } from "@/lib/cms/uploadFile";
 import { CmsErrorDetails } from "@/components/cms/CmsErrorDetails";
@@ -18,8 +20,10 @@ import { FileRow } from "@/components/files/FileRow";
 import { FilePreview } from "@/components/files/FilePreview";
 import type { CmsError, LibraryFile } from "@/types/cms";
 
-/** Turns the manager into an image picker for one slot on the page. */
+/** Turns the manager into a file picker for one slot on the page. */
 export interface FilePicker {
+    /** What the slot can hold - only files of this kind can be inserted. */
+    accept: FileKind;
     /** The file the slot shows right now, if any - pre-selected and can't be re-inserted. */
     currentFileId: string | null;
     /** Where the picker opens, e.g. `keynotes` for a keynote photo. */
@@ -61,7 +65,7 @@ const countLabel = (count: number) => (count === 1 ? "1 file" : `${count} files`
  * from `getFiles` on the server; every action here revalidates the page, so the list
  * refreshes itself after uploads, renames, moves and deletes - nothing is patched locally.
  *
- * With a `picker`, it also offers Insert and Remove for one image slot.
+ * With a `picker`, it also offers Insert and Remove for one image or PDF slot.
  */
 export const FileManager = ({ files, picker, className }: FileManagerProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -142,7 +146,7 @@ export const FileManager = ({ files, picker, className }: FileManagerProps) => {
                         className="btn-pill border border-teal-dark/20 px-5 py-2.5"
                     >
                         <X className="size-4" aria-hidden="true" />
-                        Remove image
+                        Remove {FILE_KIND_LABELS[picker.accept]}
                     </button>
                 )}
 

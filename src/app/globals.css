@@ -202,6 +202,10 @@
   .btn-gold {
     @apply bg-gold text-teal-dark;
   }
+  /* text flips dark on hover, since .btn-pill hovers to a cream background */
+  .btn-teal {
+    @apply bg-teal text-cream hover:text-teal-dark;
+  }
   .btn-dark {
     @apply bg-teal-dark text-cream;
   }

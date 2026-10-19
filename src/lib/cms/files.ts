@@ -55,6 +55,26 @@ export function isImageMimeType(mimeType: string): boolean {
     return isFileMimeType(mimeType) && mimeType.startsWith("image/");
 }
 
+/** What a CMS slot accepts - most slots hold an image, a few (e.g. submission guidelines) a PDF. */
+export type FileKind = "image" | "pdf";
+
+/** How each kind reads in picker copy, e.g. "Insert PDF". */
+export const FILE_KIND_LABELS: Record<FileKind, string> = {
+    image: "image",
+    pdf: "PDF",
+};
+
+/**
+ * Whether a file can go in a slot that accepts `kind`.
+ *
+ * @remarks
+ * Slots are single-kind on purpose: an image slot renders `<Image>` and a PDF slot renders
+ * a link, so a file of the other kind would break the section's markup.
+ */
+export function isFileOfKind(mimeType: string, kind: FileKind): boolean {
+    return kind === "image" ? isImageMimeType(mimeType) : mimeType === "application/pdf";
+}
+
 /**
  * The extension shown after a file's name in the CMS, e.g. `jpg`.
  *

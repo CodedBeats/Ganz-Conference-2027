@@ -25,6 +25,19 @@ const FILES: LibraryFile[] = [
     },
 ];
 
+const SECTION_ID = "0b9d1e2f-3a4b-4c5d-8e6f-7a8b9c0d1e2f";
+
+const GUIDELINES: LibraryFile = {
+    id: "file-guidelines",
+    name: "Guidelines",
+    file_ref: "/design/guidelines.pdf",
+    mime_type: "application/pdf",
+    folder: "general",
+    created_at: "",
+    updated_at: "",
+    usages: [],
+};
+
 const renderSlot = ({ fileId = null as string | null, withPlaceholder = false } = {}) =>
     render(
         <CmsEditorProvider files={FILES}>
@@ -85,6 +98,35 @@ describe("CmsImageSlotClient", () => {
 
         expect(screen.getByRole("dialog").textContent).toMatch(/Finish your current edit first/);
         expect(screen.queryByRole("dialog", { name: "Choose an image" })).toBeNull();
+    });
+
+    it("picks and saves a PDF when it accepts PDFs", async () => {
+        mocks.updateCmsRow.mockResolvedValue({ data: { id: SECTION_ID }, error: null });
+        render(
+            <CmsEditorProvider files={[...FILES, GUIDELINES]}>
+                <CmsImageSlotClient
+                    table="sections"
+                    rowId={SECTION_ID}
+                    field="image_id"
+                    fileId={null}
+                    folder="general"
+                    accept="pdf"
+                    label="Submission guidelines"
+                >
+                    <span>Guidelines link</span>
+                </CmsImageSlotClient>
+            </CmsEditorProvider>,
+        );
+
+        fireEvent.click(screen.getByRole("button", { name: "Change PDF for Submission guidelines" }));
+        expect(screen.getByRole("dialog", { name: "Choose a PDF" })).toBeTruthy();
+
+        fireEvent.click(screen.getByRole("button", { name: "Guidelines.pdf" }));
+        fireEvent.click(screen.getByRole("button", { name: "Insert PDF" }));
+
+        await waitFor(() =>
+            expect(mocks.updateCmsRow).toHaveBeenCalledWith("sections", SECTION_ID, { image_id: "file-guidelines" }),
+        );
     });
 
     it("shows its placeholder to editors while empty", () => {

@@ -21,6 +21,7 @@ export const SECTION_TYPES = [
     "program",
     "keynotes",
     "registrations",
+    "submissions",
     "location",
     "accommodation",
     "sponsors",

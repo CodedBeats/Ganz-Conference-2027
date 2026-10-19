@@ -7,13 +7,16 @@ import { cn } from "@/lib/utils";
 import { updateFile } from "@/lib/cms/actions";
 import {
     FILE_FOLDERS,
+    FILE_KIND_LABELS,
     FOLDER_LABELS,
     describeFileUsage,
     getFileExtension,
     getFileUrl,
     isFileFolder,
+    isFileOfKind,
     isImageMimeType,
     type FileFolder,
+    type FileKind,
 } from "@/lib/cms/files";
 import { CmsErrorDetails } from "@/components/cms/CmsErrorDetails";
 import { DeleteFileDialog } from "@/components/files/DeleteFileDialog";
@@ -30,6 +33,12 @@ interface FilePreviewProps {
 }
 
 type SaveStatus = { kind: "idle" } | { kind: "saved" } | { kind: "error"; error: CmsError };
+
+/** Insert button copy when the selected file is the wrong kind for the slot. */
+const WRONG_KIND_LABELS: Record<FileKind, string> = {
+    image: "PDFs can't go here",
+    pdf: "Only PDFs can go here",
+};
 
 const FIELD_CLASS =
     "w-full rounded-lg bg-white px-3 py-2 text-teal-dark outline-1 outline-teal-dark/20 focus:outline-2 focus:outline-violet-500";
@@ -53,7 +62,11 @@ export const FilePreview = ({ file, picker, onMoved, onDeleted }: FilePreviewPro
         return (
             <div className="flex h-full min-h-48 flex-col items-center justify-center gap-3 rounded-2xl bg-teal-pale p-6 text-center text-teal-dark/60">
                 <MousePointerClick className="size-6" aria-hidden="true" />
-                <p>{picker ? "Choose an image to preview it here." : "Select a file to preview and edit it."}</p>
+                <p>
+                    {picker
+                        ? `Choose ${picker.accept === "pdf" ? "a PDF" : "an image"} to preview it here.`
+                        : "Select a file to preview and edit it."}
+                </p>
             </div>
         );
     }
@@ -64,6 +77,7 @@ export const FilePreview = ({ file, picker, onMoved, onDeleted }: FilePreviewPro
     const url = getFileUrl(file.file_ref);
     const folder = isFileFolder(file.folder) ? file.folder : "general";
     const isInSlot = picker?.currentFileId === file.id;
+    const canInsert = picker ? isFileOfKind(file.mime_type, picker.accept) : false;
 
     const save = (input: { name?: string; folder?: FileFolder }, afterSave?: () => void) => {
         startSaving(async () => {
@@ -192,12 +206,16 @@ export const FilePreview = ({ file, picker, onMoved, onDeleted }: FilePreviewPro
                 {picker && (
                     <button
                         type="button"
-                        className={cn("inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase bg-teal-dark text-cream transition-all duration-200 hover:bg-teal hover:-translate-y-0.5 cursor-pointer flex-1", (!isImage || isInSlot) && "pointer-events-none opacity-50")}
+                        className={cn("inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-xs font-medium tracking-[0.15em] uppercase bg-teal-dark text-cream transition-all duration-200 hover:bg-teal hover:-translate-y-0.5 cursor-pointer flex-1", (!canInsert || isInSlot) && "pointer-events-none opacity-50")}
                         onClick={() => picker.onInsert(file)}
-                        disabled={!isImage || isInSlot || picker.isSaving}
+                        disabled={!canInsert || isInSlot || picker.isSaving}
                     >
                         {picker.isSaving && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
-                        {isInSlot ? "Already in use here" : isImage ? "Insert image" : "PDFs can't go here"}
+                        {isInSlot
+                            ? "Already in use here"
+                            : canInsert
+                              ? `Insert ${FILE_KIND_LABELS[picker.accept]}`
+                              : WRONG_KIND_LABELS[picker.accept]}
                     </button>
                 )}
                 <button
