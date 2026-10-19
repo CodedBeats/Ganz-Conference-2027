@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useTransition, type ReactNode } from "react";
-import { ImageIcon } from "lucide-react";
+import { FileText, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { updateCmsRow } from "@/lib/cms/actions";
 import { useCmsEditor } from "@/hooks/useCmsEditor";
 import { FileManagerDialog } from "@/components/files/FileManagerDialog";
-import type { FileFolder } from "@/lib/cms/files";
+import { FILE_KIND_LABELS, type FileFolder, type FileKind } from "@/lib/cms/files";
 import type { CmsError, EditableTable } from "@/types/cms";
 
 export interface CmsImageSlotClientProps {
@@ -20,6 +20,8 @@ export interface CmsImageSlotClientProps {
     fileId: string | null;
     /** Folder the picker opens in. */
     folder: FileFolder;
+    /** What the slot holds - an image (default) or a PDF, e.g. a guidelines document behind a link. */
+    accept?: FileKind;
     /** Layout classes - the slot *is* the image's wrapper, so `fill` images size against it. */
     className?: string;
     /** Shown to editors instead of `children` while the slot is empty, so there's something to click. */
@@ -30,7 +32,7 @@ export interface CmsImageSlotClientProps {
 }
 
 /**
- * An image on the homepage that can be swapped from the file library.
+ * An image (or, with `accept="pdf"`, a PDF) on the homepage that can be swapped from the file library.
  *
  * @remarks
  * The pen opens the file manager as a picker. Insert and Remove save straight away via
@@ -45,6 +47,7 @@ export const CmsImageSlotClient = ({
     label,
     fileId,
     folder,
+    accept = "image",
     className,
     placeholder,
     isHiddenWhenEmpty = false,
@@ -56,9 +59,11 @@ export const CmsImageSlotClient = ({
     const [isSaving, startSaving] = useTransition();
 
     const boxId = `${table}:${rowId}:${field}`;
+    const kindLabel = FILE_KIND_LABELS[accept];
+    const KindIcon = accept === "pdf" ? FileText : ImageIcon;
 
     const open = () => {
-        if (!editor.claimBox({ id: boxId, label: `${label} image` })) return;
+        if (!editor.claimBox({ id: boxId, label: `${label} ${kindLabel}` })) return;
         setError(null);
         setIsOpen(true);
     };
@@ -94,11 +99,11 @@ export const CmsImageSlotClient = ({
                     type="button"
                     onClick={open}
                     className="cms-image-button"
-                    aria-label={`Change image for ${label}`}
-                    title={`Change image for ${label}`}
+                    aria-label={`Change ${kindLabel} for ${label}`}
+                    title={`Change ${kindLabel} for ${label}`}
                 >
-                    <ImageIcon className="size-4" aria-hidden="true" />
-                    Image
+                    <KindIcon className="size-4" aria-hidden="true" />
+                    {accept === "pdf" ? "PDF" : "Image"}
                 </button>
             )}
 
@@ -108,6 +113,7 @@ export const CmsImageSlotClient = ({
                 files={editor.files}
                 pickerLabel={label}
                 picker={{
+                    accept,
                     currentFileId: fileId,
                     initialFolder: folder,
                     onInsert: (file) => save(file.id),
