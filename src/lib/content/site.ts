@@ -42,3 +42,18 @@ export const EVENT = {
     submissionsHref: "#submissions",
     programHref: "#program",
 } as const;
+
+/**
+ * Copy sent along with a shared link.
+ *
+ * @remarks
+ * Only the networks that take prefilled text use this (WhatsApp, X, Threads, email).
+ * Facebook, LinkedIn and Messenger ignore it and build their preview card from the
+ * page's Open Graph metadata instead.
+ *
+ * @see `ShareDialog` in `src/components/shared/ShareDialog.tsx`
+ */
+export const SHARE = {
+    title: "GANZ Conference 2027 - In Our Bodies, Of The Field",
+    text: "Join us at the 13th Gestalt Australia & New Zealand Conference, 25-27 June 2027. Celebrating 30 years of GANZ.",
+} as const;

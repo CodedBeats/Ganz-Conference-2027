@@ -13,6 +13,7 @@ import { Committee } from "@/components/sections/Committee";
 import { Faq } from "@/components/sections/Faq";
 import { Contact } from "@/components/sections/Contact";
 import { GateLogoutButton } from "@/components/gate/GateLogoutButton";
+import { SharePrompt } from "@/components/shared/SharePrompt";
 import { CmsEditorProvider } from "@/components/cms/CmsEditorProvider";
 import { AdminBar } from "@/components/cms/AdminBar";
 import { getPageContent } from "@/lib/content/getPageContent";
@@ -31,6 +32,7 @@ const Home = async () => {
                 <Welcome section={content.welcome} />
                 <Program section={content.program} />
                 <Keynotes section={content.keynotes} />
+                <SharePrompt />
                 <Registrations section={content.registrations} />
                 <Submissions section={content.submissions} />
                 <Location section={content.location} />

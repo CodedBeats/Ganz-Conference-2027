@@ -1,3 +1,4 @@
+import { Share2 } from "lucide-react";
 import type { CmsSection, CmsStatItem } from "@/types/content";
 import { FOOTER_LINKS } from "@/lib/content/site";
 import { RichText } from "@/components/shared/RichText";
@@ -6,6 +7,7 @@ import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
 import { CmsBox } from "@/components/cms/CmsBox";
 import { CmsImageSlot } from "@/components/cms/CmsImageSlot";
 import { CmsText } from "@/components/cms/CmsText";
+import { ShareDialog } from "@/components/shared/ShareDialog";
 
 // footer splits the nav into two columns; ABOUT holds the last four links
 const ABOUT_IDS = new Set(["sponsors", "committee", "faqs", "contact"]);
@@ -126,6 +128,10 @@ export const Footer = ({ section }: { section?: CmsSection }) => {
                             </p>
                         </CmsText>
                     </CmsBox>
+                    <ShareDialog className="btn-pill btn-dark mt-6 hover:bg-teal">
+                        <Share2 className="size-4" />
+                        Share the conference
+                    </ShareDialog>
                 </div>
 
                 <FooterLinks heading="Conference" links={CONFERENCE_LINKS} />

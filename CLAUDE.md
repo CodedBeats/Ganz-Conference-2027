@@ -40,6 +40,7 @@ SUPABASE_SECRET_KEY_DEV=
 SITE_PASSWORD=
 ADMIN_EMAIL=                  # the one admin login (no sign-ups)
 ADMIN_PASSWORD=
+NEXT_PUBLIC_FACEBOOK_APP_ID=  # optional, Messenger share option is hidden without it
 ```
 
 ## Coding Conventions
