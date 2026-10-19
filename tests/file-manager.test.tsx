@@ -159,6 +159,7 @@ describe("FileManager - uploading", () => {
 
 describe("FileManager - picking an image for a slot", () => {
     const makePicker = (overrides: Partial<FilePicker> = {}): FilePicker => ({
+        accept: "image",
         currentFileId: MICHAEL.id,
         initialFolder: "keynotes",
         onInsert: vi.fn(),
@@ -209,5 +210,44 @@ describe("FileManager - picking an image for a slot", () => {
         render(<FileManager files={FILES} picker={makePicker({ error })} />);
 
         expect(screen.getByRole("alert").textContent).toContain("Your session has expired.");
+    });
+});
+
+describe("FileManager - picking a PDF for a slot", () => {
+    const makePdfPicker = (overrides: Partial<FilePicker> = {}): FilePicker => ({
+        accept: "pdf",
+        currentFileId: null,
+        initialFolder: "general",
+        onInsert: vi.fn(),
+        onRemove: vi.fn(),
+        isSaving: false,
+        error: null,
+        ...overrides,
+    });
+
+    it("inserts a PDF", () => {
+        const picker = makePdfPicker();
+        render(<FileManager files={FILES} picker={picker} />);
+
+        selectFile("Program");
+        fireEvent.click(screen.getByRole("button", { name: "Insert PDF" }));
+
+        expect(picker.onInsert).toHaveBeenCalledWith(PROGRAM);
+    });
+
+    it("won't insert an image", () => {
+        render(<FileManager files={FILES} picker={makePdfPicker({ initialFolder: "keynotes" })} />);
+
+        selectFile("Spare photo");
+
+        expect(screen.getByRole<HTMLButtonElement>("button", { name: "Only PDFs can go here" }).disabled).toBe(true);
+    });
+
+    it("offers to remove the current PDF", () => {
+        const picker = makePdfPicker({ currentFileId: PROGRAM.id });
+        render(<FileManager files={FILES} picker={picker} />);
+
+        fireEvent.click(screen.getByRole("button", { name: "Remove PDF" }));
+        expect(picker.onRemove).toHaveBeenCalled();
     });
 });

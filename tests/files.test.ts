@@ -8,6 +8,7 @@ import {
     getFileExtension,
     getFileUrl,
     isFileFolder,
+    isFileOfKind,
     isGeneratedStoragePath,
     isImageMimeType,
     isStorageRef,
@@ -112,6 +113,14 @@ describe("folders and display names", () => {
         expect(getFileExtension("text/plain")).toBe("");
         expect(isImageMimeType("image/webp")).toBe(true);
         expect(isImageMimeType("application/pdf")).toBe(false);
+    });
+
+    it("matches files to the kind of slot they can go in", () => {
+        expect(isFileOfKind("image/png", "image")).toBe(true);
+        expect(isFileOfKind("application/pdf", "image")).toBe(false);
+        expect(isFileOfKind("application/pdf", "pdf")).toBe(true);
+        expect(isFileOfKind("image/jpeg", "pdf")).toBe(false);
+        expect(isFileOfKind("text/plain", "pdf")).toBe(false);
     });
 
     it.each([
