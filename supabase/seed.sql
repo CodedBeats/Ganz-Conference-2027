@@ -53,42 +53,53 @@ insert into public.sections (type, heading, subheading, body, excerpt, sort_orde
         'Registration opens in 2026. Rates are being finalised - join the mailing list and we will let you know the moment early bird opens.',
         null,
         5, null),
+    -- submissions: body = invitation, excerpt = virtual note, subheading = line above
+    -- the guidelines button, image = the guidelines PDF (uploaded through the CMS)
+    ('submissions',
+        'Make a *submission*.',
+        'Full submission guidelines, including information about each contribution format and what to include in your proposal.',
+        array_to_string(array[
+            'For the 13th GANZ Conference, *In Our Bodies, Of The Field*, we are inviting contributions that explore embodiment and somatic Gestalt in ways that are thoughtful, experiential, provocative, clinically grounded and alive.',
+            'We welcome submissions from students, emerging practitioners, researchers and experienced clinicians alike. We value lived experience, clinical wisdom, embodied knowledge, creativity and community knowledge alongside academic and theoretical expertise.'
+        ], E'\n\n'),
+        'The conference will be an in-person event, but if you''re overseas and interested in presenting virtually, we''d love to work with you to make an online contribution possible.',
+        6, null),
     ('location',
         'Finding us on campus.',
         null,
         'Griffith University''s Gold Coast campus at Southport - not the Nathan, Mt Gravatt or Logan campuses.',
         null,
-        6, null),
+        7, null),
     ('accommodation',
         'Where to stay',
         null,
         'We are securing a selection of accommodation options close to the Griffith University Gold Coast campus, across a range of price points. Details will be published here.',
         'Details to be confirmed',
-        7, (select id from public.files where name = 'accommodation')),
+        8, (select id from public.files where name = 'accommodation')),
     ('sponsors',
         'Supporting thirty years of Gestalt practice.',
         null,
         'Sponsorship opportunities are open. To discuss partnering with the 13th GANZ Conference, contact the committee.',
         null,
-        8, null),
+        9, null),
     ('committee',
         'Held by many hands.',
         null,
         'The committee continues to grow. Bios and photographs to follow.',
         null,
-        9, null),
+        10, null),
     ('faqs',
         E'Questions,\nanswered.',
         null,
         'Full answers will be published as arrangements are confirmed. Anything else, write to us.',
         null,
-        10, null),
+        11, null),
     ('contact',
         'We''d love to hear from you.',
         null,
         'contact@ganz.org.au',
         null,
-        11, null),
+        12, null),
     -- footer: image = logo, body = description under it, excerpt = acknowledgement
     -- of country, subheading = copyright line. Not in the nav, so it has no DOM id.
     ('footer',
@@ -96,7 +107,7 @@ insert into public.sections (type, heading, subheading, body, excerpt, sort_orde
         '© 2027 Gestalt Australia & New Zealand. All rights reserved.',
         'Gestalt Australia & New Zealand - The professional association for Gestalt practitioners across Australia and Aotearoa New Zealand.',
         'GANZ acknowledges the lands, waterways and skies across Australia and Aotearoa (New Zealand) where we live, meet and practise. We honour the continuing connection of First Nations peoples to Country, acknowledge that sovereignty was never ceded in Australia, and honour Te Tiriti o Waitangi in Aotearoa. We honour the richness of Indigenous healing practices and our ongoing learning alongside First Nations peoples.',
-        12, (select id from public.files where name = 'ganz-logo'));
+        13, (select id from public.files where name = 'ganz-logo'));
 
 -- Top-level stat items
 insert into public.stat_items (label, value, style, description, sort_order, section_id) values
@@ -183,6 +194,26 @@ join public.stat_items grp
     on grp.label = rows.group_label
     and grp.parent_id is null
     and grp.section_id = footer.id;
+
+-- Submissions: same group-row shape as the footer - "Formats" and "Details" own the editable rows
+insert into public.stat_items (label, value, sort_order, section_id)
+select group_label, '', group_order, (select id from public.sections where type = 'submissions')
+from (values ('Formats', 1), ('Details', 2)) as groups (group_label, group_order);
+
+insert into public.stat_items (label, value, sort_order, section_id, parent_id)
+select rows.label, rows.value, rows.sort_order, submissions.id, grp.id
+from (values
+    ('Formats', 'Experiential Workshops',  '',                          1),
+    ('Formats', 'Clinical Conversations',  '',                          2),
+    ('Formats', 'Local Keynote Proposals', '',                          3),
+    ('Details', 'Submissions close',       'Friday 11th December 2026', 1),
+    ('Details', 'Send your submission to', 'contact@ganz.org.au',       2)
+) as rows (group_label, label, value, sort_order)
+cross join (select id from public.sections where type = 'submissions') as submissions
+join public.stat_items grp
+    on grp.label = rows.group_label
+    and grp.parent_id is null
+    and grp.section_id = submissions.id;
 
 -- People: keynotes and committee
 insert into public.people (image, name, title, location, description, link, style, sort_order, section_id) values
