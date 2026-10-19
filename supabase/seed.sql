@@ -121,12 +121,14 @@ insert into public.stat_items (label, value, style, description, sort_order, sec
     ('Keynotes',      '3',   'primary',   null, 3, (select id from public.sections where type = 'program')),
     ('Workshops',     'TBC', 'secondary', null, 4, (select id from public.sections where type = 'program')),
 
-    -- registrations: tiers (label = title, value = subtitle); price rows are children below
-    ('GANZ Members',  'Current financial members',   'primary',   null, 1, (select id from public.sections where type = 'registrations')),
-    ('Non-Members',   'All welcome',                 'primary',   null, 2, (select id from public.sections where type = 'registrations')),
-    ('Scholarships',  'Trainees & supported places', 'secondary',
-        'A limited number of supported places will be offered. Application details to follow.',
-        3, (select id from public.sections where type = 'registrations')),
+    -- registrations: tiers (label = title, value = subtitle); price rows are children below.
+    -- Three per membership group, so the 3-column grid puts members on row 1 and non-members on row 2.
+    ('3-day Conference',              'GANZ Members', 'primary',   null,                                                1, (select id from public.sections where type = 'registrations')),
+    ('2-day Pre-Conference Workshop', 'GANZ Members', 'primary',   'Workshop only. Conference not included.',           2, (select id from public.sections where type = 'registrations')),
+    ('Bundle',                        'GANZ Members', 'secondary', '3-day Conference + 2-day Pre-Conference Workshop.', 3, (select id from public.sections where type = 'registrations')),
+    ('3-day Conference',              'Non-Members',  'primary',   null,                                                4, (select id from public.sections where type = 'registrations')),
+    ('2-day Pre-Conference Workshop', 'Non-Members',  'primary',   'Workshop only. Conference not included.',           5, (select id from public.sections where type = 'registrations')),
+    ('Bundle',                        'Non-Members',  'secondary', '3-day Conference + 2-day Pre-Conference Workshop.', 6, (select id from public.sections where type = 'registrations')),
 
     -- location
     ('Venue',        'Griffith University Gold Coast Campus',                'primary', null, 1, (select id from public.sections where type = 'location')),
@@ -157,18 +159,27 @@ insert into public.stat_items (label, value, style, description, sort_order, sec
         'A call for papers and workshop proposals will be released ahead of the conference. Details to be confirmed.',
         'primary', null, 5, (select id from public.sections where type = 'faqs'));
 
--- Registration price rows, nested under their tier
+-- Registration price rows, nested under their tier. Tier titles repeat across the
+-- two membership groups, so a tier is matched on its title + subtitle together.
 insert into public.stat_items (label, value, sort_order, section_id, parent_id)
 select rows.label, rows.value, rows.sort_order, tier.section_id, tier.id
 from (values
-    ('GANZ Members', 'Early Bird',        'TBC', 1),
-    ('GANZ Members', 'Full Registration', 'TBC', 2),
-    ('Non-Members',  'Early Bird',        'TBC', 1),
-    ('Non-Members',  'Full Registration', 'TBC', 2),
-    ('Scholarships', 'Scholarship Rate',  'TBC', 1)
-) as rows (tier_label, label, value, sort_order)
+    ('3-day Conference',              'GANZ Members', 'Early Bird',        '$485',  1),
+    ('3-day Conference',              'GANZ Members', 'Full Registration', '$585',  2),
+    ('2-day Pre-Conference Workshop', 'GANZ Members', 'Early Bird',        '$650',  1),
+    ('2-day Pre-Conference Workshop', 'GANZ Members', 'Full Registration', '$750',  2),
+    ('Bundle',                        'GANZ Members', 'Early Bird',        '$1045', 1),
+    ('Bundle',                        'GANZ Members', 'Full Registration', '$1145', 2),
+    ('3-day Conference',              'Non-Members',  'Early Bird',        '$635',  1),
+    ('3-day Conference',              'Non-Members',  'Full Registration', '$735',  2),
+    ('2-day Pre-Conference Workshop', 'Non-Members',  'Early Bird',        '$800',  1),
+    ('2-day Pre-Conference Workshop', 'Non-Members',  'Full Registration', '$900',  2),
+    ('Bundle',                        'Non-Members',  'Early Bird',        '$1195', 1),
+    ('Bundle',                        'Non-Members',  'Full Registration', '$1295', 2)
+) as rows (tier_label, tier_subtitle, label, value, sort_order)
 join public.stat_items tier
     on tier.label = rows.tier_label
+    and tier.value = rows.tier_subtitle
     and tier.parent_id is null
     and tier.section_id = (select id from public.sections where type = 'registrations');
 

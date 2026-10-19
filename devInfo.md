@@ -106,6 +106,7 @@ Auto generate tests with Codegen.
 ## GIT stuff
 ### Branches
 - auth
+- admin-dashboard
 - docs
 - design
 - responsive-design

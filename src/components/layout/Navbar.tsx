@@ -16,7 +16,7 @@ export const Navbar = () => {
     const closeMenu = () => setIsMenuOpen(false);
 
     return (
-        <nav className="sticky top-0 border-b border-teal-dark/10 bg-cream/95 backdrop-blur z-10">
+        <nav className="sticky top-0 border-b border-teal-dark/10 bg-cream/95 backdrop-blur z-50">
             <div className="container-site flex h-20 items-center justify-between gap-6">
                 {/* logo + conference title */}
                 <a href="#top" className="flex shrink-0 items-center gap-3" onClick={closeMenu}>
