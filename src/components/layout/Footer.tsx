@@ -1,16 +1,20 @@
-import Image from "next/image";
-import { NAV_LINKS, EVENT } from "@/lib/content/site";
+import type { CmsSection, CmsStatItem } from "@/types/content";
+import { NAV_LINKS } from "@/lib/content/site";
+import { RichText } from "@/components/shared/RichText";
+import { ContentImage } from "@/components/shared/ContentImage";
+import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
+import { CmsBox } from "@/components/cms/CmsBox";
+import { CmsImageSlot } from "@/components/cms/CmsImageSlot";
+import { CmsText } from "@/components/cms/CmsText";
 
 // footer splits the nav into two columns; ABOUT holds the last four links
 const ABOUT_IDS = new Set(["sponsors", "committee", "faqs", "contact"]);
 const CONFERENCE_LINKS = NAV_LINKS.filter((link) => !ABOUT_IDS.has(link.id));
 const ABOUT_LINKS = NAV_LINKS.filter((link) => ABOUT_IDS.has(link.id));
 
-const FLAGS = [
-    { src: "/design/imgs/flag-aboriginal.jpg", alt: "Aboriginal flag" },
-    { src: "/design/imgs/flag-tsi.jpg", alt: "Torres Strait Islander flag" },
-    { src: "/design/imgs/flag-maori.jpg", alt: "Tino Rangatiratanga (Māori) flag" },
-];
+const DESCRIPTION_CLASS = "max-w-xs text-base leading-relaxed text-teal-dark/70";
+const ACKNOWLEDGEMENT_CLASS = "text-sm leading-relaxed text-teal-dark/70";
+const COPYRIGHT_CLASS = "text-sm text-teal-dark/60";
 
 const FooterLinks = ({ heading, links }: { heading: string; links: typeof NAV_LINKS }) => (
     <div>
@@ -27,22 +31,101 @@ const FooterLinks = ({ heading, links }: { heading: string; links: typeof NAV_LI
     </div>
 );
 
-export const Footer = () => {
+// a detail is a stat: label = what it is (shown only in the editor), value = the text.
+// the email detail renders as a mailto link.
+const FooterDetail = ({ detail }: { detail: CmsStatItem }) => {
+    const value = detail.value.trim();
+    const isEmail = detail.label.toLowerCase() === "email";
+
+    return (
+        <CmsBox
+            as="li"
+            table="stat_items"
+            rowId={detail.id}
+            label={`Footer detail: ${detail.label}`}
+            values={{ label: detail.label, value: detail.value }}
+        >
+            <CmsText field="label" label="Label" editClassName="eyebrow text-teal-dark/50" />
+            <CmsText field="value" label="Value" multiline editClassName="text-base text-teal-dark">
+                {isEmail ? (
+                    <a href={`mailto:${value}`} className="transition-colors hover:text-teal">
+                        {value}
+                    </a>
+                ) : (
+                    <RichText text={detail.value} />
+                )}
+            </CmsText>
+        </CmsBox>
+    );
+};
+
+// a flag is a stat: label = alt text, image = the flag
+const FooterFlag = ({ flag }: { flag: CmsStatItem }) => (
+    <CmsBox as="li" table="stat_items" rowId={flag.id} label={`Flag: ${flag.label}`} values={{ label: flag.label }}>
+        <CmsImageSlot
+            table="stat_items"
+            rowId={flag.id}
+            field="image"
+            fileId={flag.image?.id ?? null}
+            folder="misc"
+            label={`Flag: ${flag.label}`}
+            isHiddenWhenEmpty
+            placeholder={<PlaceholderBox label="Flag" className="h-6 w-10 rounded-sm" />}
+        >
+            <ContentImage image={flag.image} alt={flag.label} width={48} height={28} className="h-6 w-auto rounded-sm" />
+        </CmsImageSlot>
+        {/* not shown as text - it's the flag's alt text */}
+        <CmsText field="label" label="Flag name (alt text)" editClassName="text-sm" />
+    </CmsBox>
+);
+
+/**
+ * The page footer, driven by the `footer` section.
+ *
+ * @remarks
+ * The section's stat items are two unrendered group rows - "Details" and "Flags" -
+ * whose children are the editable rows. Grouping by row rather than by "has an image"
+ * means a flag whose image was cleared in the CMS doesn't turn into a detail line.
+ *
+ * Field mapping: `image` = logo, `body` = description under the logo, `excerpt` =
+ * acknowledgement of country, `subheading` = copyright line.
+ */
+export const Footer = ({ section }: { section?: CmsSection }) => {
+    if (!section) return null;
+
+    const details = section.stats.find((stat) => stat.label === "Details")?.children ?? [];
+    const flags = section.stats.find((stat) => stat.label === "Flags")?.children ?? [];
+
     return (
         <footer className="container-site border-t border-teal-dark/10 pt-16 pb-10">
             <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
                 <div>
-                    <Image
-                        src="/design/logo/GANZLogo_FullColour.png"
-                        alt="GANZ - Gestalt Australia & New Zealand"
-                        width={120}
-                        height={104}
-                        className="mb-6 h-24 w-auto"
-                    />
-                    <p className="max-w-xs text-base leading-relaxed text-teal-dark/70">
-                        Gestalt Australia & New Zealand - The professional association for Gestalt practitioners
-                        across Australia and Aotearoa New Zealand.
-                    </p>
+                    <CmsImageSlot
+                        table="sections"
+                        rowId={section.id}
+                        field="image_id"
+                        fileId={section.image?.id ?? null}
+                        folder="general"
+                        label="Footer logo"
+                        className="mb-6"
+                        isHiddenWhenEmpty
+                        placeholder={<PlaceholderBox label="Logo" className="h-24 w-28 rounded-xl" />}
+                    >
+                        <ContentImage
+                            image={section.image}
+                            alt="GANZ - Gestalt Australia & New Zealand"
+                            width={120}
+                            height={104}
+                            className="h-24 w-auto"
+                        />
+                    </CmsImageSlot>
+                    <CmsBox table="sections" rowId={section.id} label="Footer description" values={{ body: section.body }}>
+                        <CmsText field="body" label="Description" multiline hint="highlight" editClassName={DESCRIPTION_CLASS}>
+                            <p className={DESCRIPTION_CLASS}>
+                                <RichText text={section.body} />
+                            </p>
+                        </CmsText>
+                    </CmsBox>
                 </div>
 
                 <FooterLinks heading="Conference" links={CONFERENCE_LINKS} />
@@ -51,17 +134,9 @@ export const Footer = () => {
                 <div>
                     <span className="eyebrow mb-5 text-teal-dark/50">Details</span>
                     <ul className="space-y-3 text-base text-teal-dark">
-                        <li>{EVENT.dates}</li>
-                        <li>
-                            The University of Queensland, St Lucia Campus 
-                            <br />
-                            Brisbane, QLD, Australia
-                        </li>
-                        <li>
-                            <a href={`mailto:${EVENT.email}`} className="transition-colors hover:text-teal">
-                                {EVENT.email}
-                            </a>
-                        </li>
+                        {details.map((detail) => (
+                            <FooterDetail key={detail.id} detail={detail} />
+                        ))}
                     </ul>
                 </div>
             </div>
@@ -69,30 +144,30 @@ export const Footer = () => {
             {/* acknowledgement of country */}
             <div className="mt-14 flex flex-col gap-6 border-t border-teal-dark/10 pt-8 md:flex-row md:items-start md:gap-10">
                 <ul className="flex shrink-0 items-center gap-3">
-                    {FLAGS.map((flag) => (
-                        <li key={flag.src}>
-                            <Image
-                                src={flag.src}
-                                alt={flag.alt}
-                                width={48}
-                                height={28}
-                                className="h-6 w-auto rounded-sm"
-                            />
-                        </li>
+                    {flags.map((flag) => (
+                        <FooterFlag key={flag.id} flag={flag} />
                     ))}
                 </ul>
-                <p className="text-sm leading-relaxed text-teal-dark/70">
-                    GANZ acknowledges the lands, waterways and skies across Australia and Aotearoa (New Zealand)
-                    where we live, meet and practise. We honour the continuing connection of First Nations peoples
-                    to Country, acknowledge that sovereignty was never ceded in Australia, and honour Te Tiriti o
-                    Waitangi in Aotearoa. We honour the richness of Indigenous healing practices and our ongoing
-                    learning alongside First Nations peoples.
-                </p>
+                <CmsBox table="sections" rowId={section.id} label="Acknowledgement of Country" values={{ excerpt: section.excerpt }}>
+                    <CmsText field="excerpt" label="Acknowledgement" multiline hint="highlight" editClassName={ACKNOWLEDGEMENT_CLASS}>
+                        <p className={ACKNOWLEDGEMENT_CLASS}>
+                            <RichText text={section.excerpt} />
+                        </p>
+                    </CmsText>
+                </CmsBox>
             </div>
 
-            <p className="mt-8 border-t border-teal-dark/10 pt-6 text-sm text-teal-dark/60">
-                © 2027 Gestalt Australia & New Zealand. All rights reserved.
-            </p>
+            <CmsBox
+                className="mt-8 border-t border-teal-dark/10 pt-6"
+                table="sections"
+                rowId={section.id}
+                label="Copyright line"
+                values={{ subheading: section.subheading }}
+            >
+                <CmsText field="subheading" label="Copyright line" editClassName={COPYRIGHT_CLASS}>
+                    <p className={COPYRIGHT_CLASS}>{section.subheading}</p>
+                </CmsText>
+            </CmsBox>
         </footer>
     );
 };
