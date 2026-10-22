@@ -14,6 +14,8 @@
   --color-teal-pale: #eaf5f6;
   --color-placeholder: #e2e2e2;
 
+  /* navbar swaps the hamburger for inline links + "More" - laptops at 100% zoom land just above this */
+  --breakpoint-nav: 72rem;
   /* the viewport where .container-site hits its max width - the full navbar fits from here up */
   --breakpoint-wide: 87.5rem;
 }

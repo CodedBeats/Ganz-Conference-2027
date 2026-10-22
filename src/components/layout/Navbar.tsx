@@ -40,7 +40,7 @@ export const Navbar = () => {
                 </a>
 
                 {/* desktop links - secondary ones fold into "More" until the container is at full width */}
-                <ul className="hidden items-center gap-6 xl:flex">
+                <ul className="hidden items-center gap-5 nav:flex wide:gap-6">
                     {NAV_LINKS.map((link) => (
                         <li key={link.id} className={cn(link.isSecondary && "hidden wide:block")}>
                             <a
@@ -64,7 +64,7 @@ export const Navbar = () => {
 
                     <button
                         type="button"
-                        className="flex size-11 items-center justify-center rounded-full text-teal-dark transition-colors hover:bg-teal xl:hidden"
+                        className="flex size-11 items-center justify-center rounded-full text-teal-dark transition-colors hover:bg-teal nav:hidden"
                         aria-expanded={isMenuOpen}
                         aria-controls="mobile-nav"
                         aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -79,7 +79,7 @@ export const Navbar = () => {
             <div
                 id="mobile-nav"
                 className={cn(
-                    "grid overflow-hidden transition-[grid-template-rows] duration-300 xl:hidden",
+                    "grid overflow-hidden transition-[grid-template-rows] duration-300 nav:hidden",
                     isMenuOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
                 )}
             >
