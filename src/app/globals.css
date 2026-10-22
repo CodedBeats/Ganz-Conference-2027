@@ -13,6 +13,9 @@
   --color-teal-light: #c9e6e9;
   --color-teal-pale: #eaf5f6;
   --color-placeholder: #e2e2e2;
+
+  /* the viewport where .container-site hits its max width - the full navbar fits from here up */
+  --breakpoint-wide: 87.5rem;
 }
 
 /*
