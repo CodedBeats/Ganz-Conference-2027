@@ -49,8 +49,16 @@ export const Faq = ({ section }: { section?: CmsSection }) => {
                                         </CmsText>
                                     }
                                     answer={
-                                        <CmsText field="value" label="Answer" multiline placeholder="Leave blank to show “Answer coming soon.”">
-                                            <p>{item.value.trim() || "Answer coming soon."}</p>
+                                        <CmsText
+                                            field="value"
+                                            label="Answer"
+                                            multiline
+                                            hint="highlight"
+                                            placeholder="Leave blank to show “Answer coming soon.”"
+                                        >
+                                            <p>
+                                                <RichText text={item.value.trim() || "Answer coming soon."} />
+                                            </p>
                                         </CmsText>
                                     }
                                 />

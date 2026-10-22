@@ -3,6 +3,7 @@ import type { CmsPerson, CmsSection } from "@/types/content";
 import { SectionHeaderRow } from "@/components/shared/SectionHeaderRow";
 import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
 import { ContentImage } from "@/components/shared/ContentImage";
+import { RichText } from "@/components/shared/RichText";
 import { CmsBox } from "@/components/cms/CmsBox";
 import { CmsImageSlot } from "@/components/cms/CmsImageSlot";
 import { CmsText } from "@/components/cms/CmsText";
@@ -85,8 +86,12 @@ const KeynoteCard = ({ person }: { person: CmsPerson }) => {
                     </CmsText>
                 </div>
 
-                <CmsText field="description" label="Bio" multiline editClassName={descriptionClass}>
-                    {person.description && <p className={descriptionClass}>{person.description}</p>}
+                <CmsText field="description" label="Bio" multiline hint="highlight" editClassName={descriptionClass}>
+                    {person.description && (
+                        <p className={descriptionClass}>
+                            <RichText text={person.description} />
+                        </p>
+                    )}
                 </CmsText>
 
                 {/* shown without the protocol, but edited as the full URL */}

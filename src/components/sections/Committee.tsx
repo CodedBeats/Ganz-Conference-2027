@@ -3,6 +3,7 @@ import type { CmsPerson, CmsSection } from "@/types/content";
 import { SectionHeaderRow } from "@/components/shared/SectionHeaderRow";
 import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
 import { ContentImage } from "@/components/shared/ContentImage";
+import { RichText } from "@/components/shared/RichText";
 import { CmsBox } from "@/components/cms/CmsBox";
 import { CmsImageSlot } from "@/components/cms/CmsImageSlot";
 import { CmsText } from "@/components/cms/CmsText";
@@ -61,8 +62,12 @@ const MemberCard = ({ member }: { member: CmsPerson }) => {
                 <CmsText field="title" label="Role" editClassName="eyebrow mb-4 text-teal">
                     {member.title && <span className="eyebrow mb-4 text-teal">{member.title}</span>}
                 </CmsText>
-                <CmsText field="description" label="Bio" multiline editClassName="text-sm leading-relaxed text-teal-dark/60">
-                    {member.description && <p className="text-sm leading-relaxed text-teal-dark/60">{member.description}</p>}
+                <CmsText field="description" label="Bio" multiline hint="highlight" editClassName="text-sm leading-relaxed text-teal-dark/60">
+                    {member.description && (
+                        <p className="text-sm leading-relaxed text-teal-dark/60">
+                            <RichText text={member.description} />
+                        </p>
+                    )}
                 </CmsText>
             </div>
         </CmsBox>
