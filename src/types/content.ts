@@ -12,6 +12,8 @@
 export interface NavLink {
     id: string;
     label: string;
+    /** Folded into the navbar's "More" dropdown until the bar is wide enough to show every link. */
+    isSecondary?: boolean;
 }
 
 /** Every section `type` the home page knows how to render. Matches each section's DOM id (`footer` has none). */
