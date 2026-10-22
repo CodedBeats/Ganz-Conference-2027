@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseHighlights, splitParagraphs } from "../src/lib/content/text";
+import { isExternalHref, parseHighlights, parseLinks, resolveHref, splitParagraphs } from "../src/lib/content/text";
 
 describe("splitParagraphs", () => {
     it("splits on blank lines and trims each paragraph", () => {
@@ -55,5 +55,67 @@ describe("parseHighlights", () => {
 
     it("does not let a highlight span a line break", () => {
         expect(parseHighlights("*one\ntwo*")).toEqual([{ text: "*one\ntwo*", isHighlight: false }]);
+    });
+});
+
+describe("resolveHref", () => {
+    it("allows web, email, phone, anchor and site-relative links", () => {
+        for (const url of ["https://ganz.org.au", "http://example.com", "mailto:info@ganz.org.au", "tel:+61400000000", "#program", "/admin"]) {
+            expect(resolveHref(url)).toBe(url);
+        }
+    });
+
+    it("adds https to a bare www address", () => {
+        expect(resolveHref("www.ganz.org.au")).toBe("https://www.ganz.org.au");
+    });
+
+    it("rejects unknown schemes, protocol-relative and bare domains", () => {
+        expect(resolveHref("javascript:alert(1)")).toBeNull();
+        expect(resolveHref("//evil.com")).toBeNull();
+        expect(resolveHref("ganz.org.au")).toBeNull();
+    });
+});
+
+describe("isExternalHref", () => {
+    it("is true only for http(s) links", () => {
+        expect(isExternalHref("https://ganz.org.au")).toBe(true);
+        expect(isExternalHref("#program")).toBe(false);
+        expect(isExternalHref("mailto:info@ganz.org.au")).toBe(false);
+    });
+});
+
+describe("parseLinks", () => {
+    it("returns a single plain segment when there are no links", () => {
+        expect(parseLinks("No links here")).toEqual([{ text: "No links here" }]);
+    });
+
+    it("splits a link out of the middle of the text", () => {
+        expect(parseLinks("See [the program](#program) for details.")).toEqual([
+            { text: "See " },
+            { text: "the program", href: "#program" },
+            { text: " for details." },
+        ]);
+    });
+
+    it("handles links at the start, end and back to back", () => {
+        expect(parseLinks("[a](/a)[b](/b) and [c](https://c.com)")).toEqual([
+            { text: "a", href: "/a" },
+            { text: "b", href: "/b" },
+            { text: " and " },
+            { text: "c", href: "https://c.com" },
+        ]);
+    });
+
+    it("normalises a www link", () => {
+        expect(parseLinks("[GANZ](www.ganz.org.au)")).toEqual([{ text: "GANZ", href: "https://www.ganz.org.au" }]);
+    });
+
+    it("leaves a disallowed link as literal text, merged with its neighbours", () => {
+        expect(parseLinks("Click [me](javascript:alert(1)) now")).toEqual([{ text: "Click [me](javascript:alert(1)) now" }]);
+    });
+
+    it("leaves unclosed and line-spanning links as literal text", () => {
+        expect(parseLinks("[text](https://a.com")).toEqual([{ text: "[text](https://a.com" }]);
+        expect(parseLinks("[one\ntwo](https://a.com)")).toEqual([{ text: "[one\ntwo](https://a.com)" }]);
     });
 });
