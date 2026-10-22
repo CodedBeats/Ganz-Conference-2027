@@ -4,6 +4,10 @@ import type { NavLink } from "@/types/content";
  * Section links in page order. `id` must match the `id` attribute on each
  * section so anchor links and the active-section observer line up.
  *
+ * @remarks
+ * `isSecondary` links sit in the navbar's "More" dropdown on laptop widths, where all ten
+ * don't fit in one row, so they should be the ones visitors look for least.
+ *
  * @see {@link useActiveSection} in `src/hooks/useActiveSection.ts`
  */
 export const NAV_LINKS: NavLink[] = [
@@ -12,9 +16,9 @@ export const NAV_LINKS: NavLink[] = [
     { id: "keynotes", label: "Keynotes" },
     { id: "registrations", label: "Registrations" },
     { id: "location", label: "Location" },
-    { id: "accommodation", label: "Accommodation" },
-    { id: "sponsors", label: "Sponsors" },
-    { id: "committee", label: "Committee" },
+    { id: "accommodation", label: "Accommodation", isSecondary: true },
+    { id: "sponsors", label: "Sponsors", isSecondary: true },
+    { id: "committee", label: "Committee", isSecondary: true },
     { id: "faqs", label: "FAQs" },
     { id: "contact", label: "Contact" },
 ];
