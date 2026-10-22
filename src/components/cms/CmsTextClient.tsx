@@ -8,8 +8,9 @@ import { useCmsBox } from "@/hooks/useCmsBox";
 export type CmsTextHint = "highlight" | "paragraphs";
 
 const HINTS: Record<CmsTextHint, string> = {
-    highlight: "Wrap words in *asterisks* to highlight them. Press Enter for a line break.",
-    paragraphs: "Leave a blank line between paragraphs. Wrap words in *asterisks* to highlight them.",
+    highlight: "Wrap words in *asterisks* to highlight them. Add a link with [link text](https://…). Press Enter for a line break.",
+    paragraphs:
+        "Leave a blank line between paragraphs. Wrap words in *asterisks* to highlight them. Add a link with [link text](https://…).",
 };
 
 export interface CmsTextClientProps {
