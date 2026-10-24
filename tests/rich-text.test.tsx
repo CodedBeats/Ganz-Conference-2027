@@ -22,6 +22,14 @@ describe("RichText", () => {
         expect(link.getAttribute("target")).toBeNull();
     });
 
+    it("renders a mailto link in the same tab", () => {
+        render(<RichText text="Apply by emailing [contact@ganz.org.au](mailto:contact@ganz.org.au)." />);
+
+        const link = screen.getByRole("link", { name: "contact@ganz.org.au" });
+        expect(link.getAttribute("href")).toBe("mailto:contact@ganz.org.au");
+        expect(link.getAttribute("target")).toBeNull();
+    });
+
     it("renders a link inside a highlight within the accent span", () => {
         render(<RichText text="*Read [more](/more)*" accentClassName="text-gold" />);
 
