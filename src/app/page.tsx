@@ -4,6 +4,7 @@ import { Hero } from "@/components/sections/Hero";
 import { Welcome } from "@/components/sections/Welcome";
 import { Program } from "@/components/sections/Program";
 import { Keynotes } from "@/components/sections/Keynotes";
+import { Workshop } from "@/components/sections/Workshop";
 import { Registrations } from "@/components/sections/Registrations";
 import { Submissions } from "@/components/sections/Submissions";
 import { Location } from "@/components/sections/Location";
@@ -14,26 +15,26 @@ import { Faq } from "@/components/sections/Faq";
 import { Contact } from "@/components/sections/Contact";
 import { GateLogoutButton } from "@/components/gate/GateLogoutButton";
 import { SharePrompt } from "@/components/shared/SharePrompt";
-import { CmsEditorProvider } from "@/components/cms/CmsEditorProvider";
-import { AdminBar } from "@/components/cms/AdminBar";
+import { CmsPage } from "@/components/cms/CmsPage";
 import { getPageContent } from "@/lib/content/getPageContent";
-import { getFiles } from "@/lib/content/getFiles";
-import { isCmsEditor } from "@/lib/cms/editor";
+import { getRegisterCta } from "@/lib/content/site";
 
 const Home = async () => {
     // each section renders nothing when its content is missing (e.g. unpublished in the CMS)
-    const [content, isEditor] = await Promise.all([getPageContent(), isCmsEditor()]);
+    const content = await getPageContent();
+    const registerCta = getRegisterCta(content.registrations);
 
-    const page = (
-        <>
-            <Navbar />
+    return (
+        <CmsPage>
+            <Navbar registerCta={registerCta} />
             <main className="flex-1">
-                <Hero section={content.hero} hasSubmissions={Boolean(content.submissions)} />
+                <Hero section={content.hero} hasSubmissions={Boolean(content.submissions)} registerCta={registerCta} />
                 <Welcome section={content.welcome} />
                 <Program section={content.program} />
                 <Keynotes section={content.keynotes} />
                 <SharePrompt />
-                <Registrations section={content.registrations} />
+                <Workshop section={content.workshop} />
+                <Registrations section={content.registrations} registerCta={registerCta} />
                 <Submissions section={content.submissions} />
                 <Location section={content.location} />
                 <Accommodation section={content.accommodation} />
@@ -44,19 +45,7 @@ const Home = async () => {
                 <GateLogoutButton />
             </main>
             <Footer section={content.footer} />
-        </>
-    );
-
-    // admins get the inline editor; visitors never receive its provider, toolbar or file list
-    if (!isEditor) return page;
-
-    const files = await getFiles();
-
-    return (
-        <CmsEditorProvider files={files}>
-            {page}
-            <AdminBar />
-        </CmsEditorProvider>
+        </CmsPage>
     );
 };
 

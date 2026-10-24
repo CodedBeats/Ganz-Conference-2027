@@ -4,6 +4,7 @@ import { Menu } from "@base-ui/react/menu";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { NavLink } from "@/types/content";
+import { sectionHref } from "@/lib/content/site";
 
 interface NavMoreMenuProps {
     links: NavLink[];
@@ -31,7 +32,7 @@ export const NavMoreMenu = ({ links, activeId }: NavMoreMenuProps) => {
                         {links.map((link) => (
                             <Menu.LinkItem
                                 key={link.id}
-                                href={`#${link.id}`}
+                                href={sectionHref(link.id)}
                                 closeOnClick
                                 className={cn(
                                     "block rounded-xl px-3 py-2 text-sm text-teal-dark outline-none transition-colors data-highlighted:bg-teal-light data-highlighted:text-teal",

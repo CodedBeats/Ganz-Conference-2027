@@ -111,6 +111,15 @@ describe("groupSectionsByType", () => {
         expect(warn).toHaveBeenCalledOnce();
     });
 
+    it("knows the workshop and policies sections", () => {
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+        const content = groupSectionsByType([sectionRow({ type: "workshop" }), sectionRow({ type: "policies" })]);
+
+        expect(Object.keys(content)).toEqual(["workshop", "policies"]);
+        expect(warn).not.toHaveBeenCalled();
+    });
+
     it("narrows people styles", () => {
         const content = groupSectionsByType([
             sectionRow({

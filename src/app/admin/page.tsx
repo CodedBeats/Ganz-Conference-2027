@@ -12,17 +12,15 @@ const TICKET_GROUPS = [
     {
         name: "GANZ Members",
         tickets: [
-            { name: "3-day Conference", earlyBird: "$485", full: "$585" },
-            { name: "2-day Pre-Conference Workshop", earlyBird: "$650", full: "$750" },
-            { name: "Bundle", earlyBird: "$1045", full: "$1145" },
+            { name: "Conference only", earlyBird: "$485", full: "$585" },
+            { name: "Conference + Workshop", earlyBird: "$1,085", full: "$1,185" },
         ],
     },
     {
         name: "Non-Members",
         tickets: [
-            { name: "3-day Conference", earlyBird: "$635", full: "$735" },
-            { name: "2-day Pre-Conference Workshop", earlyBird: "$800", full: "$900" },
-            { name: "Bundle", earlyBird: "$1195", full: "$1295" },
+            { name: "Conference only", earlyBird: "$635", full: "$735" },
+            { name: "Conference + Workshop", earlyBird: "$1,235", full: "$1,335" },
         ],
     },
 ];
@@ -41,7 +39,7 @@ const AdminPage = async () => {
                     {TICKET_GROUPS.map((group) => (
                         <div key={group.name}>
                             <h3 className="eyebrow mb-3 text-teal-dark/60">{group.name}</h3>
-                            <ul className="grid gap-4 md:grid-cols-3">
+                            <ul className="grid gap-4 md:grid-cols-2">
                                 {group.tickets.map((ticket) => (
                                     <li key={ticket.name}>
                                         <p className="mb-2 font-medium">{ticket.name}</p>

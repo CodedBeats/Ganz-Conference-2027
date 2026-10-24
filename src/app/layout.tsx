@@ -21,7 +21,7 @@ const isPreLaunch = Boolean(process.env.SITE_PASSWORD);
 export const metadata: Metadata = {
     title: "GANZ Conference 2027 - In Our Bodies, Of The Field",
     description:
-        "13th National Gestalt Australia & New Zealand Conference. 25-27 June 2027, Griffith University, Gold Coast QLD. Celebrating 30 years of GANZ.",
+        "13th National Gestalt Australia & New Zealand Conference. 25-27 June 2027, with a pre-conference workshop 22-23 June, at The University of Queensland, St Lucia, Brisbane QLD. Celebrating 30 years of GANZ.",
     icons: {
         icon: "/design/logo/Favicon.png",
     },

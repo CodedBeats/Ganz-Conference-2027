@@ -47,12 +47,28 @@ insert into public.sections (type, heading, subheading, body, excerpt, sort_orde
         'Further keynote presenters will be announced through 2026.',
         null,
         4, null),
-    ('registrations',
-        'Join us on the Gold Coast.',
+    -- workshop: body = description paragraphs, image = optional photo
+    ('workshop',
+        'Two days to *go deeper*.',
         null,
-        'Registration opens in 2026. Rates are being finalised - join the mailing list and we will let you know the moment early bird opens.',
+        array_to_string(array[
+            'Before the conference begins, join us for a two-day pre-conference workshop on Tuesday 22 and Wednesday 23 June 2027.',
+            'Full details, including the facilitator and program, will be announced soon.'
+        ], E'\n\n'),
         null,
         5, null),
+    -- registrations: subheading = registration button label, excerpt = its link
+    -- (#registrations = not open yet; see getRegisterCta)
+    ('registrations',
+        'Join us in Brisbane June 2027',
+        'Registration opening soon',
+        array_to_string(array[
+            'Registration opens in November 2026.',
+            'All GANZ members receive a $150 discount on conference tickets.',
+            '[Join GANZ here](https://www.ganz.org.au/product-category/membership-options/) (Full Membership $120, Students FREE).'
+        ], E'\n\n'),
+        '#registrations',
+        6, null),
     -- submissions: body = invitation, excerpt = virtual note, subheading = line above
     -- the guidelines button, image = the guidelines PDF (uploaded through the CMS)
     ('submissions',
@@ -63,43 +79,43 @@ insert into public.sections (type, heading, subheading, body, excerpt, sort_orde
             'We welcome submissions from students, emerging practitioners, researchers and experienced clinicians alike. We value lived experience, clinical wisdom, embodied knowledge, creativity and community knowledge alongside academic and theoretical expertise.'
         ], E'\n\n'),
         'The conference will be an in-person event, but if you''re overseas and interested in presenting virtually, we''d love to work with you to make an online contribution possible.',
-        6, null),
+        7, null),
     ('location',
         'Finding us on campus.',
         null,
         'Griffith University''s Gold Coast campus at Southport - not the Nathan, Mt Gravatt or Logan campuses.',
         null,
-        7, null),
+        8, null),
     ('accommodation',
         'Where to stay',
         null,
         'We are securing a selection of accommodation options close to the Griffith University Gold Coast campus, across a range of price points. Details will be published here.',
         'Details to be confirmed',
-        8, (select id from public.files where name = 'accommodation')),
+        9, (select id from public.files where name = 'accommodation')),
     ('sponsors',
         'Supporting thirty years of Gestalt practice.',
         null,
         'Sponsorship opportunities are open. To discuss partnering with the 13th GANZ Conference, contact the committee.',
         null,
-        9, null),
+        10, null),
     ('committee',
         'Held by many hands.',
         null,
         'The committee continues to grow. Bios and photographs to follow.',
         null,
-        10, null),
+        11, null),
     ('faqs',
         E'Questions,\nanswered.',
         null,
         'Full answers will be published as arrangements are confirmed. Anything else, write to us.',
         null,
-        11, null),
+        12, null),
     ('contact',
         'We''d love to hear from you.',
         null,
         'contact@ganz.org.au',
         null,
-        12, null),
+        13, null),
     -- footer: image = logo, body = description under it, excerpt = acknowledgement
     -- of country, subheading = copyright line. Not in the nav, so it has no DOM id.
     ('footer',
@@ -107,7 +123,13 @@ insert into public.sections (type, heading, subheading, body, excerpt, sort_orde
         '© 2027 Gestalt Australia & New Zealand. All rights reserved.',
         'Gestalt Australia & New Zealand - The professional association for Gestalt practitioners across Australia and Aotearoa New Zealand.',
         'GANZ acknowledges the lands, waterways and skies across Australia and Aotearoa (New Zealand) where we live, meet and practise. We honour the continuing connection of First Nations peoples to Country, acknowledge that sovereignty was never ceded in Australia, and honour Te Tiriti o Waitangi in Aotearoa. We honour the richness of Indigenous healing practices and our ongoing learning alongside First Nations peoples.',
-        13, (select id from public.files where name = 'ganz-logo'));
+        14, (select id from public.files where name = 'ganz-logo')),
+    -- policies: rendered on /policies, not the home page. heading = page heading,
+    -- body = optional intro, each stat item = one policy
+    ('policies',
+        'Terms & Policies',
+        null, null, null,
+        15, null);
 
 -- Top-level stat items
 insert into public.stat_items (label, value, style, description, sort_order, section_id) values
@@ -121,14 +143,33 @@ insert into public.stat_items (label, value, style, description, sort_order, sec
     ('Keynotes',      '3',   'primary',   null, 3, (select id from public.sections where type = 'program')),
     ('Workshops',     'TBC', 'secondary', null, 4, (select id from public.sections where type = 'program')),
 
+    -- workshop: details card rows (label = caption, value = text)
+    ('Dates',       'Tuesday 22 - Wednesday 23 June 2027', 'primary', null, 1, (select id from public.sections where type = 'workshop')),
+    ('Facilitator', 'To be announced',                     'primary', null, 2, (select id from public.sections where type = 'workshop')),
+    ('Times',       'To be confirmed',                     'primary', null, 3, (select id from public.sections where type = 'workshop')),
+
     -- registrations: tiers (label = title, value = subtitle); price rows are children below.
-    -- Three per membership group, so the 3-column grid puts members on row 1 and non-members on row 2.
-    ('3-day Conference',              'GANZ Members', 'primary',   null,                                                1, (select id from public.sections where type = 'registrations')),
-    ('2-day Pre-Conference Workshop', 'GANZ Members', 'primary',   'Workshop only. Conference not included.',           2, (select id from public.sections where type = 'registrations')),
-    ('Bundle',                        'GANZ Members', 'secondary', '3-day Conference + 2-day Pre-Conference Workshop.', 3, (select id from public.sections where type = 'registrations')),
-    ('3-day Conference',              'Non-Members',  'primary',   null,                                                4, (select id from public.sections where type = 'registrations')),
-    ('2-day Pre-Conference Workshop', 'Non-Members',  'primary',   'Workshop only. Conference not included.',           5, (select id from public.sections where type = 'registrations')),
-    ('Bundle',                        'Non-Members',  'secondary', '3-day Conference + 2-day Pre-Conference Workshop.', 6, (select id from public.sections where type = 'registrations')),
+    -- Two per row in page order, so members sit on the left and non-members on the right.
+    ('GANZ Members Conference Only',        'FRIDAY 25-SUNDAY 27 JUNE 2027', 'secondary',
+        '3-Day Conference, including catering and Saturday evening social event',
+        1, (select id from public.sections where type = 'registrations')),
+    ('Non Members - Conference Only',       'FRIDAY 25-SUNDAY 27 JUNE 2027', 'primary',
+        '3-Day Conference, including catering and Saturday evening social event',
+        2, (select id from public.sections where type = 'registrations')),
+    ('GANZ Members Conference + Workshop',  'WORKSHOP TUESDAY 22-WEDNESDAY 23 + CONFERENCE FRIDAY 25-SUNDAY 27 JUNE 2027', 'secondary',
+        E'3-day Conference + 2-day Pre-Conference Workshop\nCatering and Saturday evening social event included\n[Find out more about the workshop](#workshop)',
+        3, (select id from public.sections where type = 'registrations')),
+    ('Non Members - Conference + Workshop', 'WORKSHOP TUESDAY 22-WEDNESDAY 23 + CONFERENCE FRIDAY 25-SUNDAY 27 JUNE 2027', 'primary',
+        E'3-day Conference + 2-day Pre-Conference Workshop\nCatering and Saturday evening social event included\n[Find out more about the workshop](#workshop)',
+        4, (select id from public.sections where type = 'registrations')),
+    -- tertiary = the info card in the right-hand column (not a ticket); its contact email is a child row below
+    ('Scholarships', 'Number of places to be confirmed', 'tertiary',
+        array_to_string(array[
+            'A number of scholarships are available for people who meet the following criteria.',
+            'Criteria to be confirmed.',
+            'To apply, email us with a short note about yourself and why you would like to attend.'
+        ], E'\n\n'),
+        5, (select id from public.sections where type = 'registrations')),
 
     -- location
     ('Venue',        'Griffith University Gold Coast Campus',                'primary', null, 1, (select id from public.sections where type = 'location')),
@@ -157,29 +198,35 @@ insert into public.stat_items (label, value, style, description, sort_order, sec
         'primary', null, 4, (select id from public.sections where type = 'faqs')),
     ('Can I present or run a workshop?',
         'A call for papers and workshop proposals will be released ahead of the conference. Details to be confirmed.',
-        'primary', null, 5, (select id from public.sections where type = 'faqs'));
+        'primary', null, 5, (select id from public.sections where type = 'faqs')),
 
--- Registration price rows, nested under their tier. Tier titles repeat across the
--- two membership groups, so a tier is matched on its title + subtitle together.
+    -- policies: label = title, value = paragraphs
+    ('Refund & Cancellation Policy',
+        array_to_string(array[
+            'All conference registrations are non-refundable. Please consider your availability carefully before registering, as GANZ is required to make financial commitments in advance of the conference.',
+            'If you are unable to attend, you may request to transfer your registration to another person, subject to approval by GANZ and any applicable registration requirements. Transfer requests must be received in writing before the conference.',
+            'In the unlikely event that GANZ needs to cancel the conference, registered attendees will be advised of the arrangements for refunds or other remedies. If the conference is postponed or substantially changed, GANZ will communicate directly with registered attendees regarding the options available.',
+            'By registering, you acknowledge and agree to this policy.'
+        ], E'\n\n'),
+        'primary', null, 1, (select id from public.sections where type = 'policies'));
+
+-- Registration price rows, nested under their tier (titles are unique, so a tier is matched on its title),
+-- plus the Scholarships info card's contact email
 insert into public.stat_items (label, value, sort_order, section_id, parent_id)
 select rows.label, rows.value, rows.sort_order, tier.section_id, tier.id
 from (values
-    ('3-day Conference',              'GANZ Members', 'Early Bird',        '$485',  1),
-    ('3-day Conference',              'GANZ Members', 'Full Registration', '$585',  2),
-    ('2-day Pre-Conference Workshop', 'GANZ Members', 'Early Bird',        '$650',  1),
-    ('2-day Pre-Conference Workshop', 'GANZ Members', 'Full Registration', '$750',  2),
-    ('Bundle',                        'GANZ Members', 'Early Bird',        '$1045', 1),
-    ('Bundle',                        'GANZ Members', 'Full Registration', '$1145', 2),
-    ('3-day Conference',              'Non-Members',  'Early Bird',        '$635',  1),
-    ('3-day Conference',              'Non-Members',  'Full Registration', '$735',  2),
-    ('2-day Pre-Conference Workshop', 'Non-Members',  'Early Bird',        '$800',  1),
-    ('2-day Pre-Conference Workshop', 'Non-Members',  'Full Registration', '$900',  2),
-    ('Bundle',                        'Non-Members',  'Early Bird',        '$1195', 1),
-    ('Bundle',                        'Non-Members',  'Full Registration', '$1295', 2)
-) as rows (tier_label, tier_subtitle, label, value, sort_order)
+    ('GANZ Members Conference Only',        'Early Bird',        '$485',                1),
+    ('GANZ Members Conference Only',        'Full Registration', '$585',                2),
+    ('Non Members - Conference Only',       'Early Bird',        '$635',                1),
+    ('Non Members - Conference Only',       'Full Registration', '$735',                2),
+    ('GANZ Members Conference + Workshop',  'Early Bird',        '$1085',               1),
+    ('GANZ Members Conference + Workshop',  'Full Registration', '$1185',               2),
+    ('Non Members - Conference + Workshop', 'Early Bird',        '$1235',               1),
+    ('Non Members - Conference + Workshop', 'Full Registration', '$1335',               2),
+    ('Scholarships',                        'Email',             'contact@ganz.org.au', 1)
+) as rows (tier_label, label, value, sort_order)
 join public.stat_items tier
     on tier.label = rows.tier_label
-    and tier.value = rows.tier_subtitle
     and tier.parent_id is null
     and tier.section_id = (select id from public.sections where type = 'registrations');
 

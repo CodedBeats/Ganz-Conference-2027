@@ -16,7 +16,7 @@ describe("NavMoreMenu", () => {
         fireEvent.click(screen.getByRole("button", { name: "More" }));
 
         const sponsors = await screen.findByRole("menuitem", { name: "Sponsors" });
-        expect(sponsors.getAttribute("href")).toBe("#sponsors");
+        expect(sponsors.getAttribute("href")).toBe("/#sponsors");
         expect(screen.getByRole("menuitem", { name: "Accommodation" })).toBeTruthy();
     });
 

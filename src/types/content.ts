@@ -16,12 +16,16 @@ export interface NavLink {
     isSecondary?: boolean;
 }
 
-/** Every section `type` the home page knows how to render. Matches each section's DOM id (`footer` has none). */
+/**
+ * Every section `type` the site knows how to render. Matches each section's DOM id
+ * (`footer` has none). `policies` is the one that renders on `/policies` instead of the home page.
+ */
 export const SECTION_TYPES = [
     "hero",
     "welcome",
     "program",
     "keynotes",
+    "workshop",
     "registrations",
     "submissions",
     "location",
@@ -31,6 +35,7 @@ export const SECTION_TYPES = [
     "faqs",
     "contact",
     "footer",
+    "policies",
 ] as const;
 
 export type SectionType = (typeof SECTION_TYPES)[number];
