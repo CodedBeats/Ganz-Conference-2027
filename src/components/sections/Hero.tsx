@@ -1,5 +1,5 @@
 import type { CmsSection } from "@/types/content";
-import { EVENT } from "@/lib/content/site";
+import { EVENT, type RegisterCta } from "@/lib/content/site";
 import { SectionTag } from "@/components/shared/SectionTag";
 import { RichText } from "@/components/shared/RichText";
 import { ContentImage } from "@/components/shared/ContentImage";
@@ -16,9 +16,10 @@ interface HeroProps {
     section?: CmsSection;
     /** Whether the Submissions section is published - the button would point at nothing otherwise. */
     hasSubmissions: boolean;
+    registerCta: RegisterCta;
 }
 
-export const Hero = ({ section, hasSubmissions }: HeroProps) => {
+export const Hero = ({ section, hasSubmissions, registerCta }: HeroProps) => {
     if (!section) return null;
 
     return (
@@ -81,9 +82,9 @@ export const Hero = ({ section, hasSubmissions }: HeroProps) => {
                                 Make a Submission →
                             </a>
                         )}
-                        {/* TODO: swap for the dedicated /register page once registration (phase 2) is built */}
-                        <a href={EVENT.registerHref} className="btn-pill btn-gold w-full py-5 sm:text-lg sm:w-auto sm:self-center">
-                            Register Now →
+                        {/* label and link come from the CMS - see getRegisterCta */}
+                        <a href={registerCta.href} className="btn-pill btn-gold w-full py-5 sm:text-lg sm:w-auto sm:self-center">
+                            {registerCta.label} →
                         </a>
                     </div>
                 </div>
