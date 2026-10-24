@@ -1,6 +1,7 @@
 import { Share2 } from "lucide-react";
 import type { CmsSection, CmsStatItem } from "@/types/content";
-import { FOOTER_LINKS } from "@/lib/content/site";
+import type { NavLink } from "@/types/content";
+import { EVENT, FOOTER_LINKS, sectionHref } from "@/lib/content/site";
 import { RichText } from "@/components/shared/RichText";
 import { ContentImage } from "@/components/shared/ContentImage";
 import { PlaceholderBox } from "@/components/shared/PlaceholderBox";
@@ -9,23 +10,36 @@ import { CmsImageSlot } from "@/components/cms/CmsImageSlot";
 import { CmsText } from "@/components/cms/CmsText";
 import { ShareDialog } from "@/components/shared/ShareDialog";
 
-// footer splits the nav into two columns; ABOUT holds the last four links
+interface FooterLink {
+    href: string;
+    label: string;
+}
+
+const toFooterLink = (link: NavLink): FooterLink => ({
+    href: sectionHref(link.id),
+    label: link.id === "keynotes" ? "Keynote Presenters" : link.label,
+});
+
+// footer splits the nav into two columns; ABOUT holds the last four links plus the policies page
 const ABOUT_IDS = new Set(["sponsors", "committee", "faqs", "contact"]);
-const CONFERENCE_LINKS = FOOTER_LINKS.filter((link) => !ABOUT_IDS.has(link.id));
-const ABOUT_LINKS = FOOTER_LINKS.filter((link) => ABOUT_IDS.has(link.id));
+const CONFERENCE_LINKS = FOOTER_LINKS.filter((link) => !ABOUT_IDS.has(link.id)).map(toFooterLink);
+const ABOUT_LINKS = [
+    ...FOOTER_LINKS.filter((link) => ABOUT_IDS.has(link.id)).map(toFooterLink),
+    { href: EVENT.policiesHref, label: "Terms & Policies" },
+];
 
 const DESCRIPTION_CLASS = "max-w-xs text-base leading-relaxed text-teal-dark/70";
 const ACKNOWLEDGEMENT_CLASS = "text-sm leading-relaxed text-teal-dark/70";
 const COPYRIGHT_CLASS = "text-sm text-teal-dark/60";
 
-const FooterLinks = ({ heading, links }: { heading: string; links: typeof FOOTER_LINKS }) => (
+const FooterLinks = ({ heading, links }: { heading: string; links: FooterLink[] }) => (
     <div>
         <span className="eyebrow mb-5 text-teal-dark/50">{heading}</span>
         <ul className="space-y-2.5">
             {links.map((link) => (
-                <li key={link.id}>
-                    <a href={`#${link.id}`} className="text-base text-teal-dark transition-colors hover:text-teal">
-                        {link.id === "keynotes" ? "Keynote Presenters" : link.label}
+                <li key={link.href}>
+                    <a href={link.href} className="text-base text-teal-dark transition-colors hover:text-teal">
+                        {link.label}
                     </a>
                 </li>
             ))}
