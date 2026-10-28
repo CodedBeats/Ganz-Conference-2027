@@ -14,10 +14,19 @@
  */
 
 import { revalidatePath } from "next/cache";
+import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { handleError } from "@/lib/errors";
+import { SESSION_IDLE_MINUTES, getRowChanges, getUndoState } from "@/lib/cms/editSession";
 import {
+    fetchSessionEdits,
+    selectEditableRows,
+    type EditableRecord,
+    type SupabaseServerClient,
+} from "@/lib/cms/history";
+import {
+    EDITABLE_FIELDS,
     FILE_CREATE_FIELDS,
     FILE_UPDATE_FIELDS,
     PERSON_CREATE_FIELDS,
@@ -26,6 +35,7 @@ import {
     SECTION_UPDATE_FIELDS,
     STAT_ITEM_CREATE_FIELDS,
     STAT_ITEM_UPDATE_FIELDS,
+    isEditableTable,
     isValidId,
     sanitizeInput,
 } from "@/lib/cms/fields";
@@ -41,6 +51,7 @@ import {
 } from "@/lib/cms/files";
 import type {
     CmsActionResult,
+    CmsEditRecord,
     CmsError,
     DeletedRow,
     EditableTable,
@@ -60,8 +71,6 @@ import type {
     StatItemRecord,
     StatItemUpdateInput,
 } from "@/types/cms";
-
-type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
 /** The part of a Supabase query response the wrapper cares about. */
 interface QueryResult<T> {
@@ -84,6 +93,15 @@ const NOT_FOUND_ERROR = cmsError(
     "Refresh the page to load the latest content, then try again.",
 );
 const VALIDATION_HINT = "Fix the field and save again.";
+const UNDO_TOO_OLD_ERROR = cmsError(
+    "This change is too old to undo.",
+    `Changes can only be undone until you've had a ${SESSION_IDLE_MINUTES}-minute break from editing. Edit the box directly instead.`,
+);
+const UNDO_STALE_ERROR = cmsError(
+    "This was changed again after this edit, so undoing it would overwrite the newer change.",
+    "Undo the newer change first, then try again.",
+);
+const UNDO_ALREADY_DONE_ERROR = cmsError("This change has already been undone.", "Refresh the page to see the latest content.");
 
 /** An expected rejection (bad input, malformed id) - returned as-is and not logged as a server error. */
 class CmsRejection extends Error {
@@ -112,12 +130,12 @@ interface CmsActionOptions {
  * small enough that a blanket refresh is cheaper than tracking paths.
  *
  * @param context - Action name, used to prefix server logs (e.g. `"updatePerson"`).
- * @param mutate - Runs the query. Return {@link invalid} or {@link notFound} instead to reject the request.
+ * @param mutate - Runs the query, given the client and the verified admin. Return {@link invalid} or {@link notFound} instead to reject the request.
  * @param options - See {@link CmsActionOptions}.
  */
 async function runCmsAction<T>(
     context: string,
-    mutate: (supabase: SupabaseServerClient) => PromiseLike<QueryResult<T>> | QueryResult<T>,
+    mutate: (supabase: SupabaseServerClient, user: User) => PromiseLike<QueryResult<T>> | QueryResult<T>,
     { shouldRevalidate = true }: CmsActionOptions = {},
 ): Promise<CmsActionResult<T>> {
     const user = await getCurrentUser();
@@ -132,7 +150,7 @@ async function runCmsAction<T>(
 
     try {
         const supabase = await createClient();
-        const { data, error } = await mutate(supabase);
+        const { data, error } = await mutate(supabase, user);
 
         if (error instanceof CmsRejection) return { data: null, error: error.cmsError };
         if (error) return { data: null, error: handleError(error, `cms:${context}`) };
@@ -147,62 +165,170 @@ async function runCmsAction<T>(
     }
 }
 
-// Update bodies take `unknown` so the typed exports and `updateCmsRow` can share them -
-// `sanitizeInput` is what actually enforces the shape.
+// Update bodies take `unknown` so the typed exports, `updateCmsRow` and `undoCmsEdit` can
+// share them - `sanitizeInput` is what actually enforces the shape.
+
+const updateSectionQuery = (supabase: SupabaseServerClient, id: string, input: unknown) => {
+    const { values, error } = sanitizeInput(input, SECTION_UPDATE_FIELDS, { isPartial: true });
+    if (error !== null) return invalid(error);
+    return supabase.from("sections").update(values).eq("id", id).select().single();
+};
+
+const updatePersonQuery = (supabase: SupabaseServerClient, id: string, input: unknown) => {
+    const { values, error } = sanitizeInput(input, PERSON_UPDATE_FIELDS, { isPartial: true });
+    if (error !== null) return invalid(error);
+    return supabase.from("people").update(values).eq("id", id).select().single();
+};
+
+const updateStatItemQuery = (supabase: SupabaseServerClient, id: string, input: unknown) => {
+    const { values, error } = sanitizeInput(input, STAT_ITEM_UPDATE_FIELDS, { isPartial: true });
+    if (error !== null) return invalid(error);
+    return supabase.from("stat_items").update(values).eq("id", id).select().single();
+};
+
+/** Spelt out per table because supabase-js can't type `.from()` over a union of table names. */
+const UPDATE_QUERIES = {
+    sections: updateSectionQuery,
+    people: updatePersonQuery,
+    stat_items: updateStatItemQuery,
+} satisfies Record<EditableTable, unknown>;
+
+const UPDATE_CONTEXTS: Record<EditableTable, string> = {
+    sections: "updateSection",
+    people: "updatePerson",
+    stat_items: "updateStatItem",
+};
 
 const updateSectionRow = (id: string, input: unknown) =>
-    runCmsAction("updateSection", (supabase) => {
-        if (!isValidId(id)) return notFound();
-        const { values, error } = sanitizeInput(input, SECTION_UPDATE_FIELDS, { isPartial: true });
-        if (error !== null) return invalid(error);
-        return supabase.from("sections").update(values).eq("id", id).select().single();
-    });
+    runCmsAction("updateSection", (supabase) => (isValidId(id) ? updateSectionQuery(supabase, id, input) : notFound()));
 
 const updatePersonRow = (id: string, input: unknown) =>
-    runCmsAction("updatePerson", (supabase) => {
-        if (!isValidId(id)) return notFound();
-        const { values, error } = sanitizeInput(input, PERSON_UPDATE_FIELDS, { isPartial: true });
-        if (error !== null) return invalid(error);
-        return supabase.from("people").update(values).eq("id", id).select().single();
-    });
+    runCmsAction("updatePerson", (supabase) => (isValidId(id) ? updatePersonQuery(supabase, id, input) : notFound()));
 
 const updateStatItemRow = (id: string, input: unknown) =>
-    runCmsAction("updateStatItem", (supabase) => {
-        if (!isValidId(id)) return notFound();
-        const { values, error } = sanitizeInput(input, STAT_ITEM_UPDATE_FIELDS, { isPartial: true });
-        if (error !== null) return invalid(error);
-        return supabase.from("stat_items").update(values).eq("id", id).select().single();
+    runCmsAction("updateStatItem", (supabase) => (isValidId(id) ? updateStatItemQuery(supabase, id, input) : notFound()));
+
+/** Reads one editable row - `data` is `null` when it doesn't exist. */
+async function selectEditableRow(
+    supabase: SupabaseServerClient,
+    table: EditableTable,
+    id: string,
+): Promise<QueryResult<EditableRecord>> {
+    const { data, error } = await selectEditableRows(supabase, table, [id]);
+    return { data: data?.[0] ?? null, error };
+}
+
+/**
+ * Writes a save to `cms_edits` so it shows up in the Recent changes panel.
+ *
+ * @remarks
+ * Best-effort: the content save has already succeeded, so a failure here is logged rather
+ * than reported - losing an undo entry is better than telling the editor their save failed.
+ */
+async function recordEdit(
+    supabase: SupabaseServerClient,
+    user: User,
+    edit: { table: EditableTable; id: string; label: string; before: EditableRecord; after: EditableRecord },
+) {
+    const changes = getRowChanges(edit.before, edit.after, Object.keys(EDITABLE_FIELDS[edit.table]));
+    if (!changes) return;
+
+    const { error } = await supabase.from("cms_edits").insert({
+        user_id: user.id,
+        table_name: edit.table,
+        row_id: edit.id,
+        label: edit.label,
+        before: changes.before,
+        after: changes.after,
     });
+    if (error) console.error("[cms:recordEdit] couldn't record edit history", error);
+}
 
 // ---- homepage editor ----
 
 /**
- * Saves an edit from the homepage editor - the single entry point `CmsBoxClient` calls.
+ * Saves an edit from the homepage editor - the single entry point `CmsBoxClient` and image
+ * slots call - and records it for the Recent changes panel.
  *
  * @remarks
  * The editor box only knows its table name and a loose `{ column: value }` draft, so this
  * dispatches to the matching update. Unknown columns are dropped by {@link sanitizeInput}
  * exactly as they are for the typed actions.
  *
+ * The row is read just before the update so the history snapshot holds what was really
+ * there, rather than trusting the page's possibly stale copy.
+ *
  * @param table - Which table the edited row lives in.
  * @param id - The row's id.
  * @param input - Only the fields that changed.
+ * @param label - The box's human name, shown in the Recent changes panel.
+ * @see {@link undoCmsEdit}
  */
 export async function updateCmsRow(
     table: EditableTable,
     id: string,
     input: unknown,
-): Promise<CmsActionResult<SectionRecord | PersonRecord | StatItemRecord>> {
-    switch (table) {
-        case "sections":
-            return updateSectionRow(id, input);
-        case "people":
-            return updatePersonRow(id, input);
-        case "stat_items":
-            return updateStatItemRow(id, input);
-        default:
-            return { data: null, error: NOT_FOUND_ERROR };
-    }
+    label = "",
+): Promise<CmsActionResult<EditableRecord>> {
+    if (!isEditableTable(table)) return { data: null, error: NOT_FOUND_ERROR };
+
+    return runCmsAction(UPDATE_CONTEXTS[table], async (supabase, user): Promise<QueryResult<EditableRecord>> => {
+        if (!isValidId(id)) return notFound();
+
+        const before = await selectEditableRow(supabase, table, id);
+        if (before.error || !before.data) return before;
+
+        const after = await UPDATE_QUERIES[table](supabase, id, input);
+        if (after.error || !after.data) return after;
+
+        await recordEdit(supabase, user, { table, id, label: String(label).slice(0, 200), before: before.data, after: after.data });
+        return after;
+    });
+}
+
+/**
+ * Undoes one save from the Recent changes panel by writing its `before` values back.
+ *
+ * @remarks
+ * Refused when the edit isn't the caller's, has fallen out of their session (see
+ * `getSessionEdits`), was already undone, or a later save changed one of its fields again
+ * ({@link getUndoState}) - undo must never silently overwrite newer work. The undo itself
+ * isn't recorded as a new edit; the original is marked `reverted_at` instead, which also
+ * counts as session activity.
+ *
+ * @param editId - The `cms_edits` row to undo.
+ * @returns The updated history row.
+ */
+export async function undoCmsEdit(editId: string): Promise<CmsActionResult<CmsEditRecord>> {
+    return runCmsAction("undoEdit", async (supabase, user): Promise<QueryResult<CmsEditRecord>> => {
+        if (!isValidId(editId)) return notFound();
+
+        const session = await fetchSessionEdits(supabase, user.id);
+        const edit = session.edits.find((entry) => entry.id === editId);
+        if (!edit) return reject(UNDO_TOO_OLD_ERROR);
+
+        const current = await selectEditableRow(supabase, edit.table, edit.rowId);
+        if (current.error) return { data: null, error: current.error };
+
+        switch (getUndoState(edit, current.data)) {
+            case "undone":
+                return reject(UNDO_ALREADY_DONE_ERROR);
+            case "missing":
+                return notFound();
+            case "stale":
+                return reject(UNDO_STALE_ERROR);
+        }
+
+        const reverted = await UPDATE_QUERIES[edit.table](supabase, edit.rowId, edit.before);
+        if (reverted.error) return { data: null, error: reverted.error };
+
+        return supabase
+            .from("cms_edits")
+            .update({ reverted_at: new Date().toISOString() })
+            .eq("id", editId)
+            .select()
+            .single();
+    });
 }
 
 // ---- sections ----

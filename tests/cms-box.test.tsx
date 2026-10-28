@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 const mocks = vi.hoisted(() => ({ updateCmsRow: vi.fn() }));
-vi.mock("@/lib/cms/actions", () => ({ updateCmsRow: mocks.updateCmsRow }));
+vi.mock("@/lib/cms/actions", () => ({ updateCmsRow: mocks.updateCmsRow, undoCmsEdit: vi.fn() }));
 
 import { CmsEditorProvider } from "../src/components/cms/CmsEditorProvider";
 import { CmsBoxClient } from "../src/components/cms/CmsBoxClient";
@@ -77,7 +77,7 @@ describe("CmsBoxClient", () => {
         fireEvent.change(screen.getByLabelText("Heading"), { target: { value: "Changed" } });
         await act(async () => fireEvent.click(screen.getByRole("button", { name: "Save Hero section" })));
 
-        expect(mocks.updateCmsRow).toHaveBeenCalledWith("sections", FIRST_ID, { heading: "Changed" });
+        expect(mocks.updateCmsRow).toHaveBeenCalledWith("sections", FIRST_ID, { heading: "Changed" }, "Hero section");
         await waitFor(() => expect(screen.queryByLabelText("Heading")).toBeNull());
     });
 
@@ -89,7 +89,7 @@ describe("CmsBoxClient", () => {
         fireEvent.change(screen.getByLabelText("Body"), { target: { value: "New body" } });
         await act(async () => fireEvent.keyDown(screen.getByLabelText("Body"), { key: "Enter", ctrlKey: true }));
 
-        expect(mocks.updateCmsRow).toHaveBeenCalledWith("sections", FIRST_ID, { body: "New body" });
+        expect(mocks.updateCmsRow).toHaveBeenCalledWith("sections", FIRST_ID, { body: "New body" }, "Hero section");
     });
 
     it("treats saving an untouched draft as cancel", () => {

@@ -4,33 +4,31 @@ import { useMemo, useState, type ReactNode } from "react";
 import { CmsEditorContext, type ActiveCmsBox, type CmsEditorContextValue } from "@/hooks/useCmsEditor";
 import { CmsDialog, type CmsDialogContent } from "@/components/cms/CmsDialog";
 import { FileManagerDialog } from "@/components/files/FileManagerDialog";
-import type { LibraryFile } from "@/types/cms";
+import { undoCmsEdit } from "@/lib/cms/actions";
+import { revealBox } from "@/lib/cms/revealBox";
+import type { CmsEditSession, LibraryFile } from "@/types/cms";
 
 const NO_FILES: LibraryFile[] = [];
+const NO_EDIT_SESSION: CmsEditSession = { edits: [], expiresAt: null };
 
 interface CmsEditorProviderProps {
     children: ReactNode;
     /** From `getFiles` - shared by the file manager modal and every image slot's picker. */
     files?: LibraryFile[];
+    /** From `getCmsEditSession` - the admin's recent saves for the Recent changes panel. */
+    editSession?: CmsEditSession;
 }
 
-/** Scrolls an open box into view and focuses its first field, so "Show me" lands somewhere useful. */
-const revealBox = (id: string) => {
-    const box = document.querySelector<HTMLElement>(`[data-cms-box="${CSS.escape(id)}"]`);
-    box?.scrollIntoView({ behavior: "smooth", block: "center" });
-    box?.querySelector<HTMLElement>("textarea, input, select")?.focus({ preventScroll: true });
-};
-
 /**
- * Page-wide state for the homepage editor: edit mode, the one open box, the dialog, and the
- * file manager modal opened from the admin bar.
+ * Page-wide state for the homepage editor: edit mode, the one open box, the dialog, the
+ * file manager modal and the recent-changes history used by the admin tools.
  *
  * @remarks
- * Rendered by `src/app/page.tsx` for admins only. Enforces the one-box-at-a-time rule:
+ * Rendered by `CmsPage` for admins only. Enforces the one-box-at-a-time rule:
  * {@link CmsEditorContextValue.claimBox} refuses while another box is open and explains why,
- * and the same applies to switching edit mode off mid-edit.
+ * and the same applies to switching edit mode off or undoing a change mid-edit.
  */
-export const CmsEditorProvider = ({ children, files = NO_FILES }: CmsEditorProviderProps) => {
+export const CmsEditorProvider = ({ children, files = NO_FILES, editSession = NO_EDIT_SESSION }: CmsEditorProviderProps) => {
     const [isEditMode, setIsEditMode] = useState(true);
     const [isFileManagerOpen, setIsFileManagerOpen] = useState(false);
     const [activeBox, setActiveBox] = useState<ActiveCmsBox | null>(null);
@@ -64,8 +62,18 @@ export const CmsEditorProvider = ({ children, files = NO_FILES }: CmsEditorProvi
             showError: (itemLabel, error) => openDialog({ kind: "error", itemLabel, error }),
             files,
             openFileManager: () => setIsFileManagerOpen(true),
+            editSession,
+            undoEdit: async (edit) => {
+                if (activeBox) {
+                    openDialog({ kind: "notice", activeLabel: activeBox.label, reason: "undo" });
+                    return;
+                }
+                // success needs no handling - the action's revalidation refreshes the page and `editSession`
+                const result = await undoCmsEdit(edit.id);
+                if (result.error) openDialog({ kind: "error", itemLabel: edit.label, error: result.error, action: "undo" });
+            },
         };
-    }, [isEditMode, activeBox, files]);
+    }, [isEditMode, activeBox, files, editSession]);
 
     const closeDialog = () => setDialog((prev) => ({ ...prev, isOpen: false }));
 

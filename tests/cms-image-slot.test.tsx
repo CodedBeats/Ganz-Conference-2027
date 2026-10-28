@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import type { LibraryFile } from "@/types/cms";
 
 const mocks = vi.hoisted(() => ({ updateCmsRow: vi.fn() }));
-vi.mock("@/lib/cms/actions", () => ({ updateCmsRow: mocks.updateCmsRow, updateFile: vi.fn(), deleteFile: vi.fn() }));
+vi.mock("@/lib/cms/actions", () => ({ updateCmsRow: mocks.updateCmsRow, undoCmsEdit: vi.fn(), updateFile: vi.fn(), deleteFile: vi.fn() }));
 vi.mock("@/lib/cms/uploadFile", () => ({ uploadFile: vi.fn() }));
 
 import { CmsEditorProvider } from "../src/components/cms/CmsEditorProvider";
@@ -73,7 +73,7 @@ describe("CmsImageSlotClient", () => {
         fireEvent.click(screen.getByRole("button", { name: "Ada.jpg" }));
         fireEvent.click(screen.getByRole("button", { name: "Insert image" }));
 
-        await waitFor(() => expect(mocks.updateCmsRow).toHaveBeenCalledWith("people", PERSON_ID, { image: "file-ada" }));
+        await waitFor(() => expect(mocks.updateCmsRow).toHaveBeenCalledWith("people", PERSON_ID, { image: "file-ada" }, "Keynote: Ada image"));
         await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
     });
 
@@ -85,7 +85,7 @@ describe("CmsImageSlotClient", () => {
         fireEvent.click(screen.getByRole("button", { name: "Change image for Keynote: Ada" }));
         fireEvent.click(screen.getByRole("button", { name: "Remove image" }));
 
-        await waitFor(() => expect(mocks.updateCmsRow).toHaveBeenCalledWith("people", PERSON_ID, { image: null }));
+        await waitFor(() => expect(mocks.updateCmsRow).toHaveBeenCalledWith("people", PERSON_ID, { image: null }, "Keynote: Ada image"));
         expect((await screen.findByRole("alert")).textContent).toContain("Your session has expired.");
         expect(screen.getByRole("dialog", { name: "Choose an image" })).toBeTruthy();
     });
@@ -125,7 +125,7 @@ describe("CmsImageSlotClient", () => {
         fireEvent.click(screen.getByRole("button", { name: "Insert PDF" }));
 
         await waitFor(() =>
-            expect(mocks.updateCmsRow).toHaveBeenCalledWith("sections", SECTION_ID, { image_id: "file-guidelines" }),
+            expect(mocks.updateCmsRow).toHaveBeenCalledWith("sections", SECTION_ID, { image_id: "file-guidelines" }, "Submission guidelines PDF"),
         );
     });
 

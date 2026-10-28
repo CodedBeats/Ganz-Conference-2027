@@ -70,7 +70,7 @@ export const CmsBoxClient = ({ as: Tag = "div", className, table, rowId, label, 
         if (Object.keys(changes).length === 0) return stopEditing();
 
         startSaving(async () => {
-            const result = await updateCmsRow(table, rowId, changes);
+            const result = await updateCmsRow(table, rowId, changes, label);
             if (result.error) {
                 editor.showError(label, result.error);
                 return;
