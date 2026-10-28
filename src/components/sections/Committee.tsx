@@ -83,7 +83,7 @@ export const Committee = ({ section }: { section?: CmsSection }) => {
                 <SectionHeaderRow tag="Conference Committee" heading={section.heading} note={section.body} />
             </CmsBox>
 
-            <ul className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+            <ul className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {section.people.map((member) => (
                     <MemberCard key={member.id} member={member} />
                 ))}
