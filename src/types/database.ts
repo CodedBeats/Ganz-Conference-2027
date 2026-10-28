@@ -34,6 +34,42 @@ export type Database = {
     };
     public: {
         Tables: {
+            cms_edits: {
+                Row: {
+                    after: Json;
+                    before: Json;
+                    created_at: string;
+                    id: string;
+                    label: string;
+                    reverted_at: string | null;
+                    row_id: string;
+                    table_name: string;
+                    user_id: string;
+                };
+                Insert: {
+                    after: Json;
+                    before: Json;
+                    created_at?: string;
+                    id?: string;
+                    label?: string;
+                    reverted_at?: string | null;
+                    row_id: string;
+                    table_name: string;
+                    user_id?: string;
+                };
+                Update: {
+                    after?: Json;
+                    before?: Json;
+                    created_at?: string;
+                    id?: string;
+                    label?: string;
+                    reverted_at?: string | null;
+                    row_id?: string;
+                    table_name?: string;
+                    user_id?: string;
+                };
+                Relationships: [];
+            };
             files: {
                 Row: {
                     created_at: string;
