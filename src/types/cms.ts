@@ -126,3 +126,52 @@ export interface FileUsage {
 
 /** A file plus everywhere it's used - what the CMS file manager lists. */
 export type LibraryFile = FileRecord & { usages: FileUsage[] };
+
+// ---- edit history ----
+
+export type CmsEditRecord = Tables<"cms_edits">;
+
+/** Column values as stored in an edit's `before` / `after` snapshot. */
+export type CmsRowValues = Record<string, string | number | boolean | null>;
+
+/**
+ * Whether a recorded edit can still be undone.
+ *
+ * - `ready` - the row still holds exactly what this edit saved
+ * - `stale` - a later save changed one of its fields again, so undoing would clobber that
+ * - `missing` - the row has since been deleted
+ * - `undone` - already reverted
+ */
+export type CmsUndoState = "ready" | "stale" | "missing" | "undone";
+
+/** One inline save, as recorded in `cms_edits` - only the fields that changed. */
+export interface CmsEditEntry {
+    id: string;
+    table: EditableTable;
+    rowId: string;
+    /** The edited box's human name, e.g. "Keynote: Michael Clemmens". */
+    label: string;
+    before: CmsRowValues;
+    after: CmsRowValues;
+    createdAt: string;
+    revertedAt: string | null;
+}
+
+/** A recorded edit plus whether it can still be undone - one entry in the Recent changes panel. */
+export interface CmsEdit extends CmsEditEntry {
+    undoState: CmsUndoState;
+}
+
+/**
+ * The signed-in admin's current editing session.
+ *
+ * @remarks
+ * A session is a run of saves and undos with no gap of `SESSION_IDLE_MINUTES` or more
+ * (see `src/lib/cms/editSession.ts`). Only edits inside it can be undone.
+ */
+export interface CmsEditSession {
+    /** Newest first. */
+    edits: CmsEdit[];
+    /** When the session lapses without further activity - `null` when there's no live session. */
+    expiresAt: string | null;
+}

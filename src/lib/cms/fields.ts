@@ -1,6 +1,7 @@
 import { CMS_STYLES } from "@/types/content";
 import { FILE_FOLDERS, isFileFolder } from "@/lib/cms/files";
 import type {
+    EditableTable,
     FileCreateInput,
     FileUpdateInput,
     PersonCreateInput,
@@ -193,6 +194,18 @@ export const STAT_ITEM_CREATE_FIELDS: FieldSchema<StatItemCreateInput> = {
     ...STAT_ITEM_UPDATE_FIELDS,
     section_id: "id",
 };
+
+/** The update schema of each table the homepage editor writes to - keyed so edit history can look one up by name. */
+export const EDITABLE_FIELDS = {
+    sections: SECTION_UPDATE_FIELDS,
+    people: PERSON_UPDATE_FIELDS,
+    stat_items: STAT_ITEM_UPDATE_FIELDS,
+} as const satisfies Record<EditableTable, object>;
+
+/** Whether `value` names a table the homepage editor can update - e.g. `cms_edits.table_name`, which the DB stores as text. */
+export function isEditableTable(value: unknown): value is EditableTable {
+    return typeof value === "string" && Object.hasOwn(EDITABLE_FIELDS, value);
+}
 
 export const FILE_UPDATE_FIELDS: FieldSchema<FileUpdateInput> = {
     name: "text",
