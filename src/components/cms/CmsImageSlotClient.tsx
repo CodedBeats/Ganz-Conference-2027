@@ -62,8 +62,10 @@ export const CmsImageSlotClient = ({
     const kindLabel = FILE_KIND_LABELS[accept];
     const KindIcon = accept === "pdf" ? FileText : ImageIcon;
 
+    const slotLabel = `${label} ${kindLabel}`;
+
     const open = () => {
-        if (!editor.claimBox({ id: boxId, label: `${label} ${kindLabel}` })) return;
+        if (!editor.claimBox({ id: boxId, label: slotLabel })) return;
         setError(null);
         setIsOpen(true);
     };
@@ -76,7 +78,7 @@ export const CmsImageSlotClient = ({
 
     const save = (nextFileId: string | null) => {
         startSaving(async () => {
-            const result = await updateCmsRow(table, rowId, { [field]: nextFileId });
+            const result = await updateCmsRow(table, rowId, { [field]: nextFileId }, slotLabel);
             if (result.error) {
                 setError(result.error);
                 return;

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { CmsError, LibraryFile } from "@/types/cms";
+import type { CmsEdit, CmsEditSession, CmsError, LibraryFile } from "@/types/cms";
 
 /** The box currently in edit mode - only one may be open at a time. */
 export interface ActiveCmsBox {
@@ -27,6 +27,13 @@ export interface CmsEditorContextValue {
     files: LibraryFile[];
     /** Opens the file manager modal (not as a picker). */
     openFileManager: () => void;
+    /** The signed-in admin's recent saves, for the Recent changes panel. */
+    editSession: CmsEditSession;
+    /**
+     * Reverts one recent save. Refused (with a notice) while a box is open, so an open draft
+     * can't save straight back over it; failures open the error dialog.
+     */
+    undoEdit: (edit: CmsEdit) => Promise<void>;
 }
 
 export const CmsEditorContext = createContext<CmsEditorContextValue | null>(null);
