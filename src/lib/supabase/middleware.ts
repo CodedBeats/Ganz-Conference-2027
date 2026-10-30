@@ -17,7 +17,7 @@ const PROTECTED_PATH_PREFIXES = ["/admin"];
  * Must return `supabaseResponse` (or copy its cookies onto any new response), otherwise the
  * browser and server sessions drift apart and users get randomly logged out.
  *
- * @see {@link proxy} in `src/proxy.ts`, which calls this after the pre-launch gate check.
+ * @see {@link proxy} in `src/proxy.ts`, which runs this on every matched request.
  */
 export async function updateSession(request: NextRequest) {
     let supabaseResponse = NextResponse.next({ request });
