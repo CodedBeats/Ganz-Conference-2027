@@ -37,9 +37,7 @@ Create `.env.local` in the project root:
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
-SITE_PASSWORD=
 ```
-`SITE_PASSWORD` gates the site behind a simple password screen while it's pre-launch - see `src/middleware.ts`.
 
 ## Scripts
 | Command | What it does |
@@ -62,7 +60,7 @@ src/
 ├── lib/            # Business logic, Supabase queries, utilities - documented with TypeDoc
 │   └── supabase/   # Supabase client setup
 ├── types/          # types - documented with TypeDoc
-└── middleware.ts   # Password gate for pre-launch review
+└── proxy.ts        # Refreshes the Supabase session and guards /admin
 ```
 
 ## Testing
@@ -73,4 +71,4 @@ src/
 ## Deployment
 Deployed on Vercel, using a two-branch model:
 - **`master`** - *staging*. Feature/fix/design branches merge here first. auto-deploys to a persistent Vercel preview URL for ongoing checks.
-- **`prod`** - *production*. Set as the Vercel Production Branch, deployed to the real GANZ domain (password-gated via `SITE_PASSWORD` until public launch). When a batch of changes on `main` is ready to ship, open a PR from `main` into `prod` and merge.
+- **`prod`** - *production*. Set as the Vercel Production Branch, deployed to the real GANZ domain. When a batch of changes on `main` is ready to ship, open a PR from `main` into `prod` and merge.

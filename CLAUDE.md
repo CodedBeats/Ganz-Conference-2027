@@ -24,7 +24,6 @@ Single test file: `npm run test:run -- tests/pricing.test.ts`.
 - **Styling:** Tailwind CSS v4 (config lives in `src/app/globals.css` via `@theme`, not a `tailwind.config.*` file — see `components.json` → `tailwind.config: ""`).
 - **UI components:** shadcn/ui, `base-nova` style (Base UI primitives, not Radix). Generated components land in `src/components/ui`. Path aliases per `components.json`: `@/components`, `@/components/ui`, `@/lib`, `@/hooks`, utils at `@/lib/utils`.
 - **Backend:** Supabase (Postgres, Auth, Storage). Client setup is intended to live at `src/lib/supabase/` (not yet created).
-- **Pre-launch gate:** `SITE_PASSWORD` env var is meant to gate the whole site via `src/middleware.ts` (not yet created) until public launch.
 - **Docs generation:** TypeDoc pulls from `/** */` comments in `src/lib`, `src/app/api`, `src/hooks`, `src/types` only. Use the doc-comment style shown in `devInfo.md` (`@remarks`, `@param`, `@returns`) for anything in those directories, since it's the only place they render into `/docs`.
 - **Testing:** Vitest is the only test runner in use: unit tests live in `tests/` (`vite.config.mts`, jsdom environment, `e2e/**` excluded). Playwright is configured (`playwright.config.ts`, `testDir: ./e2e`) and `e2e/` has a couple of old specs, but it's completely unused right now and there are no plans to use it yet. Don't write, run or update Playwright tests, and don't suggest them as verification — use Vitest.
 
@@ -37,7 +36,6 @@ SUPABASE_SECRET_KEY=          # live, only for scripts/create-admin.mjs
 SUPABASE_URL_DEV=             # local stack
 SUPABASE_PUBLISHABLE_KEY_DEV=
 SUPABASE_SECRET_KEY_DEV=
-SITE_PASSWORD=
 ADMIN_EMAIL=                  # the one admin login (no sign-ups)
 ADMIN_PASSWORD=
 NEXT_PUBLIC_FACEBOOK_APP_ID=  # optional, Messenger share option is hidden without it
@@ -92,4 +90,4 @@ e.g. a style/refactor PR might only need **Summary** + **Tested**; a bug fix mig
 Keep PRs short and plain: a sentence or two (or a few short bullets) per header, written in plain English. Avoid walls of `code formatting` - only backtick something when it's a file, table or command the reader actually needs to find. No tables, no exhaustive per-column/per-row breakdowns; the diff covers the detail.
 
 ### Staging and Production
-- Branch model: `master` is staging (feature branches merge here, auto-deploys to a persistent Vercel preview). `prod` is production (Vercel Production Branch, real domain, password-gated pre-launch) — ship via PR from `master` into `prod`.*.
+- Branch model: `master` is staging (feature branches merge here, auto-deploys to a persistent Vercel preview). `prod` is production (Vercel Production Branch, real domain) — ship via PR from `master` into `prod`.*.

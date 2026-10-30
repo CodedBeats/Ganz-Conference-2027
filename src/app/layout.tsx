@@ -15,9 +15,6 @@ const campton = localFont({
     ],
 });
 
-// SITE_PASSWORD presence is the same "pre-launch" signal the gate itself keys off - see getExpectedGateToken in src/lib/gate.ts.
-const isPreLaunch = Boolean(process.env.SITE_PASSWORD);
-
 export const metadata: Metadata = {
     title: "GANZ Conference 2027 - In Our Bodies, Of The Field",
     description:
@@ -25,7 +22,7 @@ export const metadata: Metadata = {
     icons: {
         icon: "/design/logo/Favicon.png",
     },
-    robots: isPreLaunch ? { index: false, follow: false } : { index: true, follow: true },
+    robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
