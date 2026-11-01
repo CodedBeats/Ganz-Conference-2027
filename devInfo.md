@@ -115,7 +115,6 @@ Auto generate tests with Codegen.
 ### Branches
 - auth
 - admin-dashboard
-- docs
 - design
 - responsive-design
 - map
