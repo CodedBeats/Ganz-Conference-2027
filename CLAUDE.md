@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project
 Marketing website + CMS for the GANZ (Gestalt Australia & New Zealand) 2027 Conference. Phase 1 (this repo): public marketing site and a CMS so the client can edit content (keynote presenters, committee, FAQs, registration pricing) without a developer. Phase 2 (registration/ticketing/admin dashboard) is out of scope for this repo.
 
-Current state: freshly scaffolded (`create-next-app` + Tailwind + shadcn init, one commit for Supabase deps). `src/` currently only has `app/layout.tsx`, `app/page.tsx`, `app/globals.css`, `components/ui/button.tsx`, `lib/utils.ts` — the structure below is the intended shape per the README, not yet fully built out.
+Current state: freshly scaffolded (`create-next-app` + Tailwind + shadcn init, one commit for Supabase deps). `src/` currently only has `app/layout.tsx`, `app/page.tsx`, `app/globals.css`, `components/ui/button.tsx`, `lib/utils.ts` - the structure below is the intended shape per the README, not yet fully built out.
 
 ## Commands
 ```bash
@@ -20,12 +20,12 @@ npm run test:run   # Vitest, single run
 Single test file: `npm run test:run -- tests/pricing.test.ts`.
 
 ## Architecture
-- **Next.js 16, App Router, TypeScript.** Read the relevant guide under `node_modules/next/dist/docs/` before writing App Router code — see `AGENTS.md` for why (this Next.js version diverges from training data).
-- **Styling:** Tailwind CSS v4 (config lives in `src/app/globals.css` via `@theme`, not a `tailwind.config.*` file — see `components.json` → `tailwind.config: ""`).
+- **Next.js 16, App Router, TypeScript.** Read the relevant guide under `node_modules/next/dist/docs/` before writing App Router code - see `AGENTS.md` for why (this Next.js version diverges from training data).
+- **Styling:** Tailwind CSS v4 (config lives in `src/app/globals.css` via `@theme`, not a `tailwind.config.*` file - see `components.json` → `tailwind.config: ""`).
 - **UI components:** shadcn/ui, `base-nova` style (Base UI primitives, not Radix). Generated components land in `src/components/ui`. Path aliases per `components.json`: `@/components`, `@/components/ui`, `@/lib`, `@/hooks`, utils at `@/lib/utils`.
 - **Backend:** Supabase (Postgres, Auth, Storage). Client setup is intended to live at `src/lib/supabase/` (not yet created).
 - **Docs generation:** TypeDoc pulls from `/** */` comments in `src/lib`, `src/app/api`, `src/hooks`, `src/types` only. Use the doc-comment style shown in `devInfo.md` (`@remarks`, `@param`, `@returns`) for anything in those directories, since it's the only place they render into `/docs`.
-- **Testing:** Vitest is the only test runner in use: unit tests live in `tests/` (`vite.config.mts`, jsdom environment, `e2e/**` excluded). Playwright is configured (`playwright.config.ts`, `testDir: ./e2e`) and `e2e/` has a couple of old specs, but it's completely unused right now and there are no plans to use it yet. Don't write, run or update Playwright tests, and don't suggest them as verification — use Vitest.
+- **Testing:** Vitest is the only test runner in use: unit tests live in `tests/` (`vite.config.mts`, jsdom environment). Playwright is configured (`playwright.config.ts`, `testDir: ./e2e`) and `e2e/` has a couple of old specs, but it's completely unused right now and there are no plans to use it yet. Don't write, run or update Playwright tests, and don't suggest them as verification - use Vitest.
 
 ## Environment variables
 `.env.local` (gitignored):
@@ -90,4 +90,4 @@ e.g. a style/refactor PR might only need **Summary** + **Tested**; a bug fix mig
 Keep PRs short and plain: a sentence or two (or a few short bullets) per header, written in plain English. Avoid walls of `code formatting` - only backtick something when it's a file, table or command the reader actually needs to find. No tables, no exhaustive per-column/per-row breakdowns; the diff covers the detail.
 
 ### Staging and Production
-- Branch model: `master` is staging (feature branches merge here, auto-deploys to a persistent Vercel preview). `prod` is production (Vercel Production Branch, real domain) — ship via PR from `master` into `prod`.*.
+- Branch model: `master` is staging (feature branches merge here, auto-deploys to a persistent Vercel preview). `prod` is production (Vercel Production Branch, real domain) - ship via PR from `master` into `prod`.*.

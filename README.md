@@ -15,7 +15,7 @@ This repo covers <br />
 - **UI components:** shadcn/ui (Base UI, Nova preset) - used for the CMS/admin interface
 - **Backend:** Supabase (Postgres, Auth, Storage)
 - **Docs:** TypeDoc, generated from `["src/lib", "src/app/api", "src/hooks", "src/types"]` - run with `npm run docs`
-- **Testing:** Vitest (unit) + Playwright (e2e)
+- **Testing:** Vitest (unit)
 - **Deployment:** Vercel
 
 ## Local Dev
@@ -27,7 +27,6 @@ npm run lint      # lint the codebase
 npm run docs      # generate browsable TypeDoc reference from /** */ comments
 npm run test      # run vitest in watch mode
 npm run test:run  # run vitest once
-npx playwright test  # run e2e tests
 ```
 Visit [http://localhost:3000](http://localhost:3000).
 
@@ -48,7 +47,6 @@ SUPABASE_SERVICE_ROLE_KEY=
 | `npm run docs` | Generate TypeDoc reference docs into `/docs` |
 | `npm run test` | Run Vitest unit tests in watch mode |
 | `npm run test:run` | Run Vitest unit tests once |
-| `npx playwright test` | Run Playwright e2e tests |
 
 ## Project structure
 ```
@@ -65,8 +63,6 @@ src/
 
 ## Testing
 - **Unit tests:** Vitest, config in `vite.config.mts` (jsdom environment, React plugin). Test files live in `tests/*.test.ts`.
-- **E2e tests:** Playwright, config in `playwright.config.ts` (`testDir: './tests'`, chromium/firefox/webkit).
-- Note: Playwright's `testDir` currently overlaps with the Vitest test folder (`tests/`) - keep this in mind when adding new test files so Playwright doesn't try to pick up Vitest specs (or vice versa).
 
 ## Deployment
 Deployed on Vercel, using a two-branch model:
