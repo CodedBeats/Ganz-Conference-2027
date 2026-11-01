@@ -12,12 +12,11 @@ npm run lint            # lint the codebase
 npm run docs            # generate browsable TypeDoc reference from /** */ comments
 npm run test            # run Vitest unit tests in watch mode
 npm run test:run        # Run Vitest unit tests once
-npx playwright test     # run playwright e2e tests
 ```
 
 
 ## Supabase
-open up docker to get the engine running
+open up docker to get the engine running vrrrrrrrrrrrrr
 spin up a local stack via docker
 `npx supabase start`
 strike me down with all your hate
@@ -41,12 +40,21 @@ then apply it with
 once tables exist, generate TypeScript types from schema so queries are typed 
 `npx supabase gen types typescript --local > src/types/database.ts` (maybe don't do this, i can write better types than that mess)
 
-### Prod
-Push db to live supabase environment
-`npx supabase db push` (this doesn't reset live db schema and data, instead it applies only whats new)
-
-### ERD
+### ERD (old/deprecated)
 https://dbdiagram.io/d/GANZ-conference-2027-6aba76e75869425612b7f574 
+
+
+
+
+## Prod
+### Vercel (don't judge my notes, I'm an experienced full stack dev with 5+ years exp :)
+1. code -   push to master, 
+2. github - pull request, merge
+2. c0de -   pull master, switch production, pull master, push
+
+### Supabase
+Push local db (schema) to live supabase environment (schema)
+`npx supabase db push`    (this doesn't reset live db schema, instead it applies only whats new)
 
 
 
@@ -115,6 +123,7 @@ Auto generate tests with Codegen.
 - cms
 - share
 - metadata
+- docs
 - testing
 - production
 
