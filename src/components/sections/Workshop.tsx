@@ -63,7 +63,7 @@ export const Workshop = ({ section }: { section?: CmsSection }) => {
                         <SectionTag>Pre-Conference Workshop</SectionTag>
 
                         <CmsText field="heading" label="Heading" multiline hint="highlight" editClassName="section-heading">
-                            <h2 className="section-heading">
+                            <h2 className="section-heading text-3xl lg:text-5xl">
                                 <RichText text={section.heading} accentClassName="text-teal" />
                             </h2>
                         </CmsText>
