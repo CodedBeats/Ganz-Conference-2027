@@ -16,15 +16,20 @@ npm run docs       # generate TypeDoc reference into /docs from src/lib, src/app
 npm run test       # Vitest, watch mode
 npm run test:run   # Vitest, single run
 npm run test:email # live Resend checks (opt-in, uses real API keys from .env.local)
+npm run test:db    # RLS/grant/seed checks against the local Supabase stack (opt-in, tests/db)
+npm run db:types   # regenerate src/types/database.ts from the local DB (formatted) - run after every migration
 ```
 
-Single test file: `npm run test:run -- tests/pricing.test.ts`.
+Single test file: `npm run test:run -- tests/registration-pricing.test.ts`.
+
+`test:db` needs the local stack running (`npx supabase start`) plus `SUPABASE_*_DEV`, `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env.local`, and the local admin to exist (`node --env-file=.env.local scripts/create-admin.mjs --dev`, which has to be re-run after every `supabase db reset`). It also fails if `src/types/database.ts` is stale.
 
 ## Architecture
 - **Next.js 16, App Router, TypeScript.** Read the relevant guide under `node_modules/next/dist/docs/` before writing App Router code - see `AGENTS.md` for why (this Next.js version diverges from training data).
 - **Styling:** Tailwind CSS v4 (config lives in `src/app/globals.css` via `@theme`, not a `tailwind.config.*` file - see `components.json` → `tailwind.config: ""`).
 - **UI components:** shadcn/ui, `base-nova` style (Base UI primitives, not Radix). Generated components land in `src/components/ui`. Path aliases per `components.json`: `@/components`, `@/components/ui`, `@/lib`, `@/hooks`, utils at `@/lib/utils`.
 - **Backend:** Supabase (Postgres, Auth, Storage). Client setup is intended to live at `src/lib/supabase/` (not yet created).
+- **Registration (Phase 2):** `src/lib/registration/` (client-safe, no server-only imports). Every closed set (ticket option, audience, tier, ...) is an `as const` tuple in `options.ts` that mirrors a Postgres enum; `tests/registration-enums.test.ts` fails if they drift, so a new enum value means: migration → `npm run db:types` → tuple + label. Money is integer cents branded as `Cents` (`money.ts`). Prices only ever come from `ticket_prices` rows (`pricing.ts`); nothing accepts an amount from the client.
 - **Docs generation:** TypeDoc pulls from `/** */` comments in `src/lib`, `src/app/api`, `src/hooks`, `src/types` only. Use the doc-comment style shown in `devInfo.md` (`@remarks`, `@param`, `@returns`) for anything in those directories, since it's the only place they render into `/docs`.
 - **Testing:** Vitest is the only test runner in use: unit tests live in `tests/` (`vite.config.mts`, jsdom environment). Playwright is configured (`playwright.config.ts`, `testDir: ./e2e`) and `e2e/` has a couple of old specs, but it's completely unused right now and there are no plans to use it yet. Don't write, run or update Playwright tests, and don't suggest them as verification - use Vitest.
 
