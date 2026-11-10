@@ -74,16 +74,20 @@ const memberVerification = {
  * The membership question. Both member choices must give the name and email they joined with;
  * a non-member must not send them at all (strict objects reject the extra keys).
  */
-export const membershipSchema = z.discriminatedUnion("choice", [
-    z.strictObject({ choice: z.literal("current_member"), ...memberVerification }),
-    z.strictObject({ choice: z.literal("joining_member"), ...memberVerification }),
-    z.strictObject({ choice: z.literal("non_member") }),
-]);
+export const membershipSchema = z.discriminatedUnion(
+    "choice",
+    [
+        z.strictObject({ choice: z.literal("current_member"), ...memberVerification }),
+        z.strictObject({ choice: z.literal("joining_member"), ...memberVerification }),
+        z.strictObject({ choice: z.literal("non_member") }),
+    ],
+    { error: "Choose whether you're a GANZ member." },
+);
 export type MembershipInput = z.infer<typeof membershipSchema>;
 
 /** Select all that apply, at least one, each once; "No dietary requirements" stands alone. */
 export const dietarySchema = z
-    .array(z.enum(DIETARY_REQUIREMENTS))
+    .array(z.enum(DIETARY_REQUIREMENTS, "Choose from the dietary options listed."))
     .min(1, "Choose at least one option.")
     .refine((values) => new Set(values).size === values.length, "Choose each option only once.")
     .refine(
@@ -93,9 +97,9 @@ export const dietarySchema = z
 
 /** Everything the registration form submits. */
 export const registrationInputSchema = z.strictObject({
-    ticketOption: z.enum(TICKET_OPTIONS),
+    ticketOption: z.enum(TICKET_OPTIONS, "Choose a registration option."),
     /** The tier the form showed. Not trusted for pricing; see the module notes. */
-    quotedTier: z.enum(PRICE_TIERS),
+    quotedTier: z.enum(PRICE_TIERS, "Prices couldn't be loaded. Please reload the page."),
 
     fullName: requiredText(FIELD_LIMITS.name),
     pronouns: optionalText(FIELD_LIMITS.pronouns),
@@ -118,6 +122,58 @@ export const registrationInputSchema = z.strictObject({
 
 export type RegistrationInput = z.infer<typeof registrationInputSchema>;
 
+/**
+ * Every place a validation error can attach to, as a dotted path. `membership` is the membership
+ * question itself; `form` is for errors on hidden fields (e.g. the tier), shown in the summary.
+ *
+ * In the order they appear on `/register`, which is the order the form focuses errors in.
+ */
+export const REGISTRATION_FIELD_PATHS = [
+    "membership",
+    "membership.name",
+    "membership.email",
+    "ticketOption",
+    "quotedTier",
+    "fullName",
+    "pronouns",
+    "email",
+    "phone",
+    "dietary",
+    "dietaryDetails",
+    "accessRequirements",
+    "connectionToGestalt",
+    "heardAbout",
+    "policyAccepted",
+    "policyVersion",
+    "form",
+] as const;
+export type RegistrationFieldPath = (typeof REGISTRATION_FIELD_PATHS)[number];
+
+export type RegistrationFieldErrors = Partial<Record<RegistrationFieldPath, string[]>>;
+
+const isFieldPath = (path: string): path is RegistrationFieldPath =>
+    REGISTRATION_FIELD_PATHS.some((known) => known === path);
+
+/**
+ * Groups validation issues by the field they belong to.
+ *
+ * @remarks
+ * Uses the full dotted path, so `membership.email` errors land on that input rather than on the
+ * membership question. An issue inside an array (e.g. `dietary.1`) goes to the array's field, and
+ * anything unrecognised goes to `form`, so no error is silently dropped.
+ */
+export function toFieldErrors(error: z.ZodError): RegistrationFieldErrors {
+    const errors: RegistrationFieldErrors = {};
+
+    for (const issue of error.issues) {
+        const fullPath = issue.path.map(String).join(".");
+        const topLevel = String(issue.path[0] ?? "");
+        const field = isFieldPath(fullPath) ? fullPath : isFieldPath(topLevel) ? topLevel : "form";
+        errors[field] = [...(errors[field] ?? []), issue.message];
+    }
+    return errors;
+}
+
 /** Reasons the server can refuse a valid submission. */
 export const CREATE_REGISTRATION_ERRORS = [
     "sold_out",
@@ -125,6 +181,7 @@ export const CREATE_REGISTRATION_ERRORS = [
     "policy_changed",
     "price_unavailable",
     "payment_unavailable",
+    "rate_limited",
 ] as const;
 export type CreateRegistrationError = (typeof CREATE_REGISTRATION_ERRORS)[number];
 
@@ -136,10 +193,33 @@ export const CREATE_REGISTRATION_ERROR_MESSAGES = {
     policy_changed: "The registration terms were updated while you were registering. Please read them and accept again.",
     price_unavailable: "That ticket isn't available at the moment. Please contact us if you need help registering.",
     payment_unavailable: "We couldn't start the payment. Please try again in a few minutes.",
+    rate_limited: "There have been too many attempts from your connection. Please wait a few minutes and try again.",
 } as const satisfies Record<CreateRegistrationError, string>;
 
 /** The registration server action's result (P2-15). */
 export type CreateRegistrationResult =
     | { ok: true; checkoutUrl: string }
-    | { ok: false; error: "invalid"; fieldErrors: Partial<Record<keyof RegistrationInput, string[]>> }
+    | { ok: false; error: "invalid"; fieldErrors: RegistrationFieldErrors }
     | { ok: false; error: CreateRegistrationError };
+
+/** What a preview submission would be charged, worked out on the server. */
+export interface RegistrationPreview {
+    ticket: string;
+    audience: string;
+    tier: string;
+    /** Formatted, e.g. `$1,085`. */
+    amount: string;
+}
+
+/**
+ * The result of submitting `/register` while payment isn't connected yet.
+ *
+ * @remarks
+ * Temporary: P2-15 replaces the `preview` outcome with a redirect to Stripe Checkout
+ * (see {@link CreateRegistrationResult}). Nothing is saved for a preview.
+ */
+export type RegistrationPreviewResult =
+    | { status: "idle" }
+    | { status: "invalid"; fieldErrors: RegistrationFieldErrors }
+    | { status: "error"; error: CreateRegistrationError }
+    | { status: "preview"; preview: RegistrationPreview };
