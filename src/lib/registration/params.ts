@@ -31,6 +31,20 @@ export interface RegisterPreselection {
     audience?: Audience;
 }
 
+/** The registration form's path. */
+export const REGISTER_PATH = "/register";
+
+/**
+ * A link to the registration form with a ticket preselected, e.g. from a public ticket card.
+ *
+ * @remarks
+ * The values only preselect the form; see {@link parseRegisterSearchParams}.
+ */
+export function registerHref(ticketOption: TicketOption, audience: Audience): string {
+    const query = new URLSearchParams({ option: ticketOption, audience });
+    return `${REGISTER_PATH}?${query.toString()}`;
+}
+
 /** Reads `option` and `audience` from the `/register` query string. */
 export function parseRegisterSearchParams(searchParams: SearchParams): RegisterPreselection {
     const ticketOption = parseOneOf(TICKET_OPTIONS, searchParams.option);

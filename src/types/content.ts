@@ -7,6 +7,7 @@
  * fields map onto its design (e.g. a FAQ is a stat item: `label` = question,
  * `value` = answer).
  */
+import type { Audience, TicketOption } from "@/lib/registration/options";
 
 /** An in-page navigation target. `id` doubles as the section's DOM id. */
 export interface NavLink {
@@ -60,7 +61,7 @@ export interface CmsFile {
     mime_type: string;
 }
 
-/** A stat item with its nested children (e.g. registration tier -> price rows). */
+/** A stat item with its nested children (e.g. a footer group -> its rows). */
 export interface CmsStatItem {
     id: string;
     label: string;
@@ -69,6 +70,12 @@ export interface CmsStatItem {
     style: CmsStyle;
     sort_order: number;
     image: CmsFile | null;
+    /**
+     * The ticket a registration tier card sells. Set by migration/seed, not CMS-editable; `null`
+     * for every other stat item. The card's prices come from `ticket_prices` (see `toTicketCardPricing`).
+     */
+    ticketOption: TicketOption | null;
+    audience: Audience | null;
     children: CmsStatItem[];
 }
 

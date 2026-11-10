@@ -17,10 +17,11 @@ import { SharePrompt } from "@/components/shared/SharePrompt";
 import { CmsPage } from "@/components/cms/CmsPage";
 import { getPageContent } from "@/lib/content/getPageContent";
 import { getRegisterCta } from "@/lib/content/site";
+import { getPricing } from "@/lib/registration/queries.server";
 
 const Home = async () => {
     // each section renders nothing when its content is missing (e.g. unpublished in the CMS)
-    const content = await getPageContent();
+    const [content, pricing] = await Promise.all([getPageContent(), getPricing()]);
     const registerCta = getRegisterCta(content.registrations);
 
     return (
@@ -33,7 +34,7 @@ const Home = async () => {
                 <Keynotes section={content.keynotes} />
                 <SharePrompt />
                 <Workshop section={content.workshop} />
-                <Registrations section={content.registrations} registerCta={registerCta} />
+                <Registrations section={content.registrations} registerCta={registerCta} pricing={pricing} />
                 <Submissions section={content.submissions} />
                 <Location section={content.location} />
                 <Accommodation section={content.accommodation} />
