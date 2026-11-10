@@ -60,7 +60,8 @@ export interface RegistrationFormProps {
     /** `submitRegistration`, passed in from the page so this component never imports server code. */
     action: (previous: RegistrationPreviewResult, formData: FormData) => Promise<RegistrationPreviewResult>;
     offer: RegistrationOffer;
-    policy: { items: PolicyItem[]; version: string };
+    /** The privacy statement, then the CMS terms, and the version the server will check. */
+    policy: { privacy: PolicyItem; items: PolicyItem[]; version: string };
     /** From the `/register?option=…&audience=…` link; the person can change both. */
     preselection: RegisterPreselection;
 }
@@ -518,7 +519,7 @@ export const RegistrationForm = ({ action, offer, policy, preselection }: Regist
 
                 {/* Section 6: privacy and terms */}
                 <FormSection number={6} title="Privacy and registration terms">
-                    <PolicyText items={policy.items} />
+                    <PolicyText privacy={policy.privacy} items={policy.items} />
                     <div>
                         <label className={cn(CHOICE_CLASS, "bg-cream")}>
                             <input
@@ -575,8 +576,23 @@ const SummaryRow = ({ label, value }: { label: string; value: string | null }) =
     </div>
 );
 
-const PolicyText = ({ items }: { items: PolicyItem[] }) => (
+const PolicyBlock = ({ item }: { item: PolicyItem }) => (
+    <div>
+        <h3 className="mb-2 text-lg font-medium">{item.title}</h3>
+        <div className="space-y-3">
+            {item.paragraphs.map((paragraph, index) => (
+                <p key={index} className="text-base leading-relaxed text-teal-dark/80">
+                    <RichText text={paragraph} accentClassName="font-medium text-teal" />
+                </p>
+            ))}
+        </div>
+    </div>
+);
+
+// the privacy statement first, then the CMS terms (or a link to /policies if they're unpublished)
+const PolicyText = ({ privacy, items }: { privacy: PolicyItem; items: PolicyItem[] }) => (
     <div className="space-y-6">
+        <PolicyBlock item={privacy} />
         {items.length === 0 && (
             <p className="text-base leading-relaxed text-teal-dark/80">
                 Please read our{" "}
@@ -587,16 +603,7 @@ const PolicyText = ({ items }: { items: PolicyItem[] }) => (
             </p>
         )}
         {items.map((item) => (
-            <div key={item.title}>
-                <h3 className="mb-2 text-lg font-medium">{item.title}</h3>
-                <div className="space-y-3">
-                    {item.paragraphs.map((paragraph, index) => (
-                        <p key={index} className="text-base leading-relaxed text-teal-dark/80">
-                            <RichText text={paragraph} accentClassName="font-medium text-teal" />
-                        </p>
-                    ))}
-                </div>
-            </div>
+            <PolicyBlock key={item.title} item={item} />
         ))}
         {PRIVACY_POLICY_URL && (
             <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer" className="inline-block text-teal underline underline-offset-4">
