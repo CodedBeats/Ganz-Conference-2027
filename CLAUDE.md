@@ -15,6 +15,7 @@ npm run lint       # ESLint
 npm run docs       # generate TypeDoc reference into /docs from src/lib, src/app/api, src/hooks, src/types
 npm run test       # Vitest, watch mode
 npm run test:run   # Vitest, single run
+npm run test:email # live Resend checks (opt-in, uses real API keys from .env.local)
 ```
 
 Single test file: `npm run test:run -- tests/pricing.test.ts`.
@@ -39,7 +40,14 @@ SUPABASE_SECRET_KEY_DEV=
 ADMIN_EMAIL=                  # the one admin login (no sign-ups)
 ADMIN_PASSWORD=
 NEXT_PUBLIC_FACEBOOK_APP_ID=  # optional, Messenger share option is hidden without it
+RESEND_API_KEY_MAIN=          # send-only key, local dev + Vercel previews
+RESEND_API_KEY_PROD=          # send-only key, Vercel Production only (VERCEL_ENV=production)
+EMAIL_FROM=                   # "GANZ Conference 2027 <registration@ganzconference2027.com.au>" (verified domain)
+EMAIL_REPLY_TO_MAIN=
+EMAIL_REPLY_TO_PROD=
+ADMIN_ALERT_EMAIL=            # optional, inbox for internal notifications
 ```
+Email goes through `src/lib/email.ts`, which picks the MAIN or PROD variables from `VERCEL_ENV`. `npm run test:email` runs live checks against Resend (sends to the `delivered@resend.dev` sandbox; skipped in normal test runs).
 
 ## Coding Conventions
 ### React

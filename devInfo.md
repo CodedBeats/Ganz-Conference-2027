@@ -12,6 +12,7 @@ npm run lint            # lint the codebase
 npm run docs            # generate browsable TypeDoc reference from /** */ comments
 npm run test            # run Vitest unit tests in watch mode
 npm run test:run        # Run Vitest unit tests once
+npm run test:email      # live Resend checks (opt-in, uses real API keys from .env.local)
 ```
 
 
@@ -121,6 +122,7 @@ Auto generate tests with Codegen.
 - supabase
 - cms
 - share
+- resend
 - metadata
 - docs
 - testing
