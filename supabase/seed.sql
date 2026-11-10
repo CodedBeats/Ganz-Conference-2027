@@ -210,25 +210,27 @@ insert into public.stat_items (label, value, style, description, sort_order, sec
         ], E'\n\n'),
         'primary', null, 1, (select id from public.sections where type = 'policies'));
 
--- Registration price rows, nested under their tier (titles are unique, so a tier is matched on its title),
--- plus the Scholarships info card's contact email
-insert into public.stat_items (label, value, sort_order, section_id, parent_id)
-select rows.label, rows.value, rows.sort_order, tier.section_id, tier.id
+-- Link each registration tier card to the ticket it sells. Its prices come from ticket_prices
+-- (edited in Admin -> Tickets), not from CMS rows. Titles are unique, so a tier is matched on its title.
+update public.stat_items as tier
+set ticket_option = links.ticket_option::public.ticket_option, audience = links.audience::public.audience
 from (values
-    ('GANZ Members Conference Only',        'Early Bird',        '$485',                1),
-    ('GANZ Members Conference Only',        'Full Registration', '$585',                2),
-    ('Non Members - Conference Only',       'Early Bird',        '$635',                1),
-    ('Non Members - Conference Only',       'Full Registration', '$735',                2),
-    ('GANZ Members Conference + Workshop',  'Early Bird',        '$1085',               1),
-    ('GANZ Members Conference + Workshop',  'Full Registration', '$1185',               2),
-    ('Non Members - Conference + Workshop', 'Early Bird',        '$1235',               1),
-    ('Non Members - Conference + Workshop', 'Full Registration', '$1335',               2),
-    ('Scholarships',                        'Email',             'contact@ganz.org.au', 1)
-) as rows (tier_label, label, value, sort_order)
-join public.stat_items tier
-    on tier.label = rows.tier_label
+    ('GANZ Members Conference Only',        'conference_only',     'member'),
+    ('Non Members - Conference Only',       'conference_only',     'non_member'),
+    ('GANZ Members Conference + Workshop',  'conference_workshop', 'member'),
+    ('Non Members - Conference + Workshop', 'conference_workshop', 'non_member')
+) as links (tier_label, ticket_option, audience)
+where tier.label = links.tier_label
     and tier.parent_id is null
     and tier.section_id = (select id from public.sections where type = 'registrations');
+
+-- The Scholarships info card's contact email
+insert into public.stat_items (label, value, sort_order, section_id, parent_id)
+select 'Email', 'contact@ganz.org.au', 1, card.section_id, card.id
+from public.stat_items card
+where card.label = 'Scholarships'
+    and card.parent_id is null
+    and card.section_id = (select id from public.sections where type = 'registrations');
 
 -- Footer: two unrendered group rows ("Details", "Flags") own the editable rows,
 -- so a flag whose image is cleared doesn't get mistaken for a detail line.
