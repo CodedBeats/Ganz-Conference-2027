@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { parseOneOf, parseRegisterSearchParams } from "../src/lib/registration/params";
-import { TICKET_OPTIONS } from "../src/lib/registration/options";
+import { parseOneOf, parseRegisterSearchParams, registerHref } from "../src/lib/registration/params";
+import { AUDIENCES, TICKET_OPTIONS } from "../src/lib/registration/options";
 
 describe("parseOneOf", () => {
     it("returns a known value", () => {
@@ -32,4 +32,14 @@ describe("parseRegisterSearchParams", () => {
     it("returns nothing for an empty query", () => {
         expect(parseRegisterSearchParams({})).toEqual({});
     });
+});
+describe("registerHref", () => {
+    it.each(TICKET_OPTIONS.flatMap((option) => AUDIENCES.map((audience) => [option, audience] as const)))(
+        "round-trips %s for %s through parseRegisterSearchParams",
+        (option, audience) => {
+            const url = new URL(registerHref(option, audience), "https://example.com");
+            expect(url.pathname).toBe("/register");
+            expect(parseRegisterSearchParams(Object.fromEntries(url.searchParams))).toEqual({ ticketOption: option, audience });
+        },
+    );
 });
