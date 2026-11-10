@@ -65,3 +65,19 @@ export const CHECKOUT_SESSION_MINUTES = 35;
  * the registration to `abandoned`, which releases the place immediately, so this is only a fallback.
  */
 export const CHECKOUT_HOLD_GRACE_MINUTES = 15;
+
+/** The summary shown at the top of `/register` (dates corrected per the 10 Nov update). */
+export const REGISTER_EVENT_DETAILS = {
+    conference: "Conference: Friday 25 - Sunday 27 June 2027",
+    workshop: "Pre-conference workshop: Tuesday 22 - Wednesday 23 June 2027",
+    venue: "The University of Queensland, St Lucia, Brisbane QLD",
+} as const;
+
+/**
+ * Shown to people choosing "I'd like to join GANZ".
+ *
+ * @remarks
+ * Draft wording, to be confirmed with Michelle. The $50 student option is gone (Michelle, 6 Nov);
+ * only Australian Gestalt students join for free (council, via Zoë, 7 Nov).
+ */
+export const JOIN_GANZ_NOTE = "Australian Gestalt students can join GANZ for free.";

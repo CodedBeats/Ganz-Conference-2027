@@ -251,6 +251,24 @@ export type Database = {
                     },
                 ];
             };
+            rate_limits: {
+                Row: {
+                    hits: number;
+                    key: string;
+                    window_start: string;
+                };
+                Insert: {
+                    hits?: number;
+                    key: string;
+                    window_start: string;
+                };
+                Update: {
+                    hits?: number;
+                    key?: string;
+                    window_start?: string;
+                };
+                Relationships: [];
+            };
             registration_audit_log: {
                 Row: {
                     action: Database["public"]["Enums"]["audit_action"];
@@ -737,6 +755,14 @@ export type Database = {
                     registration_id: string;
                     tier: Database["public"]["Enums"]["price_tier"];
                 }[];
+            };
+            hit_rate_limit: {
+                Args: {
+                    p_key: string;
+                    p_max_hits: number;
+                    p_window_seconds: number;
+                };
+                Returns: boolean;
             };
             is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
             registration_holds_place: {
