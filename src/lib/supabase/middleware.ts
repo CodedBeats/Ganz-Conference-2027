@@ -4,8 +4,14 @@ import { NextResponse, type NextRequest } from "next/server";
 /** Where admins land after signing in. */
 export const ADMIN_HOME_PATH = "/admin";
 
-/** Path prefixes that need a session - anonymous visitors get sent to `/login`. */
-const PROTECTED_PATH_PREFIXES = ["/admin"];
+/**
+ * Path prefixes that need a session - anonymous visitors get sent to `/login`.
+ *
+ * @remarks
+ * `/register` is here while registration is admin-only testing (see `requireAdmin` on its page);
+ * take it out when registration opens to the public (P2-34).
+ */
+const PROTECTED_PATH_PREFIXES = ["/admin", "/register"];
 
 /**
  * Refreshes the Supabase session cookie on every request and handles auth-based redirects.

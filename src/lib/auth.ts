@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
@@ -38,5 +38,19 @@ export function isAdminUser(user: User): boolean {
 export async function requireUser(): Promise<User> {
     const user = await getCurrentUser();
     if (!user) redirect("/login");
+    return user;
+}
+
+/**
+ * Guard for pages only admins may see yet (e.g. `/register` while it's being tested).
+ *
+ * @remarks
+ * Signed-out visitors are sent to `/login` like {@link requireUser}. A signed-in user without the
+ * admin role gets a 404, so the page simply doesn't exist for them. Server Actions behind such a
+ * page must check {@link isAdminUser} themselves - the page guard doesn't protect them.
+ */
+export async function requireAdmin(): Promise<User> {
+    const user = await requireUser();
+    if (!isAdminUser(user)) notFound();
     return user;
 }

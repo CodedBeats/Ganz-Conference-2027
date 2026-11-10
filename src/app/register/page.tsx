@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireAdmin } from "@/lib/auth";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CmsPage } from "@/components/cms/CmsPage";
@@ -13,13 +14,16 @@ import { toRegistrationOffer } from "@/lib/registration/quote";
 import { getPricing } from "@/lib/registration/queries.server";
 import { submitRegistration } from "./actions";
 
-// Not linked from the site and kept out of search results until registration opens (P2-34)
+// Admin-only, unlinked and kept out of search results while GANZ test it, until registration opens (P2-34)
 export const metadata: Metadata = {
     title: "Register - GANZ Conference 2027",
     robots: { index: false, follow: false },
 };
 
 const RegisterPage = async ({ searchParams }: PageProps<"/register">) => {
+    // only admins can see the form for now, remove (and "/register" in the proxy) when its ready for public
+    await requireAdmin();
+
     const [content, pricing, query] = await Promise.all([getPageContent(), getPricing(), searchParams]);
     const policy = await getRegistrationPolicy(content.policies);
 
@@ -40,7 +44,7 @@ const RegisterPage = async ({ searchParams }: PageProps<"/register">) => {
                 <RegistrationForm
                     action={submitRegistration}
                     offer={toRegistrationOffer(pricing)}
-                    policy={{ items: policy.items, version: policy.version }}
+                    policy={{ privacy: policy.privacy, items: policy.items, version: policy.version }}
                     preselection={parseRegisterSearchParams(query)}
                 />
             </main>

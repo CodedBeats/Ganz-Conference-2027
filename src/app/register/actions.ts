@@ -9,6 +9,7 @@
  * Nothing is saved.
  */
 
+import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPageContent } from "@/lib/content/getPageContent";
 import { isHoneypotFilled, formDataToRegistrationInput } from "@/lib/registration/formData";
 import { AUDIENCE_LABELS, PRICE_TIER_LABELS, TICKET_OPTION_LABELS } from "@/lib/registration/options";
@@ -19,18 +20,27 @@ import { getPricing } from "@/lib/registration/queries.server";
 import { checkRateLimit } from "@/lib/registration/rateLimit.server";
 import { registrationInputSchema, toFieldErrors, type RegistrationPreviewResult } from "@/lib/registration/schema";
 
+const NOT_OPEN_YET = "Registration isn't open yet. Sign in with the admin account to test this form.";
+
 /**
  * Checks a registration and says what it would cost.
  *
  * @remarks
- * In order: the honeypot (a bot gets an uneventful `idle`), the rate limit, validation, the policy
- * version (the terms may have changed in the CMS since the page loaded), then the price from the
- * server's own settings.
+ * In order: the caller must be an admin (only admins can test the form for now, and this endpoint is
+ * reachable whatever the page shows), the honeypot (a bot gets an uneventful `idle`), the rate limit,
+ * validation, the policy version (the terms may have changed in the CMS since the page loaded), then
+ * the price from the server's own settings.
  */
 export async function submitRegistration(
     _previous: RegistrationPreviewResult,
     formData: FormData,
 ): Promise<RegistrationPreviewResult> {
+    const user = await getCurrentUser();
+    if (!user || !isAdminUser(user)) {
+        console.warn("[register] rejected a submission from a non-admin");
+        return { status: "invalid", fieldErrors: { form: [NOT_OPEN_YET] } };
+    }
+
     if (isHoneypotFilled(formData)) {
         console.warn("[register] honeypot filled, ignoring submission");
         return { status: "idle" };
