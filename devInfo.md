@@ -123,6 +123,10 @@ Auto generate tests with Codegen.
 - cms
 - share
 - resend
+- registration-updates
+- registration-model
+- register-page
+- ticket-pricing
 - metadata
 - docs
 - testing
