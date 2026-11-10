@@ -10,7 +10,9 @@
     "docs": "typedoc",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:email": "vitest run tests/email.live.test.ts --mode live"
+    "test:email": "vitest run tests/email.live.test.ts --mode live",
+    "test:db": "vitest run tests/db --mode db",
+    "db:types": "supabase gen types typescript --local > src/types/database.ts && prettier --tab-width 4 --write src/types/database.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

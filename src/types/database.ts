@@ -36,8 +36,8 @@ export type Database = {
         Tables: {
             cms_edits: {
                 Row: {
-                    after: Json;
-                    before: Json;
+                    after: NonNullable<Json>;
+                    before: NonNullable<Json>;
                     created_at: string;
                     id: string;
                     label: string;
@@ -47,8 +47,8 @@ export type Database = {
                     user_id: string;
                 };
                 Insert: {
-                    after: Json;
-                    before: Json;
+                    after: NonNullable<Json>;
+                    before: NonNullable<Json>;
                     created_at?: string;
                     id?: string;
                     label?: string;
@@ -58,8 +58,8 @@ export type Database = {
                     user_id?: string;
                 };
                 Update: {
-                    after?: Json;
-                    before?: Json;
+                    after?: NonNullable<Json>;
+                    before?: NonNullable<Json>;
                     created_at?: string;
                     id?: string;
                     label?: string;
@@ -156,6 +156,30 @@ export type Database = {
                         referencedColumns: ["id"];
                     },
                 ];
+            };
+            registration_settings: {
+                Row: {
+                    current_tier: Database["public"]["Enums"]["price_tier"];
+                    early_bird_closes_on: string | null;
+                    id: boolean;
+                    updated_at: string;
+                    workshop_capacity: number;
+                };
+                Insert: {
+                    current_tier?: Database["public"]["Enums"]["price_tier"];
+                    early_bird_closes_on?: string | null;
+                    id?: boolean;
+                    updated_at?: string;
+                    workshop_capacity: number;
+                };
+                Update: {
+                    current_tier?: Database["public"]["Enums"]["price_tier"];
+                    early_bird_closes_on?: string | null;
+                    id?: boolean;
+                    updated_at?: string;
+                    workshop_capacity?: number;
+                };
+                Relationships: [];
             };
             sections: {
                 Row: {
@@ -268,6 +292,42 @@ export type Database = {
                     },
                 ];
             };
+            ticket_prices: {
+                Row: {
+                    amount_cents: number;
+                    audience: Database["public"]["Enums"]["audience"];
+                    created_at: string;
+                    currency: string;
+                    id: string;
+                    is_active: boolean;
+                    ticket_option: Database["public"]["Enums"]["ticket_option"];
+                    tier: Database["public"]["Enums"]["price_tier"];
+                    updated_at: string;
+                };
+                Insert: {
+                    amount_cents: number;
+                    audience: Database["public"]["Enums"]["audience"];
+                    created_at?: string;
+                    currency?: string;
+                    id?: string;
+                    is_active?: boolean;
+                    ticket_option: Database["public"]["Enums"]["ticket_option"];
+                    tier: Database["public"]["Enums"]["price_tier"];
+                    updated_at?: string;
+                };
+                Update: {
+                    amount_cents?: number;
+                    audience?: Database["public"]["Enums"]["audience"];
+                    created_at?: string;
+                    currency?: string;
+                    id?: string;
+                    is_active?: boolean;
+                    ticket_option?: Database["public"]["Enums"]["ticket_option"];
+                    tier?: Database["public"]["Enums"]["price_tier"];
+                    updated_at?: string;
+                };
+                Relationships: [];
+            };
         };
         Views: {
             [_ in never]: never;
@@ -276,7 +336,9 @@ export type Database = {
             is_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
         };
         Enums: {
-            [_ in never]: never;
+            audience: "member" | "non_member";
+            price_tier: "early_bird" | "full";
+            ticket_option: "conference_only" | "conference_workshop";
         };
         CompositeTypes: {
             [_ in never]: never;
@@ -409,6 +471,10 @@ export const Constants = {
         Enums: {},
     },
     public: {
-        Enums: {},
+        Enums: {
+            audience: ["member", "non_member"],
+            price_tier: ["early_bird", "full"],
+            ticket_option: ["conference_only", "conference_workshop"],
+        },
     },
 } as const;
