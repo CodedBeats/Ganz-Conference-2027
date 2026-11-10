@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { RegistrationForm, type RegistrationFormProps } from "../src/components/register/RegistrationForm";
 import { JOIN_GANZ_URL } from "../src/lib/registration/config";
+import { PRIVACY_STATEMENT } from "../src/lib/registration/policy";
 import { MEMBERSHIP_CHOICE_LABELS } from "../src/lib/registration/options";
 import { toRegistrationOffer } from "../src/lib/registration/quote";
 import type { RegistrationPreviewResult } from "../src/lib/registration/schema";
@@ -23,7 +24,11 @@ const renderForm = (overrides: Partial<RegistrationFormProps> = {}) => {
         <RegistrationForm
             action={action}
             offer={toRegistrationOffer(makePricing())}
-            policy={{ items: [{ title: "Refund & Cancellation Policy", paragraphs: ["Registrations are non-refundable."] }], version: "abc123def456" }}
+            policy={{
+                privacy: PRIVACY_STATEMENT,
+                items: [{ title: "Refund & Cancellation Policy", paragraphs: ["Registrations are non-refundable."] }],
+                version: "abc123def456",
+            }}
             preselection={{}}
             {...overrides}
         />,
@@ -170,6 +175,14 @@ describe("RegistrationForm", () => {
         const alert = await screen.findByRole("alert");
         expect(within(alert).getByText(/Prices changed while you were registering/)).toBeTruthy();
         expect(within(alert).getByRole("button", { name: "Reload the page" })).toBeTruthy();
+    });
+
+    it("shows the privacy statement before the refund and cancellation policy", () => {
+        renderForm();
+        const privacy = screen.getByRole("heading", { name: "Privacy" });
+        const refund = screen.getByRole("heading", { name: "Refund & Cancellation Policy" });
+        expect(privacy.compareDocumentPosition(refund) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(screen.getByText(/used to administer your conference registration/)).toBeTruthy();
     });
 
     it("can't be submitted when prices couldn't be loaded", () => {

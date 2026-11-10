@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
-import { getRegistrationPolicy, policyItemsFrom } from "../src/lib/registration/policy";
+import { getRegistrationPolicy, policyItemsFrom, policyText, PRIVACY_STATEMENT } from "../src/lib/registration/policy";
 import type { CmsStatItem } from "../src/types/content";
 
 const item = (label: string, value: string): CmsStatItem => ({
@@ -45,6 +45,17 @@ describe("getRegistrationPolicy", () => {
             stats: [item(CANCELLATION.label, "All registrations are non-refundable.\n\nTransfers may be requested in writing.")],
         });
         expect(edited.version).not.toBe(original.version);
+    });
+
+    it("puts the privacy statement first and includes it in the version", async () => {
+        const policy = await getRegistrationPolicy({ stats: [CANCELLATION] });
+        expect(policy.privacy).toBe(PRIVACY_STATEMENT);
+        expect(policy.items.map((item) => item.title)).toEqual(["Refund & Cancellation Policy"]);
+
+        // a version over the CMS terms alone would differ from the real one
+        const termsOnly = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(policyText(policy.items)));
+        const termsOnlyHex = Array.from(new Uint8Array(termsOnly), (byte) => byte.toString(16).padStart(2, "0")).join("");
+        expect(policy.sha256).not.toBe(termsOnlyHex);
     });
 
     it("changes the version when a policy is added", async () => {
