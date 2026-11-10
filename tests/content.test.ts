@@ -18,6 +18,8 @@ const statRow = (overrides: Partial<StatItemRow> & Pick<StatItemRow, "id">): Sta
     sort_order: 0,
     parent_id: null,
     image: null,
+    ticket_option: null,
+    audience: null,
     ...overrides,
 });
 

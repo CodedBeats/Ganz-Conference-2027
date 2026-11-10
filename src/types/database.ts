@@ -216,6 +216,41 @@ export type Database = {
                     },
                 ];
             };
+            pricing_audit_log: {
+                Row: {
+                    after: NonNullable<Json>;
+                    before: NonNullable<Json>;
+                    changed_by: string;
+                    created_at: string;
+                    id: number;
+                    ticket_price_id: string | null;
+                };
+                Insert: {
+                    after: NonNullable<Json>;
+                    before: NonNullable<Json>;
+                    changed_by: string;
+                    created_at?: string;
+                    id?: never;
+                    ticket_price_id?: string | null;
+                };
+                Update: {
+                    after?: NonNullable<Json>;
+                    before?: NonNullable<Json>;
+                    changed_by?: string;
+                    created_at?: string;
+                    id?: never;
+                    ticket_price_id?: string | null;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: "pricing_audit_log_ticket_price_id_fkey";
+                        columns: ["ticket_price_id"];
+                        isOneToOne: false;
+                        referencedRelation: "ticket_prices";
+                        referencedColumns: ["id"];
+                    },
+                ];
+            };
             registration_audit_log: {
                 Row: {
                     action: Database["public"]["Enums"]["audit_action"];
@@ -510,6 +545,7 @@ export type Database = {
             };
             stat_items: {
                 Row: {
+                    audience: Database["public"]["Enums"]["audience"] | null;
                     description: string | null;
                     id: string;
                     image: string | null;
@@ -518,10 +554,13 @@ export type Database = {
                     section_id: string;
                     sort_order: number;
                     style: string;
+                    ticket_option:
+                        Database["public"]["Enums"]["ticket_option"] | null;
                     updated_at: string;
                     value: string;
                 };
                 Insert: {
+                    audience?: Database["public"]["Enums"]["audience"] | null;
                     description?: string | null;
                     id?: string;
                     image?: string | null;
@@ -530,10 +569,13 @@ export type Database = {
                     section_id: string;
                     sort_order?: number;
                     style?: string;
+                    ticket_option?:
+                        Database["public"]["Enums"]["ticket_option"] | null;
                     updated_at?: string;
                     value: string;
                 };
                 Update: {
+                    audience?: Database["public"]["Enums"]["audience"] | null;
                     description?: string | null;
                     id?: string;
                     image?: string | null;
@@ -542,6 +584,8 @@ export type Database = {
                     section_id?: string;
                     sort_order?: number;
                     style?: string;
+                    ticket_option?:
+                        Database["public"]["Enums"]["ticket_option"] | null;
                     updated_at?: string;
                     value?: string;
                 };
@@ -701,6 +745,15 @@ export type Database = {
                     status: Database["public"]["Enums"]["registration_status"];
                 };
                 Returns: boolean;
+            };
+            save_ticket_pricing: {
+                Args: {
+                    p_amounts_cents: number[];
+                    p_current_tier: Database["public"]["Enums"]["price_tier"];
+                    p_early_bird_closes_on?: string;
+                    p_price_ids: string[];
+                };
+                Returns: number;
             };
             workshop_places_left: {
                 Args: Record<PropertyKey, never>;

@@ -116,6 +116,20 @@ export function getPrice(table: PriceTable, key: PriceKey): PriceLookup {
 /** The `registration_settings` columns the pricing logic reads. */
 export type PricingSettings = Pick<Tables<"registration_settings">, "current_tier" | "early_bird_closes_on">;
 
+/** The settings row as the pages load it. */
+export type RegistrationSettings = PricingSettings & Pick<Tables<"registration_settings">, "workshop_capacity">;
+
+/**
+ * Everything a page needs to show prices (loaded by `getPricing` in `queries.server.ts`).
+ *
+ * @remarks
+ * `isAvailable: false` when any part couldn't be loaded, for example before the migrations reach
+ * the live database. Pages then show "To be confirmed" instead of breaking.
+ */
+export type Pricing =
+    | { isAvailable: true; settings: RegistrationSettings; table: PriceTable; placesLeft: number }
+    | { isAvailable: false };
+
 /**
  * The tier new registrations are charged at.
  *

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import type { Audience, TicketOption } from "@/lib/registration/options";
 import {
     CMS_STYLES,
     SECTION_TYPES,
@@ -20,6 +21,8 @@ export interface StatItemRow {
     sort_order: number;
     parent_id: string | null;
     image: CmsFile | null;
+    ticket_option: TicketOption | null;
+    audience: Audience | null;
 }
 
 /** A person as it comes back from the query. */
@@ -55,6 +58,8 @@ function toStatItem(row: StatItemRow): CmsStatItem {
         style: toStyle(row.style),
         sort_order: row.sort_order,
         image: row.image,
+        ticketOption: row.ticket_option,
+        audience: row.audience,
         children: [],
     };
 }
@@ -63,7 +68,7 @@ function toStatItem(row: StatItemRow): CmsStatItem {
  * Turns flat stat item rows into a tree, attaching each child to its parent's `children`.
  *
  * @remarks
- * Only one level is used today (registration tier -> price rows), but this handles any
+ * Only one level is used today (e.g. footer group -> rows), but this handles any
  * depth. Input order is preserved at every level, so pass rows already sorted by
  * `sort_order` (the query does this). A row whose parent isn't in the list is kept at
  * the top level rather than silently dropped.
@@ -139,7 +144,7 @@ export async function getPageContent(): Promise<PageContent> {
         .select(
             `id, type, heading, subheading, body, excerpt, sort_order,
             image:files(id, name, file_ref, mime_type),
-            stat_items(id, label, value, description, style, sort_order, parent_id, image:files(id, name, file_ref, mime_type)),
+            stat_items(id, label, value, description, style, sort_order, parent_id, ticket_option, audience, image:files(id, name, file_ref, mime_type)),
             people(id, name, title, location, description, link, style, sort_order, image:files(id, name, file_ref, mime_type))`,
         )
         .eq("is_published", true)

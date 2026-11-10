@@ -58,3 +58,32 @@ export function formatCents(amount: Cents): string {
     const isWholeDollars = amount % 100 === 0;
     return (isWholeDollars ? WHOLE_DOLLARS : DOLLARS_AND_CENTS).format(amount / 100);
 }
+
+/** Dollars as people type them: optional `$`, thousands commas, up to 2 decimal places. */
+const DOLLARS = /^\$?\s*(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d{1,2}))?$/;
+
+/**
+ * Reads a dollar amount typed by an admin, e.g. `1085`, `1,085`, `$1,085.50`.
+ *
+ * @remarks
+ * Works on the digits as text rather than multiplying a float by 100, so `0.29` is exactly 29
+ * cents. Anything ambiguous (blank, negative, three decimal places, stray characters) is refused
+ * rather than guessed.
+ *
+ * @returns The amount in cents, or `null` when the text isn't a valid amount.
+ */
+export function parseDollarsToCents(text: string): Cents | null {
+    const match = DOLLARS.exec(text.trim());
+    if (!match) return null;
+
+    const [, wholeDollars, fraction = ""] = match;
+    const cents = Number(wholeDollars.replaceAll(",", "")) * 100 + Number(fraction.padEnd(2, "0"));
+    return isCents(cents) ? cents : null;
+}
+
+/** Cents as an editable dollar string: `108500` becomes `1085`, `48550` becomes `485.50`. */
+export function centsToDollarInput(amount: Cents): string {
+    const dollars = Math.floor(amount / 100);
+    const cents = amount % 100;
+    return cents === 0 ? String(dollars) : `${dollars}.${String(cents).padStart(2, "0")}`;
+}
