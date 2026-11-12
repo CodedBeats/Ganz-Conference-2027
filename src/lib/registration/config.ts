@@ -25,18 +25,24 @@ export const EARLY_BIRD_TIMEZONE = "Australia/Brisbane";
 export const JOIN_GANZ_URL = "https://www.ganz.org.au/product-category/membership-options/";
 
 /**
- * The full privacy policy. `null` until GANZ send the link, so the form must handle it being missing
- * rather than linking somewhere wrong.
- */
-export const PRIVACY_POLICY_URL: string | null = null;
-
-/**
  * How long GANZ take to verify a membership, shown on the form and in emails.
  *
  * @remarks
  * Zoë suggested 24 to 48 hours; not yet confirmed by Michelle. Change it here only.
  */
 export const APPROVAL_TURNAROUND = { businessDays: 2, label: "2 business days" } as const;
+
+/**
+ * Shown to members: what happens if GANZ can't confirm their membership.
+ *
+ * @remarks
+ * Deliberately hedged until GANZ answer P2-03 item 1 (full refund, or charge the $150 difference).
+ * It promises a refund and an explanation, but not a full refund, since Stripe keeps its fees, and
+ * leaves room for GANZ to follow up when they'd rather offer the non-member price. Update it with
+ * the P2-23 reject flow and the "membership not verified" email (P2-19).
+ */
+export const MEMBERSHIP_CHECK_FAILED_NOTE =
+    "If GANZ can't confirm your membership, your registration will be refunded and you'll get an email explaining why. GANZ may also contact you about your options, such as registering at the non-member price instead.";
 
 /**
  * Marks our Checkout Sessions and payment intents in Stripe's metadata.

@@ -129,7 +129,16 @@ insert into public.sections (type, heading, subheading, body, excerpt, sort_orde
     ('policies',
         'Terms & Policies',
         null, null, null,
-        15, null);
+        15, null),
+    -- register: rendered on /register, not the home page. heading = privacy title,
+    -- body = privacy statement, excerpt = agreement checkbox sentence,
+    -- subheading = full privacy policy link (null hides it until GANZ send one)
+    ('register',
+        'Privacy',
+        null,
+        'The information you provide will be used to administer your conference registration, arrange catering and accessibility requirements, process payments and communicate important conference information. Access to personal information will be limited to those who need it for these purposes, in accordance with GANZ''s applicable privacy obligations.',
+        'I have read and agree to the above privacy and registration and cancellation terms. I understand that conference registrations are non-refundable.',
+        16, null);
 
 -- Top-level stat items
 insert into public.stat_items (label, value, style, description, sort_order, section_id) values

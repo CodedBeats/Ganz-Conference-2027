@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { RegistrationForm, type RegistrationFormProps } from "../src/components/register/RegistrationForm";
-import { JOIN_GANZ_URL } from "../src/lib/registration/config";
-import { PRIVACY_STATEMENT } from "../src/lib/registration/policy";
+import { APPROVAL_TURNAROUND, JOIN_GANZ_URL, MEMBERSHIP_CHECK_FAILED_NOTE } from "../src/lib/registration/config";
+import { DEFAULT_POLICY_AGREEMENT } from "../src/lib/registration/policy";
 import { MEMBERSHIP_CHOICE_LABELS } from "../src/lib/registration/options";
 import { toRegistrationOffer } from "../src/lib/registration/quote";
 import type { RegistrationPreviewResult } from "../src/lib/registration/schema";
@@ -24,11 +24,8 @@ const renderForm = (overrides: Partial<RegistrationFormProps> = {}) => {
         <RegistrationForm
             action={action}
             offer={toRegistrationOffer(makePricing())}
-            policy={{
-                privacy: PRIVACY_STATEMENT,
-                items: [{ title: "Refund & Cancellation Policy", paragraphs: ["Registrations are non-refundable."] }],
-                version: "abc123def456",
-            }}
+            policy={{ agreement: DEFAULT_POLICY_AGREEMENT, version: "abc123def456" }}
+            terms={<p>The registration terms</p>}
             preselection={{}}
             {...overrides}
         />,
@@ -85,6 +82,20 @@ describe("RegistrationForm", () => {
 
         fireEvent.click(membership("non_member"));
         expect(screen.queryByLabelText("Name you joined GANZ with")).toBeNull();
+    });
+
+    it("tells members the registration stays pending, and what happens if the check fails", () => {
+        renderForm();
+        expect(screen.queryByText(MEMBERSHIP_CHECK_FAILED_NOTE)).toBeNull();
+
+        for (const choice of ["current_member", "joining_member"] as const) {
+            fireEvent.click(membership(choice));
+            expect(screen.getByText(new RegExp(`${APPROVAL_TURNAROUND.label}.*stays pending`))).toBeTruthy();
+            expect(screen.getByText(MEMBERSHIP_CHECK_FAILED_NOTE)).toBeTruthy();
+        }
+
+        fireEvent.click(membership("non_member"));
+        expect(screen.queryByText(MEMBERSHIP_CHECK_FAILED_NOTE)).toBeNull();
     });
 
     it("shows people joining GANZ the Join link, opening in a new tab", () => {
@@ -177,12 +188,11 @@ describe("RegistrationForm", () => {
         expect(within(alert).getByRole("button", { name: "Reload the page" })).toBeTruthy();
     });
 
-    it("shows the privacy statement before the refund and cancellation policy", () => {
-        renderForm();
-        const privacy = screen.getByRole("heading", { name: "Privacy" });
-        const refund = screen.getByRole("heading", { name: "Refund & Cancellation Policy" });
-        expect(privacy.compareDocumentPosition(refund) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-        expect(screen.getByText(/used to administer your conference registration/)).toBeTruthy();
+    it("shows the terms above the agreement checkbox, labelled with the CMS sentence", () => {
+        renderForm({ policy: { agreement: "I agree to the edited terms.", version: "abc123def456" } });
+        const terms = screen.getByText("The registration terms");
+        const checkbox = screen.getByRole("checkbox", { name: "I agree to the edited terms." });
+        expect(terms.compareDocumentPosition(checkbox) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
 
     it("can't be submitted when prices couldn't be loaded", () => {

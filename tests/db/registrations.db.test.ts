@@ -227,6 +227,44 @@ describe.runIf(isDbMode)("registration tables (local DB)", () => {
             expect(await placesLeft()).toBe(0);
         });
 
+        it("shares the 27 between members and non-members", async () => {
+            const asMember = (email: string) =>
+                workshopArgs({
+                    p_membership_choice: "current_member",
+                    p_email: email,
+                    p_membership_name: "Test Attendee",
+                    p_membership_email: email,
+                });
+
+            await fillTo(14);
+            for (let i = 0; i < 13; i++) await createPending(asMember(`member${i}@example.com`));
+            expect(await placesLeft()).toBe(0);
+
+            for (const late of [asMember("late.member@example.com"), workshopArgs({ p_email: "late@example.com" })]) {
+                const { error } = await secret.rpc("create_pending_registration", late);
+                expect(error && toPendingRegistrationError(error)).toBe("sold_out");
+            }
+        });
+
+        it("shares the 27 between Early Bird and Full", async () => {
+            await fillTo(26);
+            try {
+                await secret.from("registration_settings").update({ current_tier: "full" }).eq("id", true);
+
+                const last = await createPending(workshopArgs({ p_quoted_tier: "full", p_email: "full.price@example.com" }));
+                expect(last.tier).toBe("full");
+                expect(await placesLeft()).toBe(0);
+
+                const { error } = await secret.rpc(
+                    "create_pending_registration",
+                    workshopArgs({ p_quoted_tier: "full", p_email: "late@example.com" }),
+                );
+                expect(error && toPendingRegistrationError(error)).toBe("sold_out");
+            } finally {
+                await secret.from("registration_settings").update({ current_tier: "early_bird" }).eq("id", true);
+            }
+        });
+
         it("releases the place of an abandoned or expired checkout", async () => {
             await fillTo(27);
             const { data } = await secret.from("registrations").select("id").limit(2);

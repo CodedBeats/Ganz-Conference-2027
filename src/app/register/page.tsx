@@ -4,6 +4,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { CmsPage } from "@/components/cms/CmsPage";
 import { SectionTag } from "@/components/shared/SectionTag";
+import { RegisterTerms } from "@/components/register/RegisterTerms";
 import { RegistrationForm } from "@/components/register/RegistrationForm";
 import { getPageContent } from "@/lib/content/getPageContent";
 import { getRegisterCta } from "@/lib/content/site";
@@ -25,7 +26,7 @@ const RegisterPage = async ({ searchParams }: PageProps<"/register">) => {
     await requireAdmin();
 
     const [content, pricing, query] = await Promise.all([getPageContent(), getPricing(), searchParams]);
-    const policy = await getRegistrationPolicy(content.policies);
+    const policy = await getRegistrationPolicy(content.policies, content.register);
 
     return (
         <CmsPage>
@@ -44,7 +45,8 @@ const RegisterPage = async ({ searchParams }: PageProps<"/register">) => {
                 <RegistrationForm
                     action={submitRegistration}
                     offer={toRegistrationOffer(pricing)}
-                    policy={{ privacy: policy.privacy, items: policy.items, version: policy.version }}
+                    policy={{ agreement: policy.agreement, version: policy.version }}
+                    terms={<RegisterTerms registerSection={content.register} policiesSection={content.policies} policy={policy} />}
                     preselection={parseRegisterSearchParams(query)}
                 />
             </main>

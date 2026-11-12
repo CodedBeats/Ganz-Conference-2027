@@ -54,7 +54,7 @@ export async function submitRegistration(
 
     const [content, pricing] = await Promise.all([getPageContent(), getPricing()]);
 
-    const policy = await getRegistrationPolicy(content.policies);
+    const policy = await getRegistrationPolicy(content.policies, content.register);
     if (input.policyVersion !== policy.version) return { status: "error", error: "policy_changed" };
 
     const quote = quoteRegistration(input, pricing);
