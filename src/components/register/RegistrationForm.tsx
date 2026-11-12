@@ -1,10 +1,13 @@
 "use client";
 
-import { useRef, useState, useTransition, type FormEvent, type Ref } from "react";
+import { useRef, useState, useTransition, type FormEvent, type ReactNode, type Ref } from "react";
 import { cn } from "@/lib/utils";
-import { RichText } from "@/components/shared/RichText";
-import { EVENT } from "@/lib/content/site";
-import { APPROVAL_TURNAROUND, JOIN_GANZ_NOTE, JOIN_GANZ_URL, PRIVACY_POLICY_URL } from "@/lib/registration/config";
+import {
+    APPROVAL_TURNAROUND,
+    JOIN_GANZ_NOTE,
+    JOIN_GANZ_URL,
+    MEMBERSHIP_CHECK_FAILED_NOTE,
+} from "@/lib/registration/config";
 import { formDataToRegistrationInput, REGISTER_FIELD_NAMES } from "@/lib/registration/formData";
 import {
     AUDIENCE_LABELS,
@@ -27,7 +30,6 @@ import {
     type TicketOption,
 } from "@/lib/registration/options";
 import type { RegisterPreselection } from "@/lib/registration/params";
-import type { PolicyItem } from "@/lib/registration/policy";
 import type { RegistrationOffer } from "@/lib/registration/quote";
 import {
     CREATE_REGISTRATION_ERROR_MESSAGES,
@@ -52,16 +54,17 @@ import {
     INPUT_CLASS,
 } from "./FormFields";
 
-/** The exact wording of the agreement checkbox (Michelle's form, Q13). */
-const POLICY_AGREEMENT =
-    "I have read and agree to the above privacy and registration and cancellation terms. I understand that conference registrations are non-refundable.";
-
 export interface RegistrationFormProps {
     /** `submitRegistration`, passed in from the page so this component never imports server code. */
     action: (previous: RegistrationPreviewResult, formData: FormData) => Promise<RegistrationPreviewResult>;
     offer: RegistrationOffer;
-    /** The privacy statement, then the CMS terms, and the version the server will check. */
-    policy: { privacy: PolicyItem; items: PolicyItem[]; version: string };
+    /** The agreement checkbox sentence, and the version of the terms the server will check. */
+    policy: { agreement: string; version: string };
+    /**
+     * The privacy statement and terms, shown above the agreement checkbox. Rendered by the page
+     * (`RegisterTerms`) so admins can edit it in place, which this client component can't do itself.
+     */
+    terms: ReactNode;
     /** From the `/register?option=…&audience=…` link; the person can change both. */
     preselection: RegisterPreselection;
 }
@@ -145,7 +148,7 @@ const placesLeftText = (placesLeft: number) =>
  * Values are controlled state so they survive a refused submission, and the first field with an
  * error is focused after each attempt.
  */
-export const RegistrationForm = ({ action, offer, policy, preselection }: RegistrationFormProps) => {
+export const RegistrationForm = ({ action, offer, policy, terms, preselection }: RegistrationFormProps) => {
     const [values, setValues] = useState<Values>(() => initialValues(preselection, offer));
     const [fieldErrors, setFieldErrors] = useState<RegistrationFieldErrors>({});
     const [result, setResult] = useState<RegistrationPreviewResult>({ status: "idle" });
@@ -273,10 +276,14 @@ export const RegistrationForm = ({ action, offer, policy, preselection }: Regist
 
                     {isMember && (
                         <div className="space-y-4 rounded-2xl border border-teal-dark/10 px-5 py-5">
-                            <p className="text-base leading-relaxed text-teal-dark/80">
-                                GANZ will check your membership after you pay, using the name and email you joined with.
-                                This usually takes {APPROVAL_TURNAROUND.label}.
-                            </p>
+                            <div className="space-y-2 text-base leading-relaxed text-teal-dark/80">
+                                <p>
+                                    GANZ will check your membership after you pay, using the name and email you joined with.
+                                    This usually takes {APPROVAL_TURNAROUND.label}, and your registration stays pending until
+                                    GANZ confirm your membership.
+                                </p>
+                                <p>{MEMBERSHIP_CHECK_FAILED_NOTE}</p>
+                            </div>
                             <button type="button" onClick={copyMyDetails} className="text-sm font-medium text-teal underline underline-offset-4">
                                 Same as my details below
                             </button>
@@ -519,7 +526,7 @@ export const RegistrationForm = ({ action, offer, policy, preselection }: Regist
 
                 {/* Section 6: privacy and terms */}
                 <FormSection number={6} title="Privacy and registration terms">
-                    <PolicyText privacy={policy.privacy} items={policy.items} />
+                    {terms}
                     <div>
                         <label className={cn(CHOICE_CLASS, "bg-cream")}>
                             <input
@@ -531,7 +538,7 @@ export const RegistrationForm = ({ action, offer, policy, preselection }: Regist
                                 {...errorProps("policyAccepted", errorsFor("policyAccepted"))}
                                 className={CHOICE_INPUT_CLASS}
                             />
-                            <span className="font-medium">{POLICY_AGREEMENT}</span>
+                            <span className="font-medium">{policy.agreement}</span>
                         </label>
                         <FieldError path="policyAccepted" errors={errorsFor("policyAccepted")} />
                     </div>
@@ -573,43 +580,6 @@ const SummaryRow = ({ label, value }: { label: string; value: string | null }) =
     <div className="flex items-baseline justify-between gap-4">
         <dt className="text-cream/70">{label}</dt>
         <dd className="text-right font-medium">{value ?? "-"}</dd>
-    </div>
-);
-
-const PolicyBlock = ({ item }: { item: PolicyItem }) => (
-    <div>
-        <h3 className="mb-2 text-lg font-medium">{item.title}</h3>
-        <div className="space-y-3">
-            {item.paragraphs.map((paragraph, index) => (
-                <p key={index} className="text-base leading-relaxed text-teal-dark/80">
-                    <RichText text={paragraph} accentClassName="font-medium text-teal" />
-                </p>
-            ))}
-        </div>
-    </div>
-);
-
-// the privacy statement first, then the CMS terms (or a link to /policies if they're unpublished)
-const PolicyText = ({ privacy, items }: { privacy: PolicyItem; items: PolicyItem[] }) => (
-    <div className="space-y-6">
-        <PolicyBlock item={privacy} />
-        {items.length === 0 && (
-            <p className="text-base leading-relaxed text-teal-dark/80">
-                Please read our{" "}
-                <a href={EVENT.policiesHref} target="_blank" rel="noopener noreferrer" className="text-teal underline underline-offset-4">
-                    terms and policies
-                </a>{" "}
-                before registering.
-            </p>
-        )}
-        {items.map((item) => (
-            <PolicyBlock key={item.title} item={item} />
-        ))}
-        {PRIVACY_POLICY_URL && (
-            <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer" className="inline-block text-teal underline underline-offset-4">
-                Read the full privacy policy (opens in a new tab)
-            </a>
-        )}
     </div>
 );
 
