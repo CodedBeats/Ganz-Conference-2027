@@ -19,7 +19,8 @@ export interface NavLink {
 
 /**
  * Every section `type` the site knows how to render. Matches each section's DOM id
- * (`footer` has none). `policies` is the one that renders on `/policies` instead of the home page.
+ * (`footer` has none). Two don't render on the home page: `policies` renders on `/policies`, and
+ * `register` (the privacy statement, agreement sentence and privacy policy link) renders on `/register`.
  */
 export const SECTION_TYPES = [
     "hero",
@@ -37,6 +38,7 @@ export const SECTION_TYPES = [
     "contact",
     "footer",
     "policies",
+    "register",
 ] as const;
 
 export type SectionType = (typeof SECTION_TYPES)[number];
